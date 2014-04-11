@@ -1,11 +1,28 @@
+from copy import deepcopy
+
+
 class Node:
 
     def __init__(self, name="", nodeId=-1):
-        self.name = name
-        self.nodeId = nodeId
+        self._name = name
+        self._nodeId = nodeId
 
-    @classmethod
-    def fromNode(cls, node):
-        name = node.name.copy()
-        nodeId = node.nodeId.copy()
-        return cls(name, nodeId)
+    @property
+    def name(self):
+        '''
+        Returns the name of the node
+        '''
+        return self._name
+
+    @property
+    def nodeId(self):
+        '''
+        Returns the id of the node
+        '''
+        return self._nodeId
+
+    def copy(self):
+        '''
+        Returns a ccopy of the node
+        '''
+        return deepcopy(self)

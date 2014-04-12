@@ -1,7 +1,7 @@
 from copy import deepcopy
 
-from . import node
-from . import hyperedge
+from node import Node
+from hyperedge import HyperEdge
 
 
 class HyperGraph:
@@ -29,11 +29,22 @@ class HyperGraph:
         Adds a node to the graph.
         '''
         try:
-            assert isinstance(n, node.Node)
+            assert isinstance(n, Node)
         except AssertionError:
             raise ValueError('Invalid node %s' % n)
 
-        self._nodes.add(node)
+        self._nodes.add(n)
+
+    def get_node_by_name(self, nodeName):
+        '''
+        Get node by nodeName, otherwise returns None
+        Node names should be unique
+        '''
+        for n in self.nodes:
+            if n.name == nodeName:
+                return n
+        return None
+
 
     def remove_hypernode(self, n):
         '''
@@ -49,16 +60,20 @@ class HyperGraph:
         '''
 
         try:
-            assert isinstance(h, hyperedge.HyperEdge)
+            assert isinstance(h, HyperEdge)
         except AssertionError:
-            raise ValueError('Invalid hyperedge %s' % h)
-
+            #raise ValueError('Invalid hyperedge %s' % h)
+            raise ValueError('Invalid hyperedge {}'.format(h))
+       
         self._hyperedges.add(h)
+        '''
+        # nodes will be already be added before the edge
         self._nodes.update(h.head)
         if isinstance(h.tail, set):
             self._nodes.update(h.tail)
         else:
             self._nodes.add(h.tail)
+        '''
 
     def remove_hyperedge(self, h):
         '''
@@ -71,6 +86,12 @@ class HyperGraph:
         Returns a copy of the graph
         '''
         return deepcopy(self)
+    
+    def printGraph(self):
+        i = 1
+        for h in self._hyperedges:
+            print("Edge {}: Tail: {}, Head: {}".format(i, h.tail, h.head))
+            i +=1
 
 
 class DirectedHyperGraph(HyperGraph):

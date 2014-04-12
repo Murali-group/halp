@@ -1,7 +1,5 @@
 from copy import deepcopy
-
-from . import node
-
+from node import Node
 
 class HyperEdge:
 
@@ -22,7 +20,7 @@ class HyperEdge:
         '''
         Returns the edge tail
         '''
-        return set(self._tail)
+        return self._tail
 
     @property
     def head(self):

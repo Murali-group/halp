@@ -1,6 +1,5 @@
 from copy import deepcopy
 
-
 class Node:
 
     def __init__(self, name="", nodeId=-1):
@@ -26,3 +25,9 @@ class Node:
         Returns a ccopy of the node
         '''
         return deepcopy(self)
+
+    def __repr__(self):
+        return self._name
+
+    def __str__(self):
+        return self._name

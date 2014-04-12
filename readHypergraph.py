@@ -26,14 +26,17 @@ def readDirectedGraph(fileName, sep='\t', delim=','):
         line = line.strip('\n')
         if line=="": continue   # skip empty lines
         words = line.split(sep)
-        if len(words) != 2:
+        if not (2 <= len(words) <= 3):
             raise Exception('File format error at line {}'.format(i))
         i+=1
         tail = words[0].split(delim)
         head = words[1].split(delim)
+        try:
+           weight = float(words[2].split(delim)[0])
+        except: weight = 0
        
         # Create hypergraph from current line
-        hyperedge = HyperEdge(set(),set())
+        hyperedge = HyperEdge(set(),set(), weight)
        
         # Read Tail nodes
         for t in tail:

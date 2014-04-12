@@ -90,7 +90,7 @@ class HyperGraph:
     def printGraph(self):
         i = 1
         for h in self._hyperedges:
-            print("Edge {}: Tail: {}, Head: {}".format(i, h.tail, h.head))
+            print("Edge {}: Tail: {}, Head: {}, weight: {}".format(i, h.tail, h.head, h.weight))
             i +=1
 
 

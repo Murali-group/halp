@@ -59,3 +59,31 @@ class DirectedHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=set(), weight=0):
         HyperEdge.__init__(head, tail, weight)
+
+
+class UndirectedHyperEdge(HyperEdge):
+    '''
+        In an undirected hyperedge, the head of parent class contains all nodes
+        and the tail is empty.
+        head and tail properties are disabled by raising exception when called 
+        (since python has no private property like c or java)
+        To get the nodes inside the UndirectedHyperEdge used the 'nodes' property
+    '''
+    def __init__(self, nodes=set(), weight=0):
+        HyperEdge.__init__(self, nodes, set(), weight)
+
+    @property
+    def nodes(self):
+        ''' Returns the edge nodes (stored in the head set) '''
+        return self._head
+
+    @property
+    def head(self):
+        ''' Disable  head property'''
+        raise AttributeError("Undirected HyperGraph has no attribute head")
+
+    @property
+    def tail(self):
+        ''' Disable tail property'''
+        raise AttributeError("Undirected HyperGraph has no attribute tail")
+    

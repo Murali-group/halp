@@ -54,11 +54,47 @@ class HyperGraph:
         '''
         pass
 
-    def add_hyperedge(self, h):
+    def add_hyperedge(self, *args):
         '''
         Adds a hyperedge to the graph.
+        Can be called with HyperEdge object or with edge names
+        This method chooses the right class to call to hide this task 
+        complexity from the user.
+        usage:
+            graph.add_hypergraph(hypergraph)
+        or
+            directedGraph.add_hypergraph(head, tail, weight)
+            where:
+                head = {'x1', 'x2', ...}
+                tail = {'x4', 'x6', ...}
+         or
+            undirectedGraph.add_hypergraph(nodes, weight)
+            where:
+                nodes = {'x1', 'x2', ...}         
         '''
-
+        if (len(args)==1):
+            if (isinstance(args[0], HyperEdge)):
+                self.add_hyperedgeByObject(args[0])
+            else:
+                self.add_hyperedgeByNames( args[0])
+        elif (len(args)==2):
+            self.add_hyperedgeByNames(args[0], args[1])
+        elif (len(args)==3):
+            self.add_hyperedgeByNames(args[0], args[1], args[2])
+        else:
+            raise ValueError('Invalid number of arguments {}'.format(len(args)))
+            
+    def add_hyperedgeByNames(self, **args):
+        '''
+            Add a hypergraph given the nodes names of the edge
+            implimented in directed/undirected classes
+        '''
+        pass
+        
+    def add_hyperedgeByObject(self, h):
+        '''
+        Adds a hyperedge to the graph as a class h of HyperEdge.
+        '''
         try:
             assert isinstance(h, HyperEdge)
         except AssertionError:
@@ -108,6 +144,31 @@ class DirectedHyperGraph(HyperGraph):
             print("Edge {}: Tail: {}, Head: {}, weight: {}".format(i, h.tail, h.head, h.weight))
             i +=1
 
+    def add_hyperedgeByNames(self, head=set(), tail=set(), weight=0):
+        '''
+        Adds a hyperedge to the graph by node names.
+        '''
+         # Create hypergraph from current line
+        hyperedge = HyperEdge(set(),set(), weight)
+           
+        # Read Tail nodes
+        for t in tail:
+            node = self.get_node_by_name(t)
+            if (node == None):
+                node = Node(t)
+                self.add_node(node)
+            hyperedge.tail.add(node)
+        
+        # Read Head nodes
+        for h in head:
+            node = self.get_node_by_name(h)
+            if (node == None):
+                node = Node(h)
+                self.add_node(node)
+            hyperedge.head.add(node)
+        
+        self.add_hyperedge(hyperedge)          
+
     def readDirectedGraph(self, fileName, sep='\t', delim=','):
         '''
             Read a directed hypergraph from file FileName
@@ -133,25 +194,8 @@ class DirectedHyperGraph(HyperGraph):
                weight = float(words[2].split(delim)[0])
             except: weight = 0
            
-            # Create hypergraph from current line
-            hyperedge = HyperEdge(set(),set(), weight)
-           
-            # Read Tail nodes
-            for t in tail:
-                node = self.get_node_by_name(t)
-                if (node == None):
-                    node = Node(t)
-                    self.add_node(node)
-                hyperedge.tail.add(node)
-            
-            # Read Head nodes
-            for h in head:
-                node = self.get_node_by_name(h)
-                if (node == None):
-                    node = Node(h)
-                    self.add_node(node)
-                hyperedge.head.add(node)
-            self.add_hyperedge(hyperedge)              
+            # Create hypergraph from current line            
+            self.add_hyperedge(head, tail, weight)              
 
 class DirectedHyperArcGraph(HyperGraph):
     pass
@@ -168,6 +212,23 @@ class UndirectedHyperGraph(HyperGraph):
         for h in self._hyperedges:
             print("Edge {}: Nodes: {}, weight: {}".format(i, h.nodes, h.weight))
             i +=1
+    
+    def add_hyperedgeByNames(self, nodes=set(), weight=0):
+        '''
+        Adds a hyperedge to the graph by node names.
+        '''
+        # Create hypergraph from current line
+        hyperedge = UndirectedHyperEdge(set(), weight)
+           
+        # Read edge nodes
+        for n in nodes:
+            node = self.get_node_by_name(n)
+            if (node==None):
+                node = Node(n)
+                self.add_node(node)
+            hyperedge.nodes.add(node)
+       
+        self.add_hyperedge(hyperedge)     
     
     def readUnDirectedGraph(self, fileName, sep='\t', delim=','):
         '''
@@ -193,15 +254,5 @@ class UndirectedHyperGraph(HyperGraph):
                weight = float(words[1].split(delim)[0])
             except: weight = 0
            
-            # Create hypergraph from current line
-            hyperedge = UndirectedHyperEdge(set(), weight)
-           
-            # Read edge nodes
-            for n in nodes:
-                node = self.get_node_by_name(n)
-                if (node==None):
-                    node = Node(n)
-                    self.add_node(node)
-                hyperedge.nodes.add(node)
-           
-            self.add_hyperedge(hyperedge)
+            # Create hypergraph from current line           
+            self.add_hyperedge(nodes, weight)

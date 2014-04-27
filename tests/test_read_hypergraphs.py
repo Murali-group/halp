@@ -1,13 +1,16 @@
-from hypergraph import *
+from hypergraph.hypergraph import *
 
-def main():
+def test_example():
+    assert 1 == 1
+
+def test_read():
     '''
         Test reading directed and undirected hypergraphs from files, 
         and add edges with and without weights.
     '''
     # read directed hypergraph
     directedHyperGraph = DirectedHyperGraph()
-    directedHyperGraph.readDirectedGraph('./data/dirhypergraph.txt')
+    directedHyperGraph.readDirectedGraph('tests/data/dirhypergraph.txt')
     
      # modify graph
     directedHyperGraph.add_hyperedge({'x2','x6'}, {'v7'}, 3.1)
@@ -19,7 +22,7 @@ def main():
     
     # read Undirected hypergraph
     undirectedHyperGraph = UndirectedHyperGraph()
-    undirectedHyperGraph.readUnDirectedGraph('./data/unDirhypergraph.txt')
+    undirectedHyperGraph.readUnDirectedGraph('tests/data/UnDirhypergraph.txt')
     
     # modify graph
     undirectedHyperGraph.add_hyperedge({'v2','v6','v7'}, 2)

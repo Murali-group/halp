@@ -1,8 +1,7 @@
 language: python
 python:
   - "2.7"
-  - "2.6"
-  - "3.2"
+  - "3.4"
 install: pip install coveralls
 script: coverage run --source=hypergraph setup.py test
 after_success:

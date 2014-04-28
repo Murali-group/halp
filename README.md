@@ -1,3 +1,8 @@
+[![Build
+Status](https://travis-ci.org/tmmurali/hypergraph.svg?branch=master)](https://travis-ci.org/tmmurali/hypergraph)
+[![Coverage
+Status](https://coveralls.io/repos/tmmurali/hypergraph/badge.png?branch=master)](https://coveralls.io/r/tmmurali/hypergraph?branch=master)
+
 hypergraph
 ==========
 

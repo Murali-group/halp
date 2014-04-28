@@ -1,5 +1,7 @@
+from __future__ import absolute_import
+
 from copy import deepcopy
-from node import Node
+from .node import Node
 
 class HyperEdge:
 
@@ -86,4 +88,3 @@ class UndirectedHyperEdge(HyperEdge):
     def tail(self):
         ''' Disable tail property'''
         raise AttributeError("Undirected HyperGraph has no attribute tail")
-    

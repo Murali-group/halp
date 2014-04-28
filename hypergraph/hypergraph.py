@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from copy import deepcopy
 
-from node import Node
-from hyperedge import *
+from .node import Node
+from .hyperedge import *
 
 
 class HyperGraph:

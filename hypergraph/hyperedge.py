@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from copy import deepcopy
 from .node import Node
 
+
 class HyperEdge:
 
     def __init__(self, head=set(), tail=set(), weight=0):
@@ -51,7 +52,7 @@ class DirectedHyperArc(HyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):
         try:
-            assert isinstance(tail, node.Node)
+            assert isinstance(tail, Node)
         except:
             raise ValueError("Invalid tail node %s", tail)
         HyperEdge.__init__(head, tail, weight)
@@ -64,13 +65,16 @@ class DirectedHyperEdge(HyperEdge):
 
 
 class UndirectedHyperEdge(HyperEdge):
+
     '''
         In an undirected hyperedge, the head of parent class contains all nodes
         and the tail is empty.
-        head and tail properties are disabled by raising exception when called 
+        head and tail properties are disabled by raising exception when called
         (since python has no private property like c or java)
-        To get the nodes inside the UndirectedHyperEdge used the 'nodes' property
+        To get the nodes inside the UndirectedHyperEdge
+        used the 'nodes' property.
     '''
+
     def __init__(self, nodes=set(), weight=0):
         HyperEdge.__init__(self, nodes, set(), weight)
 

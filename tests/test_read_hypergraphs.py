@@ -1,4 +1,5 @@
-from hypergraph.hypergraph import DirectedHyperGraph, UndirectedHyperGraph
+from hypergraph.directedHyperGraph import DirectedHyperGraph
+from hypergraph.undirectedHyperGraph import UndirectedHyperGraph 
 
 
 def test_example():

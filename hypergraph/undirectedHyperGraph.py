@@ -78,13 +78,13 @@ class UndirectedHyperGraph(HyperGraph):
         fout = open(fileName, 'w')
 
         # write first header line
-        fout.write("Edge"+ sep+"weight\n")
-       
+        fout.write("Edge" + sep + "weight\n")
+
         for e in self.hyperedges:
             line = ""
             for n in e.nodes:
-               line+=n.name + delim
-            line = line[:-1]    # remove last extra delim                     
-            line+=sep + str(e.weight) + "\n"
-            fout.write(line)            
+                line += n.name + delim
+            line = line[:-1]    # remove last extra delim
+            line += sep + str(e.weight) + "\n"
+            fout.write(line)
         fout.close()

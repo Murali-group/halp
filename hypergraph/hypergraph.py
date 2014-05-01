@@ -47,6 +47,25 @@ class HyperGraph:
                 return n
         return None
 
+    def get_nodes_by_name(self, node_names):
+        '''
+        Takes a set of names and returns the corresponding set of node objects
+        '''
+        node_set = set()
+        for node in self.nodes:
+            if node.name in node_names:
+                node_set.add(node)
+        return node_set
+
+    def get_node_names(self):
+        '''
+        Helper function to return the names of all the nodes in the graph
+        '''
+        name_set = set()
+        for node in self.nodes:
+            set.add(node.name)
+        return name_set
+
     def remove_hypernode(self, n):
         '''
         Removes a hypernode from the graph.
@@ -125,146 +144,15 @@ class HyperGraph:
         '''
         return deepcopy(self)
 
-    def readDirectedHyperGraph(self):
+    def read(self):
         pass
 
-    def readUndirectedHyperGraph(self):
+    def write(self):
         pass
 
     def printGraph(self):
         pass
-
-'''----------------------- Directed HyperGraph -----------------------------'''
-
-
-class DirectedHyperGraph(HyperGraph):
-
-    def __init__(self, nodes=set(), hyperedges=set()):
-        HyperGraph.__init__(self, nodes, hyperedges)
-
-    def printGraph(self):
-        i = 1
-        for h in self._hyperedges:
-            print("Edge {}: Tail: {}, Head: {}, weight: {}".format(
-                i, h.tail, h.head, h.weight))
-            i += 1
-
-    def add_hyperedgeByNames(self, head=set(), tail=set(), weight=0):
-        '''
-        Adds a hyperedge to the graph by node names.
-        '''
-        # Create hypergraph from current line
-        hyperedge = HyperEdge(set(), set(), weight)
-
-        # Read Tail nodes
-        for t in tail:
-            node = self.get_node_by_name(t)
-            if (node is None):
-                node = Node(t)
-                self.add_node(node)
-            hyperedge.tail.add(node)
-
-        # Read Head nodes
-        for h in head:
-            node = self.get_node_by_name(h)
-            if (node is None):
-                node = Node(h)
-                self.add_node(node)
-            hyperedge.head.add(node)
-
-        self.add_hyperedge(hyperedge)
-
-    def readDirectedGraph(self, fileName, sep='\t', delim=','):
-        '''
-            Read a directed hypergraph from file FileName
-            each row is a hyperEdge.
-            Tail, head and weight are separated by "sep"
-            nodes within a hypernode are separated by "delim"
-        '''
-        fin = open(fileName, 'r')
-
-        # read first header line
-        fin.readline()
-        i = 1
-        for line in fin.readlines():
-            line = line.strip('\n')
-            if line == "":
-                continue   # skip empty lines
-            words = line.split(sep)
-            if not (2 <= len(words) <= 3):
-                raise Exception('File format error at line {}'.format(i))
-            i += 1
-            tail = words[0].split(delim)
-            head = words[1].split(delim)
-            try:
-                weight = float(words[2].split(delim)[0])
-            except:
-                weight = 0
-
-            # Create hypergraph from current line
-            self.add_hyperedge(head, tail, weight)
 
 
 class DirectedHyperArcGraph(HyperGraph):
     pass
-
-'''----------------------- UnDirected HyperGraph ---------------------------'''
-
-
-class UndirectedHyperGraph(HyperGraph):
-
-    def __init__(self, nodes=set(), hyperedges=set()):
-        HyperGraph.__init__(self, nodes, hyperedges)
-
-    def printGraph(self):
-        i = 1
-        for h in self._hyperedges:
-            print(
-                "Edge {}: Nodes: {}, weight: {}".format(i, h.nodes, h.weight))
-            i += 1
-
-    def add_hyperedgeByNames(self, nodes=set(), weight=0):
-        '''
-        Adds a hyperedge to the graph by node names.
-        '''
-        # Create hypergraph from current line
-        hyperedge = UndirectedHyperEdge(set(), weight)
-
-        # Read edge nodes
-        for n in nodes:
-            node = self.get_node_by_name(n)
-            if (node is None):
-                node = Node(n)
-                self.add_node(node)
-            hyperedge.nodes.add(node)
-
-        self.add_hyperedge(hyperedge)
-
-    def readUnDirectedGraph(self, fileName, sep='\t', delim=','):
-        '''
-            Read an undirected hypergraph from file FileName
-            each row is a hyperEdge.
-            nodes and weight are separated by "sep"
-            nodes within a hyperedge are separated by "delim"
-        '''
-        fin = open(fileName, 'r')
-
-        # read first header line
-        fin.readline()
-        i = 1
-        for line in fin.readlines():
-            line = line.strip('\n')
-            if line == "":
-                continue   # skip empty lines
-            words = line.split(sep)
-            if not (1 <= len(words) <= 2):
-                raise Exception('File format error at line {}'.format(i))
-            i += 1
-            nodes = words[0].split(delim)
-            try:
-                weight = float(words[1].split(delim)[0])
-            except:
-                weight = 0
-
-            # Create hypergraph from current line
-            self.add_hyperedge(nodes, weight)

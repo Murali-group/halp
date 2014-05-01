@@ -1,0 +1,5 @@
+Tail	Head	weight
+x2	x4	0
+x4	x5	0
+x1	x3,x2	6.0
+x3,x1	x5	8.0

@@ -38,7 +38,7 @@ class UndirectedHyperGraph(HyperGraph):
 
         self.add_hyperedge(hyperedge)
 
-    def readUnDirectedGraph(self, fileName, sep='\t', delim=','):
+    def read(self, fileName, sep='\t', delim=','):
         '''
             Read an undirected hypergraph from file FileName
             each row is a hyperEdge.
@@ -66,6 +66,25 @@ class UndirectedHyperGraph(HyperGraph):
 
             # Create hypergraph from current line
             self.add_hyperedge(nodes, weight)
+        fin.close()
 
-    def writeUndirectedHyperGraph(self, fileName, sep='\t', delim=','):
-        pass
+    def write(self, fileName, sep='\t', delim=','):
+        '''
+            write an undirected hypergraph to file FileName
+            each row is a hyperEdge.
+            Tail, head and weight are separated by "sep"
+            nodes within a hypernode are separated by "delim"
+        '''
+        fout = open(fileName, 'w')
+
+        # write first header line
+        fout.write("Edge"+ sep+"weight\n")
+       
+        for e in self.hyperedges:
+            line = ""
+            for n in e.nodes:
+               line+=n.name + delim
+            line = line[:-1]    # remove last extra delim                     
+            line+=sep + str(e.weight) + "\n"
+            fout.write(line)            
+        fout.close()

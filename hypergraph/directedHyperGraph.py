@@ -46,7 +46,7 @@ class DirectedHyperGraph(HyperGraph):
 
         self.add_hyperedge(hyperedge)
 
-    def readDirectedGraph(self, fileName, sep='\t', delim=','):
+    def read(self, fileName, sep='\t', delim=','):
         '''
             Read a directed hypergraph from file FileName
             each row is a hyperEdge.
@@ -75,6 +75,32 @@ class DirectedHyperGraph(HyperGraph):
 
             # Create hypergraph from current line
             self.add_hyperedge(head, tail, weight)
+        fin.close()
+
+    def write(self, fileName, sep='\t', delim=','):
+        '''
+            write a directed hypergraph to file FileName
+            each row is a hyperEdge.
+            Tail, head and weight are separated by "sep"
+            nodes within a hypernode are separated by "delim"
+        '''
+        fout = open(fileName, 'w')
+
+        # write first header line
+        fout.write("Tail"+ sep+"Head"+ sep+"weight\n")
+       
+        for e in self.hyperedges:
+            line = ""
+            for t in e.tail:
+               line+=t.name + delim
+            line = line[:-1]    # remove last extra delim
+            line+=sep           # add separetor between columns
+            for h in e.head:
+               line+=h.name + delim
+            line = line[:-1]    # remove last extra delim
+            line+=sep + str(e.weight) + "\n"
+            fout.write(line)            
+        fout.close()
 
     def symmetric_image(self):
         '''
@@ -88,10 +114,7 @@ class DirectedHyperGraph(HyperGraph):
             e._tail, e._head = e.head, e.tail
         # what if it's now a DirectedHyperArcGraph?
         return DirectedHyperGraph(nodes, hyperedges)
-
-    def writeDirectedHyperGraph(self, fileName, sep='\t', delim=','):
-        pass
-
+ 
     def b_visit(self, s):
         '''
         Returns the set of all nodes that are B-Connected to s

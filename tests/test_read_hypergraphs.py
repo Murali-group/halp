@@ -10,7 +10,7 @@ def test_read_directedgraph():
     '''
     # read directed hypergraph
     directedHyperGraph = DirectedHyperGraph(set(), set())
-    directedHyperGraph.readDirectedGraph('tests/data/dirhypergraph.txt')
+    directedHyperGraph.read('tests/data/dirhypergraph.txt')
 
     assert len(directedHyperGraph.nodes) == 5
     assert len(directedHyperGraph.hyperedges) == 4   
@@ -34,7 +34,7 @@ def test_read_undirectedgraph():
     '''    
     # read Undirected hypergraph
     undirectedHyperGraph = UndirectedHyperGraph(set(), set())
-    undirectedHyperGraph.readUnDirectedGraph('tests/data/UnDirhypergraph.txt')
+    undirectedHyperGraph.read('tests/data/UnDirhypergraph.txt')
 
     assert len(undirectedHyperGraph.nodes) == 6
     assert len(undirectedHyperGraph.hyperedges) == 5   

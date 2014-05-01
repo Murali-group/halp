@@ -144,16 +144,10 @@ class HyperGraph:
         '''
         return deepcopy(self)
 
-    def readDirectedHyperGraph(self):
+    def read(self):
         pass
-
-    def readUndirectedHyperGraph(self):
-        pass
-    
-    def writeDirectedHyperGraph(self):
-        pass
-
-    def writeUndirectedHyperGraph(self):
+   
+    def write(self):
         pass
 
     def printGraph(self):

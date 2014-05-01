@@ -5,27 +5,40 @@ from hypergraph.undirectedHyperGraph import UndirectedHyperGraph
 
 def test_write_directedgraph():
     '''
-        Test reading directed and undirected hypergraphs from files,
-        and add edges with and without weights.
+        Test writing directed hypergraph to file.        
     '''
     # read directed hypergraph
     directedHyperGraph = DirectedHyperGraph(set(), set())
-    directedHyperGraph.readDirectedGraph('tests/data/dirhypergraph.txt')
+    directedHyperGraph.read('tests/data/dirhypergraph.txt')
+    assert len(directedHyperGraph.nodes) == 5
+    assert len(directedHyperGraph.hyperedges) == 4 
+    
+    
+    # write the graph and read it again    
+    directedHyperGraph.write('tests/data/dirhypergraph2.txt')
+    directedHyperGraph = DirectedHyperGraph(set(), set())
+    directedHyperGraph.read('tests/data/dirhypergraph2.txt')
 
     assert len(directedHyperGraph.nodes) == 5
     assert len(directedHyperGraph.hyperedges) == 4   
     
-
     
 def test_write_undirectedgraph():
     '''
-        Test reading directed and undirected hypergraphs from files,
-        and add edges with and without weights.
+        Test writing undirected hypergraph to files.
     '''
     # read Undirected hypergraph
     undirectedHyperGraph = UndirectedHyperGraph(set(), set())
-    undirectedHyperGraph.readUnDirectedGraph('tests/data/UnDirhypergraph.txt')
-
+    undirectedHyperGraph.read('tests/data/UnDirhypergraph.txt')
+    assert len(undirectedHyperGraph.nodes) == 6
+    assert len(undirectedHyperGraph.hyperedges) == 5
+    
+        
+    # write the graph and read it again    
+    undirectedHyperGraph.write('tests/data/UnDirhypergraph2.txt')
+    undirectedHyperGraph = UndirectedHyperGraph(set(), set())
+    undirectedHyperGraph.read('tests/data/UnDirhypergraph2.txt')
+    
     assert len(undirectedHyperGraph.nodes) == 6
     assert len(undirectedHyperGraph.hyperedges) == 5      
    

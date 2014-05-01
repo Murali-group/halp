@@ -149,6 +149,12 @@ class HyperGraph:
 
     def readUndirectedHyperGraph(self):
         pass
+    
+    def writeDirectedHyperGraph(self):
+        pass
+
+    def writeUndirectedHyperGraph(self):
+        pass
 
     def printGraph(self):
         pass

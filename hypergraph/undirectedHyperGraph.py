@@ -66,3 +66,6 @@ class UndirectedHyperGraph(HyperGraph):
 
             # Create hypergraph from current line
             self.add_hyperedge(nodes, weight)
+
+    def writeUndirectedHyperGraph(self, fileName, sep='\t', delim=','):
+        pass

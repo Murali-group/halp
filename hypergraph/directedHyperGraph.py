@@ -193,3 +193,24 @@ class DirectedHyperGraph(HyperGraph):
         else:
             raise ValueError(
                 'Invalid number of arguments {}'.format(len(arg)))
+
+				
+class DirectedBHyperGraph(DirectedHyperGraph):
+
+    def __init__(self, nodes=set(), hyperedges=set()):
+		try:
+			for e in hyperedges
+				assert isinstance(e, DirectedBHyperEdge)
+        except:
+            raise ValueError("Invalid b-hyperedge set")
+        HyperGraph.__init__(self, nodes, hyperedges)
+
+class DirectedFHyperGraph(DirectedHyperGraph):
+
+    def __init__(self, nodes=set(), hyperedges=set()):
+		try:
+			for e in hyperedges
+				assert isinstance(e, DirectedFHyperEdge)
+        except:
+            raise ValueError("Invalid f-hyperedge set")
+        HyperGraph.__init__(self, nodes, hyperedges)

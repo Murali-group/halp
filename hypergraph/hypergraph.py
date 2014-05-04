@@ -96,7 +96,7 @@ class HyperGraph:
         '''
         name_set = set()
         for node in self.nodes:
-            set.add(node.name)
+            name_set.add(node.name)
         return name_set
 
     def remove_hypernode(self, n):

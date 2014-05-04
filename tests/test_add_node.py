@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 from hypergraph.node import Node
 from hypergraph.undirectedHyperGraph import UndirectedHyperGraph
-from hypergraph.hypergraph import HyperGraph
 
 
 def test_addNodeToHypergraph():
@@ -38,6 +37,16 @@ def test_addNodeToHypergraph():
     else:
         raise Exception(
             'add_node should raise Exception, but it did not')
+
+    # Test duplicate node name (by object)
+    try:
+        graph._HyperGraph__add_node_by_object('x2')
+    except Exception:
+        pass
+    else:
+        raise Exception(
+            '__add_node_by_object should raise Exception, but it did not')
+
 
     # Test wrong input type
     try:

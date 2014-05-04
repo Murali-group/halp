@@ -32,6 +32,7 @@ def test_addNodeToHypergraph():
     # Test duplicate node name (by object)
     try:
         graph.add_node(Node('x2'))
+        graph.__add_node_by_object('x2')
     except Exception:
         pass
     else:

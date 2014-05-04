@@ -28,12 +28,37 @@ class HyperGraph:
 
     def add_node(self, n):
         '''
-        Adds a node to the graph.
+            Adds a node to the graph.
+            Can be called with node object or with node name
+            This method chooses the right function to call to hide
+            this task from the user.
+            usage:
+                graph.add_node(nodeObject)
+            or
+                graph.add_node('x1')
+        '''
+        if (isinstance(n, Node)):
+            self.add_nodeByObject(n)
+        elif (isinstance(n, str)):
+            self.add_nodeByName(n)
+        else:
+            raise ValueError(
+                'Invalid arguments type{}'.format(n))
+
+    def add_nodeByName(self, nodeName):
+        '''
+            Add a node given the node name
+        '''
+        self._nodes.add(Node(nodeName))
+
+    def add_nodeByObject(self, n):
+        '''
+        Adds a node Object to the graph.
         '''
         try:
             assert isinstance(n, Node)
         except AssertionError:
-            raise ValueError('Invalid node %s' % n)
+            raise ValueError('Invalid node {}'.format(n))
 
         self._nodes.add(n)
 
@@ -73,6 +98,8 @@ class HyperGraph:
         Should this remove all of the connected edges as well?
         '''
         pass
+
+    ''' ------------------------------------------------------ '''
 
     def add_hyperedge(self, *args):
         '''

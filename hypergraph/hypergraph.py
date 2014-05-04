@@ -38,24 +38,24 @@ class HyperGraph:
                 graph.add_node('x1')
         '''
         if (isinstance(n, Node)):
-            self.add_nodeByObject(n)
+            self.__add_node_by_object(n)
         elif (isinstance(n, str)):
-            self.add_nodeByName(n)
+            self.__add_node_by_name(n)
         else:
             raise ValueError(
                 'Invalid arguments type{}'.format(n))
 
-    def add_nodeByName(self, nodeName):
+    def __add_node_by_name(self, nodeName):
         '''
             Add a node given the node name
         '''
         if (self.get_node_by_name(nodeName) is None):
-            self._nodes.add(Node(nodeName))
+            self.nodes.add(Node(nodeName))
         else:
             raise Exception(
                 'Node not added, Duplicate Node name: {}'.format(nodeName))
 
-    def add_nodeByObject(self, n):
+    def __add_node_by_object(self, n):
         '''
         Adds a node Object to the graph.
         '''
@@ -65,7 +65,7 @@ class HyperGraph:
             raise ValueError('Invalid node {}'.format(n))
 
         if (self.get_node_by_name(n.name) is None):
-            self._nodes.add(n)
+            self.nodes.add(n)
         else:
             raise Exception(
                 'Node not added, Duplicate Node name: {}'.format(n.name))

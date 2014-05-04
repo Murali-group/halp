@@ -21,7 +21,25 @@ def test_addNodeToHypergraph():
     graph.add_node(n)
     assert graph.get_node_by_name('x2') is not None
 
-    # Test wrong input
+    # Test duplicate node name (by name)
+    try:
+        graph.add_node('x2')
+    except Exception:
+        pass
+    else:
+        raise Exception(
+            'add_node should raise Exception, but it did not')
+
+    # Test duplicate node name (by object)
+    try:
+        graph.add_node(Node('x2'))
+    except Exception:
+        pass
+    else:
+        raise Exception(
+            'add_node should raise Exception, but it did not')
+
+    # Test wrong input type
     try:
         graph.add_node(set())
     except ValueError:

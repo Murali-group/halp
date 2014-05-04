@@ -49,7 +49,11 @@ class HyperGraph:
         '''
             Add a node given the node name
         '''
-        self._nodes.add(Node(nodeName))
+        if (self.get_node_by_name(nodeName) is None):
+            self._nodes.add(Node(nodeName))
+        else:
+            raise Exception(
+                'Node not added, Duplicate Node name: {}'.format(nodeName))
 
     def add_nodeByObject(self, n):
         '''
@@ -60,7 +64,11 @@ class HyperGraph:
         except AssertionError:
             raise ValueError('Invalid node {}'.format(n))
 
-        self._nodes.add(n)
+        if (self.get_node_by_name(n.name) is None):
+            self._nodes.add(n)
+        else:
+            raise Exception(
+                'Node not added, Duplicate Node name: {}'.format(n.name))
 
     def get_node_by_name(self, nodeName):
         '''

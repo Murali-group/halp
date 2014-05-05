@@ -174,12 +174,12 @@ class DirectedHyperGraph(HyperGraph):
         '''
         Determines if a node is F-Connected to other nodes
         usage:
-                1st argument is node 's'
-                if 1 argument is provided:
-                        determines if all nodes are F-Connected to 's'
-                if 2 arguments are provided:
-                        determines if the node 't' specified by
-                        the 2nd argument is F-Connected to 's'
+            1st argument is node 's'
+            if 1 argument is provided:
+                    determines if all nodes are F-Connected to 's'
+            if 2 arguments are provided:
+                    determines if the node 't' specified by
+                    the 2nd argument is F-Connected to 's'
         '''
         if len(arg) == 1:
             symmetric_image = self.symmetric_image()
@@ -193,3 +193,69 @@ class DirectedHyperGraph(HyperGraph):
         else:
             raise ValueError(
                 'Invalid number of arguments {}'.format(len(arg)))
+
+                
+class DirectedBHyperGraph(DirectedHyperGraph):
+
+    def __init__(self, nodes=set(), hyperedges=set()):
+        try:
+            for e in hyperedges:
+                assert isinstance(e, DirectedBHyperEdge)
+        except:
+            raise ValueError("Invalid b-hyperedge set")
+        HyperGraph.__init__(self, nodes, hyperedges)
+        
+        
+        
+class DirectedBHyperTree(DirectedBHyperGraph):
+
+    def __init__(self, rootNodes=set(), nonRootNodes=set(), hyperedges=set()):
+        try:
+            assert len(rootNodes.intersection(nonRootNodes)) == 0
+        except:
+            raise ValueError("Root and non-root set are not disjoint")
+        try:
+            for r in rootNodes:
+                for e in r.inList:
+                    assert e not in hyperedges
+        except:
+            raise ValueError("Invalid root set of nodes")
+        try:
+            for n in nonRootNodes:
+                assert len(n.inList) == 1
+        except:
+            raise ValueError("Invalid non-root set of nodes")
+        self.rootNodes = rootNodes
+        self.nonRootNodes = nonRootNodes
+        DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)
+        
+    def visitHyperTree(self):
+        '''
+        This is the VISIT(T_R) function from the "Flows on Hypergraphs" paper
+        '''
+        ordering = [self.rootNodes]
+        vPrime = self.rootNodes.copy()
+        ePrime = self.hyperedges.copy()
+        edgesUsed = 1
+        while edgesUsed > 0:
+            edgesUsed = 0
+            ePrimeCopy = ePrime.copy()
+            for e in ePrimeCopy:
+                if e.tail.issubset(vPrime):
+                    ePrime.remove(e)
+                    ordering.append(e)
+                    ordering.append(e.head)
+                    vPrime.remove(e.head)
+                    edgesUsed += 1
+                    break
+        return ordering
+
+class DirectedFHyperGraph(DirectedHyperGraph):
+
+    def __init__(self, nodes=set(), hyperedges=set()):
+        try:
+            for e in hyperedges:
+                assert isinstance(e, DirectedFHyperEdge)
+        except:
+            raise ValueError("Invalid f-hyperedge set")
+        HyperGraph.__init__(self, nodes, hyperedges)

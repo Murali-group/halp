@@ -62,31 +62,37 @@ def dummy_SBT(G, s, F=sum_function, valid_ordering=False):
     else:
         return P
 
+
 def get_hyperpath_from_hypertree(T, s, t):
     '''
-        Given a predecessor function, 
+        Given a predecessor function,
         get the shortest B-hyperpath from s and t
     '''
     # check that T is a valid predecessor function:
-    # It must be a map from Nodes to HyperEdges 
+    # It must be a map from Nodes to HyperEdges
     # with exactly one Node mapping to None
     if type(T) != dict:
-        raise InvalidArgumentError("T must be a map from nodes to hyperedges. %s received" %T)
+        raise InvalidArgumentError(
+            "T must be a map from nodes to hyperedges. %s received" % T)
     noneCounter = 0
     for node, hyperedge in T.items():
-        if not isinstance(node, Node) or not (isinstance(hyperedge, HyperEdge) or hyperedge == None):
-            raise InvalidArgumentError("T must be a map from nodes to hyperedges. %s received" %T)
-        if hyperedge == None:
+        if not isinstance(node, Node) or
+        not (isinstance(hyperedge, HyperEdge) or hyperedge is None):
+            raise InvalidArgumentError(
+                "T must be a map from nodes to hyperedges. %s received" % T)
+        if hyperedge is None:
             noneCounter += 1
     if noneCounter > 1:
-            raise InvalidArgumentError("Multiple nodes without predecessor. %s received" %T)
+            raise InvalidArgumentError(
+                "Multiple nodes without predecessor. %s received" % T)
     elif noneCounter == 0:
-            raise InvalidArgumentError("Hypertree does not have root node. %s received" %T)
+            raise InvalidArgumentError(
+                "Hypertree does not have root node. %s received" % T)
 
     G = DirectedHyperGraph(nodes=set(), hyperedges=set())
 
     # keep track of which nodes are or have been processed
-    processedOrInQueue  = {n:False for n in T}
+    processedOrInQueue = {n: False for n in T}
     nodesToProcess = [t]
     processedOrInQueue[t] = True
     while nodesToProcess:
@@ -105,9 +111,9 @@ def get_hyperpath_from_hypertree(T, s, t):
     return G
 
 
-def get_hyperpath_weight_from_hypertree(T,s,t):
+def get_hyperpath_weight_from_hypertree(T, s, t):
     '''
-        Given a predecessor function, 
+        Given a predecessor function,
         get weight of shortest B-hyperpath from s and t
     '''
     return
@@ -115,24 +121,25 @@ def get_hyperpath_weight_from_hypertree(T,s,t):
 
 def k_shortest_hyperpaths(G, s, t, k, F=sum_function):
     '''
-        Computes the k shortest hyperpaths from a given 
+        Computes the k shortest hyperpaths from a given
         node to every other node in the graph.
         Output is a list of hypertrees in ascending order of path length.
         This method only works for directed B-hypergraphs.
     '''
     if G.__class__ != DirectedBHyperGraph:
-        raise InvalidArgumentError("G must be a directed B-Hypergraph. Cast if appropriate.")
+        raise InvalidArgumentError(
+            "G must be a directed B-Hypergraph. Cast if appropriate.")
     if s not in G.nodes:
-        raise InvalidArgumentError("s must be a node in G. %s received" %s)
+        raise InvalidArgumentError("s must be a node in G. %s received" % s)
     if t not in G.nodes:
-        raise InvalidArgumentError("t must be a node in G. %s received" %t)
+        raise InvalidArgumentError("t must be a node in G. %s received" % t)
     if type(k) != int:
-        raise InvalidArgumentError("k must be an integer. %s received" %k)
+        raise InvalidArgumentError("k must be an integer. %s received" % k)
     if k <= 0:
-        raise OutOfRangeError("k must be a positive integer. %s received" %k)
+        raise OutOfRangeError("k must be a positive integer. %s received" % k)
 
     # container for the k-shortest hyperpaths
-    paths = []  
+    paths = []
     # container for the candidate paths. Every item is a 3-tuple:
     # subgraph, lower bound on shortest hyperpath weight, shortest hypertree
     candidates = []
@@ -142,7 +149,7 @@ def k_shortest_hyperpaths(G, s, t, k, F=sum_function):
 
     candidates.append((G, 0, shortestHypertree))
     for i in xrange(k):
-        if not candidates: 
+        if not candidates:
             break
         ind = candidates.index(min(candidates, key=lambda x: x[1]))
         kShortest = candidates.pop(ind)
@@ -154,4 +161,3 @@ def k_shortest_hyperpaths(G, s, t, k, F=sum_function):
             # reinsert into candidates
             pass
     return paths
-

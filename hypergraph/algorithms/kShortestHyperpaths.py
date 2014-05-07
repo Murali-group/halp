@@ -148,7 +148,7 @@ def k_shortest_hyperpaths(G, s, t, k, F=sum_function):
     shortestHyperpath = None
 
     candidates.append((G, 0, shortestHypertree))
-    for i in xrange(k):
+    for i in range(k):
         if not candidates:
             break
         ind = candidates.index(min(candidates, key=lambda x: x[1]))

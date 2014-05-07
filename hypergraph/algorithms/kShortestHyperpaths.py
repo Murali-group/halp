@@ -76,8 +76,8 @@ def get_hyperpath_from_hypertree(T, s, t):
             "T must be a map from nodes to hyperedges. %s received" % T)
     noneCounter = 0
     for node, hyperedge in T.items():
-        if not isinstance(node, Node) or
-        not (isinstance(hyperedge, HyperEdge) or hyperedge is None):
+        if (not isinstance(node, Node) or
+                not (isinstance(hyperedge, HyperEdge) or hyperedge is None)):
             raise InvalidArgumentError(
                 "T must be a map from nodes to hyperedges. %s received" % T)
         if hyperedge is None:

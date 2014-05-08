@@ -28,14 +28,47 @@ class HyperGraph:
 
     def add_node(self, n):
         '''
-        Adds a node to the graph.
+            Adds a node to the graph.
+            Can be called with node object or with node name
+            This method chooses the right function to call to hide
+            this task from the user.
+            usage:
+                graph.add_node(nodeObject)
+            or
+                graph.add_node('x1')
+        '''
+        if (isinstance(n, Node)):
+            self.__add_node_by_object(n)
+        elif (isinstance(n, str)):
+            self.__add_node_by_name(n)
+        else:
+            raise ValueError(
+                'Invalid arguments type{}'.format(n))
+
+    def __add_node_by_name(self, nodeName):
+        '''
+            Add a node given the node name
+        '''
+        if (self.get_node_by_name(nodeName) is None):
+            self.nodes.add(Node(nodeName))
+        else:
+            raise Exception(
+                'Node not added, Duplicate Node name: {}'.format(nodeName))
+
+    def __add_node_by_object(self, n):
+        '''
+        Adds a node Object to the graph.
         '''
         try:
             assert isinstance(n, Node)
         except AssertionError:
-            raise ValueError('Invalid node %s' % n)
+            raise ValueError('Invalid node {}'.format(n))
 
-        self._nodes.add(n)
+        if (self.get_node_by_name(n.name) is None):
+            self.nodes.add(n)
+        else:
+            raise Exception(
+                'Node not added, Duplicate Node name: {}'.format(n.name))
 
     def get_node_by_name(self, nodeName):
         '''
@@ -63,7 +96,7 @@ class HyperGraph:
         '''
         name_set = set()
         for node in self.nodes:
-            set.add(node.name)
+            name_set.add(node.name)
         return name_set
 
     def remove_hypernode(self, n):
@@ -73,6 +106,8 @@ class HyperGraph:
         Should this remove all of the connected edges as well?
         '''
         pass
+
+    ''' ------------------------------------------------------ '''
 
     def add_hyperedge(self, *args):
         '''

@@ -46,14 +46,14 @@ class HyperEdge:
         Returns a copy of the edge
         '''
         return deepcopy(self)
-		
+        
 
 class DirectedHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=set(), weight=0):
         HyperEdge.__init__(head, tail, weight)
-	
-	
+    
+    
 class DirectedBHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):
@@ -62,12 +62,12 @@ class DirectedBHyperEdge(HyperEdge):
         except:
             raise ValueError("Invalid tail node %s", tail)
         HyperEdge.__init__(head, tail, weight)
-	
-	
+    
+    
 class DirectedFHyperEdge(DirectedHyperEdge):
 
-	def __init__(self, head=None, tail=set(), weight=0):
-		try:
+    def __init__(self, head=None, tail=set(), weight=0):
+        try:
             assert isinstance(head, Node)
         except:
             raise ValueError("Invalid head node %s", head)

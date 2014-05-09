@@ -244,7 +244,7 @@ class DirectedBHyperTree(DirectedBHyperGraph):
         for line in fin.readlines():
             line = line.strip('\n')
             if line == "":
-                continue   # skip empty lines                
+                continue   # skip empty lines
             words = line.split(sep)
             if words[0] == "R":
                 nodes = words[1].split(delim)
@@ -284,8 +284,8 @@ class DirectedBHyperTree(DirectedBHyperGraph):
                 if e.tail.issubset(vPrime):
                     ePrime.remove(e)
                     ordering.append(e)
-                    ordering.append(e.head)
-                    vPrime.remove(e.head)
+                    ordering.append(next(iter(e.head)))
+                    vPrime = vPrime.union(e.head)
                     edgesUsed += 1
                     break
         return ordering

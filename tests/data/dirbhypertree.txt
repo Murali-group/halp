@@ -1,13 +1,7 @@
 T	H	weight
-x1	x2
-x3	x1
 x2,x4	x1
-x2,x4	x5
-x4	x2
+x4,x5	x2
 x4	x3
-x4	x5
-x4	x6
-x3	x6
 x5,x6	x4
 
 R	x5,x6

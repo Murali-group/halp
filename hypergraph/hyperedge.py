@@ -46,6 +46,13 @@ class HyperEdge:
         Returns a copy of the edge
         '''
         return deepcopy(self)
+
+    def __repr__(self):
+        return "head:" + str(self._head) + " tail:" + str(self._tail) + " weight: " + str(self._weight)
+
+    def __str__(self):
+        return "head:" + str(self._head) + " tail:" + str(self._tail) + " weight: " + str(self._weight)
+
         
 
 class DirectedHyperEdge(HyperEdge):

@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 
-class Node:
+class Node(object):
 
     def __init__(self, name="", nodeId=-1):
         self._name = name
@@ -32,3 +32,11 @@ class Node:
 
     def __str__(self):
         return self._name
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+                and self._name == other._name
+                and self._nodeId == other._nodeId)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

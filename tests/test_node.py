@@ -20,8 +20,17 @@ def test_node():
 
     # Test copy
     node1 = node.copy()
-    assert node1 != node
+    node2 = node
+    assert not (node1 is node)
+    assert node2 is node
 
     # Test __str__
     assert str(node1) == "bob"
     assert repr(node1) == "bob"
+
+    # Test __eq__
+    node1 = Node(name="s", nodeId=1)
+    node2 = Node(name="s", nodeId=1)
+    node3 = Node(name="t", nodeId=1)
+    assert node1 == node2
+    assert node1 != node3

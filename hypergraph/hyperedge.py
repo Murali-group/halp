@@ -58,27 +58,34 @@ class HyperEdge:
 class DirectedHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=set(), weight=0):
-        HyperEdge.__init__(head, tail, weight)
+        HyperEdge.__init__(self, head, tail, weight)
+
+    def __eq__(self, other):
+        return self.head == other.head and self.tail == other.tail
+
+    def __hash__(self):
+        #TODO
+        return len(self.head) + len(self.tail)
     
     
 class DirectedBHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):
         try:
-            assert isinstance(tail, Node)
+            assert len(tail) <= 1
         except:
-            raise ValueError("Invalid tail node %s", tail)
-        HyperEdge.__init__(head, tail, weight)
+            raise ValueError("Invalid tail cardinality", tail)
+        HyperEdge.__init__(self, head, tail, weight)
     
     
 class DirectedFHyperEdge(DirectedHyperEdge):
 
     def __init__(self, head=None, tail=set(), weight=0):
         try:
-            assert isinstance(head, Node)
+            assert len(head) <= 1
         except:
-            raise ValueError("Invalid head node %s", head)
-        HyperEdge.__init__(head, tail, weight)
+            raise ValueError("Invalid head cardinality", head)
+        HyperEdge.__init__(self, head, tail, weight)
 
 
 class UndirectedHyperEdge(HyperEdge):
@@ -94,6 +101,12 @@ class UndirectedHyperEdge(HyperEdge):
 
     def __init__(self, nodes=set(), weight=0):
         HyperEdge.__init__(self, nodes, set(), weight)
+
+    def __eq__(self, other):
+        return self.nodes == other.nodes and self.weight == other.weight
+
+    def __hash__(self):
+        return len(self.nodes)
 
     @property
     def nodes(self):

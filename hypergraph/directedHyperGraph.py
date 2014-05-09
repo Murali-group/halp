@@ -229,6 +229,46 @@ class DirectedBHyperTree(DirectedBHyperGraph):
         self.nonRootNodes = nonRootNodes
         DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)
 
+    def read(self, fileName, sep='\t', delim=','):
+        '''
+            Read a directed hypergraph from file FileName
+            each row is a hyperEdge.
+            Tail, head and weight are separated by "sep"
+            nodes within a hypernode are separated by "delim"
+        '''
+        fin = open(fileName, 'r')
+
+        # read first header line
+        fin.readline()
+        i = 1
+        for line in fin.readlines():
+            line = line.strip('\n')
+            if line == "":
+                continue   # skip empty lines                
+            words = line.split(sep)
+            if words[0] == "R":
+                nodes = words[1].split(delim)
+                self.define_root_nodes(nodes)
+                break
+            if not (2 <= len(words) <= 3):
+                raise Exception('File format error at line {}'.format(i))
+            i += 1
+            tail = words[0].split(delim)
+            head = words[1].split(delim)
+            try:
+                weight = float(words[2].split(delim)[0])
+            except:
+                weight = 0
+
+            # Create hypergraph from current line
+            self.add_hyperedge(head, tail, weight)
+        fin.close()
+
+    def define_root_nodes(self, nodes):
+        for node in nodes:
+            self.rootNodes.add(self.get_node_by_name(node))
+        self.nonRootNodes = self.nodes.difference(self.rootNodes)
+
     def visitHyperTree(self):
         '''
         This is the VISIT(T_R) function from the "Flows on Hypergraphs" paper

@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from Queue import PriorityQueue
 
 from .hypergraph import HyperGraph
 from copy import deepcopy
@@ -205,7 +206,48 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         except:
             raise ValueError("Invalid b-hyperedge set")
 
+    def get_spanning_hypertree(self):
+        rootNodes = set()
+        nonRootNodes = set()
+        ordering = []
+        vPrime = self.nodes.copy()
+        ePrime = self.hyperedges.copy()
+        eQueue = PriorityQueue()
+        Q = dict()
+        for e in self.hyperedges:
+            Q[e] = e.head.union(e.tail)
+            eQueue.put((len(Q[e]),e))
 
+        while len(vPrime) > 0:
+            x = eQueue.get()
+            a = x[1]
+            print "chose", a
+            if len(Q[a]) == 0:
+                continue
+            v = next(iter(Q[a]))
+            print "     chose", v
+            if len(Q[a]) == 1:
+                nonRootNodes.add(v)
+                if v in vPrime:
+                    vPrime.remove(v)
+            else:
+                rootNodes = rootNodes.union(Q[a])
+                nonRootNodes.add(v)
+                vPrime = vPrime.difference(Q[a])
+            ordering.append(a)
+            ordering.append(v)
+            ePrime.remove(a)
+
+            eQueue = PriorityQueue()
+            for e in ePrime:
+                Q[e] = Q[e].difference(Q[a])
+                if len(Q[e]) == 0:
+                    #TODO - proper python syntax for max val
+                    MAX_VAL = 100000000
+                    eQueue.put((MAX_VAL, e))
+                else:
+                    eQueue.put((len(Q[e]),e))
+        return ordering
 
 class DirectedBHyperTree(DirectedBHyperGraph):
 
@@ -225,6 +267,7 @@ class DirectedBHyperTree(DirectedBHyperGraph):
                 assert len(n.inList) == 1
         except:
             raise ValueError("Invalid non-root set of nodes")
+        #TODO - need to check for cycles
         self.rootNodes = rootNodes
         self.nonRootNodes = nonRootNodes
         DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)

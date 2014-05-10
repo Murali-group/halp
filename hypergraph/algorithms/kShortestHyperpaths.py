@@ -47,15 +47,14 @@ def dummy_SBT(G, s, F=sum_function, valid_ordering=False):
             k[e] += 1
             if k[e] == len(e.tail):
                 f = F(e, W)
-                c = [n for n in e.head if W[n] > e.weight + f]
                 for y in [n for n in e.head if W[n] > e.weight + f]:
                     if y not in Q:
                         Q.append(y)
                         if W[y] < 100000:
                             for eh in FS(G, y):
                                 k[eh] -= 1
-                        W[y] = e.weight + f
-                        P[y] = e
+                    W[y] = e.weight + f
+                    P[y] = e
 
     if valid_ordering:
         return P, ordering
@@ -89,7 +88,7 @@ def get_hyperpath_from_hypertree(T, s, t):
             raise InvalidArgumentError(
                 "Hypertree does not have root node. %s received" % T)
 
-    G = DirectedHyperGraph(nodes=set(), hyperedges=set())
+    G = DirectedHyperGraph(set(), set())
 
     # keep track of which nodes are or have been processed
     processedOrInQueue = {n: False for n in T}
@@ -145,6 +144,7 @@ def k_shortest_hyperpaths(G, s, t, k, F=sum_function):
     candidates = []
 
     shortestHypertree, ordering = dummy_SBT(G, s, valid_ordering=True)
+    print shortestHypertree
     shortestHyperpath = None
 
     candidates.append((G, 0, shortestHypertree))

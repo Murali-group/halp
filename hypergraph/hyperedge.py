@@ -47,6 +47,13 @@ class HyperEdge:
         '''
         return deepcopy(self)
 
+    def __repr__(self):
+        return str((self._head,  self._tail, self._weight))
+
+    def __str__(self):
+        return 'Tail: %s, Head: %s, weight: %s' % (self._tail, self._head,
+                                                   self._weight)
+
 
 class DirectedHyperArc(HyperEdge):
 
@@ -92,3 +99,9 @@ class UndirectedHyperEdge(HyperEdge):
     def tail(self):
         ''' Disable tail property'''
         raise AttributeError("Undirected HyperGraph has no attribute tail")
+
+    def __repr__(self):
+        return str((self.nodes, self.weight))
+
+    def __str__(self):
+        return 'nodes: %s, weight: %s' % (self._nodes, self._weight)

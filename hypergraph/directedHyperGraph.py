@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from Queue import PriorityQueue
+from collections import deque
 
 from .hypergraph import HyperGraph
 from copy import deepcopy
@@ -270,6 +271,21 @@ class DirectedBHyperTree(DirectedBHyperGraph):
         except:
             raise ValueError("Invalid non-root set of nodes")
         #TODO - need to check for cycles
+        try:
+            visited = rootNodes.copy()
+            queue = deque([])
+            for n in rootNodes:
+                queue.append(n)
+            while len(queue) > 0:
+                curNode = queue.popleft()
+                for e in hyperedges:
+                    if curNode in e.tail:
+                        for newNode in e.head:
+                            assert newNode not in visited
+                            visited.add(newNode)
+                            queue.append(newNode)
+        except:
+            raise ValueError("Hypertree contains a cycle")
         self.rootNodes = rootNodes
         self.nonRootNodes = nonRootNodes
         DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)

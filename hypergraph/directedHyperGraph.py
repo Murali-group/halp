@@ -248,7 +248,6 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     eQueue.put((MAX_VAL, e))
                 else:
                     eQueue.put((len(Q[e]),e))
-
         ordering.insert(0,rootNodes)
         return ordering
 
@@ -312,12 +311,10 @@ class DirectedBHyperTree(DirectedBHyperGraph):
             # Create hypergraph from current line
             self.add_hyperedge(head, tail, weight)
         fin.close()
-        '''
         try:
             assert self.isCycleFree()
         except:
             raise ValueError("Hypertree is not cycle-free")
-        '''
 
     def isCycleFree(self):
         paths = dict()

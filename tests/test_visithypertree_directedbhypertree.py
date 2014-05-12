@@ -40,8 +40,12 @@ def test_read_dirbhypertree():
     assert ordering[8] == x3
 
     graph2 = DirectedBHyperTree(set(),set(),set())
-    graph2.read('tests/data/dirbhypertree2.txt')
-    assert not graph2.isCycleFree()
+    try:
+        graph2.read('tests/data/dirbhypertree2.txt')
+    except Exception:
+        pass
+    else:
+        raise Exception('HyperTree with cycle did not raise exception')
 
 
 

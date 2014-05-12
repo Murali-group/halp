@@ -251,6 +251,43 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         ordering.insert(0,rootNodes)
         return ordering
 
+    def flow(self, tree, demand, flow):
+        '''
+        Given a demand vector and a spanning tree, this function returns the
+        flow on the tree and the needed initial demand.
+        '''
+        assert len(tree) > 0
+        # Get root nad non root nodes
+        root = tree[0]
+        non_root = self.nodes.difference(root)
+
+        # Get tree and external edges
+        tree_edges = set(tree[1::2])
+        tree_nodes = set(tree[::2])
+        ex_edges = tree_edges.difference(self.nodes)
+
+        for node in root:
+            flow[node] = 0
+
+        for e in ex_edges:
+            verts = e.head.union(e.tail)
+            for v in verts:
+                mult = 0
+                if v in e.head:
+                    mult = 1
+                elif v in e.tail:
+                    mult = - e.weight
+                demand[v] = demand[v] - (mult*flow[e])
+
+        unvisited = {}
+        leaves = tree_nodes
+        for node in self.nodes:
+            count = 0
+            for e in tree_edges:
+                if node in e.head: count += 1
+                leaves = leaves.difference(e.tail)
+            unvisited[node] = count
+
 class DirectedBHyperTree(DirectedBHyperGraph):
 
     def __init__(self, rootNodes=set(), nonRootNodes=set(), hyperedges=set()):
@@ -334,6 +371,7 @@ class DirectedBHyperTree(DirectedBHyperGraph):
                     edgesUsed += 1
                     break
         return ordering
+
 
 class DirectedFHyperGraph(DirectedHyperGraph):
 

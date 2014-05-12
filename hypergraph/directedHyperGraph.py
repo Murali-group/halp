@@ -221,23 +221,23 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         while len(vPrime) > 0:
             x = eQueue.get()
             a = x[1]
-            print "chose", a
+            #print "chose", a
             if len(Q[a]) == 0:
                 continue
             v = next(iter(Q[a]))
-            print "     chose", v
+            #print "     chose", v
             if len(Q[a]) == 1:
                 nonRootNodes.add(v)
                 if v in vPrime:
                     vPrime.remove(v)
             else:
-                rootNodes = rootNodes.union(Q[a])
+                rootNodes = rootNodes.union(Q[a].difference([v]))
                 nonRootNodes.add(v)
                 vPrime = vPrime.difference(Q[a])
             ordering.append(a)
             ordering.append(v)
             ePrime.remove(a)
-
+            #print rootNodes
             eQueue = PriorityQueue()
             for e in ePrime:
                 Q[e] = Q[e].difference(Q[a])
@@ -247,6 +247,8 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     eQueue.put((MAX_VAL, e))
                 else:
                     eQueue.put((len(Q[e]),e))
+
+        ordering.insert(0,rootNodes)
         return ordering
 
 class DirectedBHyperTree(DirectedBHyperGraph):

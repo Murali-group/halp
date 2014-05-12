@@ -242,8 +242,8 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             for e in ePrime:
                 Q[e] = Q[e].difference(Q[a])
                 if len(Q[e]) == 0:
-                    #TODO - proper python syntax for max val
-                    MAX_VAL = 100000000
+                    import sys
+                    MAX_VAL = sys.maxsize
                     eQueue.put((MAX_VAL, e))
                 else:
                     eQueue.put((len(Q[e]),e))

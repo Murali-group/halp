@@ -6,6 +6,9 @@ from copy import deepcopy
 from .node import Node
 from .hyperedge import HyperEdge, UndirectedHyperEdge
 
+from numpy import matrix
+from numpy import linalg
+
 '''----------------------- Directed HyperGraph -----------------------------'''
 
 
@@ -193,3 +196,54 @@ class DirectedHyperGraph(HyperGraph):
         else:
             raise ValueError(
                 'Invalid number of arguments {}'.format(len(arg)))
+
+    def build_incidence_matrix(self):
+        '''
+        Builds the incidence matrix for the current directed 
+        hypergraph as the tail and head matrices
+        usage:
+                Pass the directed hypergraph
+                Returns the head and tail incidence matrices
+        '''
+        hyperedgeNum = len(self.hyperedges)
+        nodeNum = len(self.nodes)
+	
+        incidenceMatrixHead = [[0 for x in xrange(hyperedgeNum)] for x in xrange(nodeNum)]
+        incidenceMatrixTail = [[0 for x in xrange(hyperedgeNum)] for x in xrange(nodeNum)]
+     
+        hyperedgeId = 0
+        nodeId = 0
+        nodeIdList = {}
+        for e in self.hyperedges:
+            for n in e.head:
+	        if not nodeIdList.has_key(n.name):
+                    nodeIdList[n.name] = nodeId
+                    nodeId = nodeId + 1
+                print("head {0},{1}".format(n.name,nodeId))
+                incidenceMatrixHead[nodeIdList.get(n.name)][hyperedgeId] = 1
+	    for n in e.tail:
+                if not nodeIdList.has_key(n.name):
+                    nodeIdList[n.name] = nodeId
+                    nodeId = nodeId + 1
+                print("tail {0},{1}".format(n.name,nodeId))
+                incidenceMatrixTail[nodeIdList.get(n.name)][hyperedgeId] = 1
+            hyperedgeId = hyperedgeId + 1
+            
+        return incidenceMatrixHead, incidenceMatrixTail
+
+    def build_transition_matrix(self):
+        incidenceMatrixHead,incidenceMatrixTail = build_incidence_matrix_tail()
+        return 1
+
+    def build_diagonal_node_matrix(self):
+        '''stuff'''
+        return 1
+
+    def build_diagonal_edge_matrix(self):
+        '''stuff'''
+        return 1
+
+    def build_diagonal_weight_matrix(self):
+        '''stuff'''
+        return 1
+		

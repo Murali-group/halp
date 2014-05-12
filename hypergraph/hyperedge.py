@@ -47,6 +47,24 @@ class HyperEdge:
         '''
         return deepcopy(self)
 
+    def cardinality(self):
+        '''
+        return the number of nodes in tail and head
+        '''
+        return len(self._head) + len(self._tail)
+
+    def cardinalityHead(self):
+        '''
+        return the number of nodes in head
+        '''
+        return len(self._head)
+
+    def cardinalityTail(self):
+        '''
+        return the number of nodes in tail
+        '''
+        return len(self._tail)
+
 
 class DirectedHyperArc(HyperEdge):
 

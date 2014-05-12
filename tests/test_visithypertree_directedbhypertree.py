@@ -6,12 +6,13 @@ from hypergraph.hyperedge import DirectedHyperEdge
 
 def test_read_dirbhypertree():
     '''
-        Test reading directed hypergraphs from files,
-        and add edges with and without weights.
+        Test reading directed b hypertrees from files,
+        and testing visit functionality
     '''
     # read directed hypergraph
     graph = DirectedBHyperTree(set(), set(), set())
     graph.read('tests/data/dirbhypertree.txt')
+    assert graph.isCycleFree()
     x1 = graph.get_node_by_name('x1')
     x2 = graph.get_node_by_name('x2')
     x3 = graph.get_node_by_name('x3')
@@ -38,3 +39,16 @@ def test_read_dirbhypertree():
     assert ordering[7] == e6
     assert ordering[8] == x3
 
+    graph2 = DirectedBHyperTree(set(),set(),set())
+    graph2.read('tests/data/dirbhypertree2.txt')
+    assert not graph2.isCycleFree()
+
+
+
+'''
+from __future__ import absolute_import
+from hypergraph.directedHyperGraph import DirectedBHyperTree
+from hypergraph.hyperedge import DirectedHyperEdge
+graph2 = DirectedBHyperTree(set(),set(),set())
+graph2.read('tests/data/dirbhypertree2.txt')
+'''

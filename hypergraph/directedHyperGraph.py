@@ -255,6 +255,9 @@ class DirectedBHyperGraph(DirectedHyperGraph):
 class DirectedBHyperTree(DirectedBHyperGraph):
 
     def __init__(self, rootNodes=set(), nonRootNodes=set(), hyperedges=set()):
+        DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)
+        self.rootNodes = rootNodes
+        self.nonRootNodes = nonRootNodes
         try:
             assert len(rootNodes.intersection(nonRootNodes)) == 0
         except:
@@ -270,25 +273,10 @@ class DirectedBHyperTree(DirectedBHyperGraph):
                 assert len(n.inList) == 1
         except:
             raise ValueError("Invalid non-root set of nodes")
-        #TODO - need to check for cycles
         try:
-            visited = rootNodes.copy()
-            queue = deque([])
-            for n in rootNodes:
-                queue.append(n)
-            while len(queue) > 0:
-                curNode = queue.popleft()
-                for e in hyperedges:
-                    if curNode in e.tail:
-                        for newNode in e.head:
-                            assert newNode not in visited
-                            visited.add(newNode)
-                            queue.append(newNode)
+            assert self.isCycleFree()
         except:
-            raise ValueError("Hypertree contains a cycle")
-        self.rootNodes = rootNodes
-        self.nonRootNodes = nonRootNodes
-        DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)
+            raise ValueError("Hypertree is not cycle-free")
 
     def read(self, fileName, sep='\t', delim=','):
         '''
@@ -324,6 +312,28 @@ class DirectedBHyperTree(DirectedBHyperGraph):
             # Create hypergraph from current line
             self.add_hyperedge(head, tail, weight)
         fin.close()
+        '''
+        try:
+            assert self.isCycleFree()
+        except:
+            raise ValueError("Hypertree is not cycle-free")
+        '''
+
+    def isCycleFree(self):
+        paths = dict()
+        queue = deque([])
+        for n in self.rootNodes:
+            queue.append((n,set([n])))
+        while len(queue) > 0:
+            curNode, curPath = queue.popleft()
+            for e in self.hyperedges:
+                if curNode in e.tail:
+                    for newNode in e.head:
+                        print newNode, " from ", curNode, "(", curPath, ")"
+                        if newNode in curPath:
+                            return False
+                        queue.appendleft((newNode,curPath.union(set([newNode]))))
+        return True
 
     def define_root_nodes(self, nodes):
         for node in nodes:

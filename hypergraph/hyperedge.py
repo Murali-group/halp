@@ -90,9 +90,9 @@ class DirectedBHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):
         try:
-            assert len(tail) <= 1
+            assert len(head) <= 1
         except:
-            raise ValueError("Invalid tail cardinality", tail)
+            raise ValueError("Invalid head cardinality", tail)
         HyperEdge.__init__(self, head, tail, weight)
     
     
@@ -100,9 +100,9 @@ class DirectedFHyperEdge(DirectedHyperEdge):
 
     def __init__(self, head=None, tail=set(), weight=0):
         try:
-            assert len(head) <= 1
+            assert len(tail) <= 1
         except:
-            raise ValueError("Invalid head cardinality", head)
+            raise ValueError("Invalid tail cardinality", head)
         HyperEdge.__init__(self, head, tail, weight)
 
 

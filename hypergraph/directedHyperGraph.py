@@ -416,13 +416,14 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 demand[v] = demand[v] - (mult*flow[e])
 
         unvisited = {}
-        leaves = non_root_nodes
+        leaves = set()
         for node in self.nodes:
             count = 0
             for e in tree_edges:
                 if node in e.head.union(e.tail):
                     count += 1
-                leaves = leaves.difference(e.tail)
+            if count == 1:
+                leaves.add(node)
             unvisited[node] = count
 
         queue = list(leaves)

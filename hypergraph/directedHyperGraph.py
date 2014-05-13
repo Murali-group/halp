@@ -259,7 +259,6 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         assert len(tree) > 0
         # Get root nad non root nodes
         root = tree[0]
-        non_root = self.nodes.difference(root)
 
         # Get tree and external edges
         tree_edges = set(tree[1::2])
@@ -287,6 +286,12 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 if node in e.head: count += 1
                 leaves = leaves.difference(e.tail)
             unvisited[node] = count
+
+        queue = list(leaves)
+        while queue.count != 0:
+            v = queue.pop(0)
+
+
 
 class DirectedBHyperTree(DirectedBHyperGraph):
 
@@ -354,7 +359,6 @@ class DirectedBHyperTree(DirectedBHyperGraph):
             raise ValueError("Hypertree is not cycle-free")
 
     def isCycleFree(self):
-        paths = dict()
         queue = deque([])
         for n in self.rootNodes:
             queue.append((n,set([n])))

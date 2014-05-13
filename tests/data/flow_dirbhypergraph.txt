@@ -2,5 +2,5 @@ T	H	weight
 x1	x2	1
 x3	x1	4
 x2,x4	x1	7
-x4	x5	5
+x4	x3	5
 x4	x2	0.5

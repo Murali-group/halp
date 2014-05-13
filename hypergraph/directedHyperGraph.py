@@ -403,7 +403,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         ex_edges = self.hyperedges.difference(tree_edges)
 
         for node in root_nodes:
-            flow[node] = 0
+            demand[node] = 0
 
         for e in ex_edges:
             verts = e.head.union(e.tail)
@@ -449,6 +449,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     queue.append(w)
         for v in root_nodes:
             demand[v] = -1 * demand[v]
+        return demand, flow
 
     def potential(self, tree, cost, potential):
         '''

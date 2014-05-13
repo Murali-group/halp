@@ -10,49 +10,27 @@ def test_flow_directedbhypergraph():
         and testing visit functionality
     '''
     # read directed hypergraph
-    graph = DirectedBHyperTree(set(), set(), set())
+    graph = DirectedBHyperGraph(set(), set())
     graph.read('tests/data/flow_dirbhypergraph.txt')
-    assert graph.isCycleFree()
     x1 = graph.get_node_by_name('x1')
     x2 = graph.get_node_by_name('x2')
     x3 = graph.get_node_by_name('x3')
     x4 = graph.get_node_by_name('x4')
-    x5 = graph.get_node_by_name('x5')
-    x6 = graph.get_node_by_name('x6')
-    e10 = DirectedHyperEdge(set([x4]),set([x5,x6]))
-    e4 = DirectedHyperEdge(set([x2]),set([x4,x5]))
-    e3 = DirectedHyperEdge(set([x1]),set([x2,x4]))
-    e6 = DirectedHyperEdge(set([x3]),set([x1,x4]))
-    root = set([x5, x6])
-    nonroot = set([x1, x2, x3, x4])
-    assert root ==  graph.rootNodes
-    assert nonroot ==  graph.nonRootNodes
-    ordering = graph.visitHyperTree()
-    #print ordering
-    assert ordering[0] == root
-    assert ordering[1] == e10
-    assert ordering[2] == x4
-    assert ordering[3] == e4
-    assert ordering[4] == x2
-    assert ordering[5] == e3
-    assert ordering[6] == x1
-    assert ordering[7] == e6
-    assert ordering[8] == x3
+    e1 = DirectedHyperEdge(set([x2]),set([x1]),1)
+    e2 = DirectedHyperEdge(set([x1]),set([x3]),4)
+    e3 = DirectedHyperEdge(set([x1]),set([x2,x4]),7)
+    e4 = DirectedHyperEdge(set([x3]),set([x4]),5)
+    e5 = DirectedHyperEdge(set([x2]),set([x4]),0.5)
+    root = set([x1])
+    ordering = [root,e2,x3,e4,x4,e3,x2]
+    flow = {}
+    flow[e1] = 3
+    flow[e5] = 5
+    demand = {}
+    demand[x2] = 4
+    demand[x3] = 7
+    demand[x4] = 1
 
-    graph2 = DirectedBHyperTree(set(),set(),set())
-    try:
-        graph2.read('tests/data/dirbhypertree2.txt')
-    except Exception:
-        pass
-    else:
-        raise Exception('HyperTree with cycle did not raise exception')
+    demand2, flow2 = graph.flow(ordering, demand, flow)
+    print demand2, flow2
 
-
-
-'''
-from __future__ import absolute_import
-from hypergraph.directedHyperGraph import DirectedBHyperTree
-from hypergraph.hyperedge import DirectedHyperEdge
-graph2 = DirectedBHyperTree(set(),set(),set())
-graph2.read('tests/data/dirbhypertree2.txt')
-'''

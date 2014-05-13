@@ -131,7 +131,7 @@ class UndirectedHyperGraph(HyperGraph):
                         that you wanna access the self.nodes and self.hyperedges variables, the order of nodes and
                         hyperedges change. This is because of the way Python handles the Set and the only way to make
                         sure that we are keeping track of the orders correctly is to track them, manually
-            (III) edge weight (self.edgeWeight): contains the weights of each hyperedge
+            (III) edge weight (self.edgeWeight):
 	'''
     def getIncidenceMatrix(self):
         edgeNumber = len(self.hyperedges)

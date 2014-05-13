@@ -47,7 +47,7 @@ class HyperEdge:
         '''
         return deepcopy(self)
 
-    def cardinality(self):
+    def cardinality(self)
         '''
         return the number of nodes in tail and head
         '''

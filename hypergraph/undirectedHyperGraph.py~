@@ -275,7 +275,7 @@ class UndirectedHyperGraph(HyperGraph):
         return Delta
 
     '''
-        Finds the index of second minimum value in a list
+		Finds the index of second minimum value in a list
     '''
 
     def findSecondMinIndex(self, x):

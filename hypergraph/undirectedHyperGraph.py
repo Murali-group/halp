@@ -12,22 +12,25 @@ import random
 
 
 class UndirectedHyperGraph(HyperGraph):
+
     @property
     def nodeIdList(self):
         '''
         Returns the name of the nodes
         '''
         return self._nodeIdList
+
     @property
     def H(self):
         '''
         Returns the incidence matrix
         '''
         return self._incidenceMatrix
+
     @property
     def edgeWeight(self):
         '''
-        Stores a diagonal matrix containing the hyperedge weight 
+        Stores a diagonal matrix containing the hyperedge weight
         '''
         return self._edgeWeight
 
@@ -88,7 +91,7 @@ class UndirectedHyperGraph(HyperGraph):
                 '''
                 --yaserkl
                 The default weight should be 1 otherwise if it's zero it means
-                that node is disconnected to this hyperedge 
+                that node is disconnected to this hyperedge
                 '''
                 weight = 1
 
@@ -118,26 +121,30 @@ class UndirectedHyperGraph(HyperGraph):
         fout.close()
 
     '''
-		NOTE: This is a naive way to implement this matrix.
-		      A better approach would be to use a sparce matrix.
-        THIS IS THE MAIN FUNCTION IN THIS CLASS, EVERY TIME YOU CHANGE
-        THE HYPERGRAPH YOU SHOULD CALL THIS FUNCTION TO GET THE CORRECT
-        PROPERTIES OF HYPERGRAPH
+    NOTE: This is a naive way to implement this matrix.
+          A better approach would be to use a sparce matrix.
+    THIS IS THE MAIN FUNCTION IN THIS CLASS, EVERY TIME YOU CHANGE
+    THE HYPERGRAPH YOU SHOULD CALL THIS FUNCTION TO GET THE CORRECT
+    PROPERTIES OF HYPERGRAPH
 
-        This function sets the following variable in this class:
-            (I)   incidence matrix (self.H): contains the |V| by |E| incidence matrix
-            (II)  nodeId list (self.nodeIdList): contains the mapping of each node name to a unique integer value (id)
-                  Note: This is a neccessary variable in both UndirectedGraph and DirectedGraph since every time
-                        that you wanna access the self.nodes and self.hyperedges variables, the order of nodes and
-                        hyperedges change. This is because of the way Python handles the Set and the only way to make
-                        sure that we are keeping track of the orders correctly is to track them, manually
-            (III) edge weight (self.edgeWeight): contains the weights of each hyperedge
-	'''
+    This function sets the following variable in this class:
+    (I)   incidence matrix (self.H): contains the |V| by |E| incidence matrix
+    (II)  nodeId list (self.nodeIdList): contains the mapping of each node name
+          to a unique integer value (id)
+          Note: This is a neccessary variable in both UndirectedGraph and
+                DirectedGraph since every time that you wanna access the
+                self.nodes and self.hyperedges variables, the order of nodes
+                and hyperedges change. This is because of the way Python
+                handles the Set and the only way to make sure that we are
+               keeping track of the orders correctly is to track them, manually
+    (III) edge weight (self.edgeWeight): contains the weights of each hyperedge
+    '''
+
     def getIncidenceMatrix(self):
         edgeNumber = len(self.hyperedges)
         nodeNumber = len(self.nodes)
 
-        incidenceMatrix = np.zeros((nodeNumber,edgeNumber), dtype=int)
+        incidenceMatrix = np.zeros((nodeNumber, edgeNumber), dtype=int)
         hyperedgeId = 0
         nodeId = 0
         self.nodeIdList = {}
@@ -150,61 +157,67 @@ class UndirectedHyperGraph(HyperGraph):
                 incidenceMatrix[self.nodeIdList.get(n.name)][hyperedgeId] = 1
             self.edgeWeight[hyperedgeId] = e.weight
             hyperedgeId = hyperedgeId + 1
-        self.H = incidenceMatrix        
+        self.H = incidenceMatrix
 
     '''
-		Returns a diagonal matrix containing the node degrees
-        which is basically the summation of the weights of each node's incident edges
+        Returns a diagonal matrix containing the node degrees
+        which is basically the summation of the weights of each
+        node's incident edges
     '''
+
     def getDiagonalNodeMatrix(self):
-        if self.H.shape == (0,0):
+        if self.H.shape == (0, 0):
             self.getIncidenceMatrix(self)
         nodeNumber = len(self.nodes)
         edgeNumber = len(self.hyperedges)
         degrees = np.zeros(nodeNumber, dtype=int)
         for row in xrange(nodeNumber):
-            for col in xrange(edgeNumber):                
+            for col in xrange(edgeNumber):
                 if self.H[row][col] == 1:
                     degrees[row] = degrees[row] + self.edgeWeight[col]
         return np.diag(degrees)
 
     '''
-		Returns a diagonal matrix containing the hyperedge weights
+        Returns a diagonal matrix containing the hyperedge weights
     '''
+
     def getDiagonalWeightMatrix(self):
-        if self.H.shape == (0,0):
+        if self.H.shape == (0, 0):
             self.getIncidenceMatrix(self)
         return np.diag(self.edgeWeight)
 
     '''
-		Returns a diagonal matrix containing the hyperedge degrees
+        Returns a diagonal matrix containing the hyperedge degrees
     '''
+
     def getDiagonalEdgeMatrix(self):
-        if self.H.shape == (0,0):
+        if self.H.shape == (0, 0):
             self.getIncidenceMatrix(self)
-        degrees = np.sum(self.H,axis = 0)
+        degrees = np.sum(self.H, axis=0)
         return np.diag(degrees)
 
     '''
-		Creates the transition matrix for the random walk
+        Creates the transition matrix for the random walk
     '''
+
     def randomWalkMatrix(self):
         D_e = self.getDiagonalEdgeMatrix()
         D_v = self.getDiagonalNodeMatrix()
         W = self.getDiagonalWeightMatrix()
-        D_v_inverse = linalg.inv(D_v);
-        D_e_inverse = linalg.inv(D_e);
+        D_v_inverse = linalg.inv(D_v)
+        D_e_inverse = linalg.inv(D_e)
         H = self.H
         H_transpose = H.transpose()
-        P = np.dot(D_v_inverse,H)
-        P = np.dot(P,W)
-        P = np.dot(P,D_e_inverse)
-        P = np.dot(P,H_transpose)
+        P = np.dot(D_v_inverse, H)
+        P = np.dot(P, W)
+        P = np.dot(P, D_e_inverse)
+        P = np.dot(P, H_transpose)
         return P
 
     '''
-		Creates a random vector as the starting point for doing the random walk
+        Creates a random vector as the starting point for doing the random walk
     '''
+
     def createRandomStarter(self):
         nodeNumber = len(self.nodes)
         pi = np.zeros(nodeNumber, dtype=float)
@@ -212,56 +225,60 @@ class UndirectedHyperGraph(HyperGraph):
             pi[i] = random.random()
         summation = np.sum(pi)
         for i in xrange(nodeNumber):
-            pi[i]= pi[i]/summation
+            pi[i] = pi[i] / summation
         return pi
 
     '''
-		Finds the stationary distribution of a hypergraph
+        Finds the stationary distribution of a hypergraph
     '''
-    def stationaryDistribution(self,P):
+
+    def stationaryDistribution(self, P):
         nodeNumber = len(self.nodes)
         pi = self.createRandomStarter()
         pi_star = self.createRandomStarter()
-        while not self.converged(pi_star,pi):
+        while not self.converged(pi_star, pi):
             pi = pi_star
-            pi_star = np.dot(pi,P)
+            pi_star = np.dot(pi, P)
         return pi_star
 
     '''
-		Checks whether the stationary distribution converged
+        Checks whether the stationary distribution converged
     '''
-    def converged(self,pi_star,pi):
+
+    def converged(self, pi_star, pi):
         nodeNumber = pi.shape[0]
         for i in xrange(nodeNumber):
-            if pi[i]-pi_star[i] > 10e-5:
+            if pi[i] - pi_star[i] > 10e-5:
                 return False
         return True
- 
+
     '''
         Finds the Normalized Laplacian Matrix
     '''
+
     def normalizedLaplacian(self):
         nodeNumber = len(self.nodes)
         D_e = self.getDiagonalEdgeMatrix()
         D_v = self.getDiagonalNodeMatrix()
-        D_v_sqrt_inverse = np.real(linalg.inv(linalg.sqrtm(D_v)));
-        D_e_inverse = linalg.inv(D_e);
+        D_v_sqrt_inverse = np.real(linalg.inv(linalg.sqrtm(D_v)))
+        D_e_inverse = linalg.inv(D_e)
         W = self.getDiagonalWeightMatrix()
         H = self.H
         H_transpose = H.transpose()
-        Theta = np.dot(D_v_sqrt_inverse,H)
-        Theta = np.dot(Theta,W)
-        Theta = np.dot(Theta,D_e_inverse)
-        Theta = np.dot(Theta,H_transpose)
-        Theta = np.dot(Theta,D_v_sqrt_inverse)
+        Theta = np.dot(D_v_sqrt_inverse, H)
+        Theta = np.dot(Theta, W)
+        Theta = np.dot(Theta, D_e_inverse)
+        Theta = np.dot(Theta, H_transpose)
+        Theta = np.dot(Theta, D_v_sqrt_inverse)
         I = np.eye(nodeNumber)
-        Delta = np.subtract(I,Theta)
+        Delta = np.subtract(I, Theta)
         return Delta
 
     '''
-		Finds the index of second minimum value in a list
+        Finds the index of second minimum value in a list
     '''
-    def findSecondMinIndex(self,x):
+
+    def findSecondMinIndex(self, x):
         import operator
         min_index, min_value = min(enumerate(x), key=operator.itemgetter(1))
         max_index, max_value = max(enumerate(x), key=operator.itemgetter(1))
@@ -279,7 +296,8 @@ class UndirectedHyperGraph(HyperGraph):
         The return value is a two dimensional array containing
         the node names for the first and second partition
     '''
-    def minCut(self,threshold):
+
+    def minCut(self, threshold):
         '''
         TODO: make sure that the hypergraph is connected
         '''
@@ -288,13 +306,14 @@ class UndirectedHyperGraph(HyperGraph):
         eigenValues = eigens[0]
         secondMinIndex = self.findSecondMinIndex(eigenValues)
         eigenVectors = eigens[1]
-        secondEigenVector = eigenVectors[:,secondMinIndex]
-        partitionIndex = [i for i in xrange(len(secondEigenVector)) if secondEigenVector[i]>=threshold]
+        secondEigenVector = eigenVectors[:, secondMinIndex]
+        partitionIndex = [
+            i for i in xrange(
+                len(secondEigenVector)) if secondEigenVector[i] >= threshold]
         Partition = [list() for x in range(2)]
-        for (key,value) in self.nodeIdList.items():
+        for (key, value) in self.nodeIdList.items():
             if value in partitionIndex:
                 Partition[0].append(key)
             else:
                 Partition[1].append(key)
         return Partition
-

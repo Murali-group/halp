@@ -53,6 +53,7 @@ class HyperEdge:
         '''
         return len(self._head) + len(self._tail)
 
+
 class DirectedHyperArc(HyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):

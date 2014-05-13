@@ -246,12 +246,12 @@ class DirectedHyperGraph(HyperGraph):
         self.edgeWeight = np.zeros(edgeNum, dtype=int)
         for e in self.hyperedges:
             for n in e.head:
-                if not n.name in self.nodeIdList:
+                if n.name not in self.nodeIdList:
                     self.nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1
                 incMatHead[self.nodeIdList.get(n.name)][hyperedgeId] = 1
             for n in e.tail:
-                if not n.name in self.nodeIdList:
+                if n.name not in self.nodeIdList:
                     self.nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1
                 incMatTail[self.nodeIdList.get(n.name)][hyperedgeId] = 1

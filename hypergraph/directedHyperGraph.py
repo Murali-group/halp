@@ -24,14 +24,14 @@ class DirectedHyperGraph(HyperGraph):
         '''
         Returns the incidence tail matrix
         '''
-        return self._incidenceMatrixTail
+        return self._incMatTail
 
     @property
     def H_minus(self):
         '''
         Returns the incidence head matrix
         '''
-        return self._incidenceMatrixHead
+        return self._incMatHead
 
     @property
     def edgeWeight(self):
@@ -43,8 +43,8 @@ class DirectedHyperGraph(HyperGraph):
     def __init__(self, nodes=set(), hyperedges=set()):
         HyperGraph.__init__(self, nodes, hyperedges)
         self._nodeIdList = {}
-        self._incidenceMatrixHead = []
-        self._incidenceMatrixTail = []
+        self._incMatHead = []
+        self._incMatTail = []
         self._edgeWeight = []
 
     def printGraph(self):
@@ -237,8 +237,8 @@ class DirectedHyperGraph(HyperGraph):
         edgeNum = len(self.hyperedges)
         nodeNum = len(self.nodes)
 
-        incidenceMatrixHead = np.zeros((nodeNum, edgeNum), dtype=int)
-        incidenceMatrixTail = np.zeros((nodeNum, edgeNum), dtype=int)
+        incMatHead = np.zeros((nodeNum, edgeNum), dtype=int)
+        incMatTail = np.zeros((nodeNum, edgeNum), dtype=int)
 
         hyperedgeId = 0
         nodeId = 0
@@ -249,24 +249,21 @@ class DirectedHyperGraph(HyperGraph):
                 if not n.name in self.nodeIdList:
                     self.nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1
-                #print("head {0},{1}".format(n.name,nodeId))
-                incidenceMatrixHead[self.nodeIdList.get(n.name)][hyperedgeId] = 1
+                incMatHead[self.nodeIdList.get(n.name)][hyperedgeId] = 1
             for n in e.tail:
                 if not n.name in self.nodeIdList:
                     self.nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1
-                #print("tail {0},{1}".format(n.name,nodeId))
-                incidenceMatrixTail[self.nodeIdList.get(n.name)][hyperedgeId] = 1
+                incMatTail[self.nodeIdList.get(n.name)][hyperedgeId] = 1
             self.edgeWeight[hyperedgeId] = e.weight
             hyperedgeId = hyperedgeId + 1
-        self.H_minus = incidenceMatrixHead
-        self.H_plus = incidenceMatrixTail
+        self.H_minus = incMatHead
+        self.H_plus = incMatTail
 
     def build_diagonal_node_matrix(self):
         '''
         Constructs the diagonal matrix for nodes
         '''
-        #Enough to just check tail or head as both get set in one function
         if self.H_minus.shape == (0, 0):
             self.build_incidence_matrix(self)
         edgeNum = len(self.hyperedges)
@@ -314,7 +311,6 @@ class DirectedHyperGraph(HyperGraph):
         W = self.build_diagonal_weight_matrix()
         mainDiag = D_v_plus.diagonal()
         P = []
-        #Check matrix is invertible
         for x in mainDiag:
             if x == 0:
                 return P

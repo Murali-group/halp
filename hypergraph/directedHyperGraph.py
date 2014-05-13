@@ -270,8 +270,8 @@ class DirectedHyperGraph(HyperGraph):
         nodeNum = len(self.nodes)
         degreesPlus = np.zeros(nodeNum, dtype=int)
         degreesMinus = np.zeros(nodeNum, dtype=int)
-        for row in xrange(nodeNum):
-            for col in xrange(edgeNum):
+        for row in range(nodeNum):
+            for col in range(edgeNum):
                 if self._H_plus[row][col] == 1:
                     degreesPlus[row] = degreesPlus[row] + self._edgeWeight[col]
                 if self._H_minus[row][col] == 1:

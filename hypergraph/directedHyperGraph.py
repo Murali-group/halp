@@ -251,20 +251,20 @@ class DirectedHyperGraph(HyperGraph):
                     nodeId = nodeId + 1
                 incMatHead[self._nodeIdList.get(n.name)][hyperedgeId] = 1
             for n in e.tail:
-                if n.name not in self.nodeIdList:
+                if n.name not in self._nodeIdList:
                     self._nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1
                 incMatTail[self._nodeIdList.get(n.name)][hyperedgeId] = 1
             self._edgeWeight[hyperedgeId] = e.weight
             hyperedgeId = hyperedgeId + 1
-        self.H_minus = incMatHead
-        self.H_plus = incMatTail
+        self._H_minus = incMatHead
+        self._H_plus = incMatTail
 
     def build_diagonal_node_matrix(self):
         '''
         Constructs the diagonal matrix for nodes
         '''
-        if self.H_minus.shape == (0, 0):
+        if self._H_minus.shape == (0, 0):
             self.build_incidence_matrix(self)
         edgeNum = len(self.hyperedges)
         nodeNum = len(self.nodes)
@@ -272,28 +272,28 @@ class DirectedHyperGraph(HyperGraph):
         degreesMinus = np.zeros(nodeNum, dtype=int)
         for row in xrange(nodeNum):
             for col in xrange(edgeNum):
-                if self.H_plus[row][col] == 1:
-                    degreesPlus[row] = degreesPlus[row] + self.edgeWeight[col]
-                if self.H_minus[row][col] == 1:
+                if self._H_plus[row][col] == 1:
+                    degreesPlus[row] = degreesPlus[row] + self._edgeWeight[col]
+                if self._H_minus[row][col] == 1:
                     degreesMinus[row] = degreesMinus[row] + \
-                        self.edgeWeight[col]
+                        self._edgeWeight[col]
         return np.diag(degreesMinus), np.diag(degreesPlus)
 
     def build_diagonal_edge_matrix(self):
         '''
         Constructs the diagonal matrix for hyperedges
         '''
-        if self.H_minus.shape == (0, 0):
+        if self._H_minus.shape == (0, 0):
             self.build_incidence_matrix(self)
-        degreesMinus = np.sum(self.H_minus, axis=0)
-        degreesPlus = np.sum(self.H_plus, axis=0)
+        degreesMinus = np.sum(self._H_minus, axis=0)
+        degreesPlus = np.sum(self._H_plus, axis=0)
         return np.diag(degreesMinus), np.diag(degreesPlus)
 
     def build_diagonal_weight_matrix(self):
         '''
         Constructs the diagonal weight matrix for the hyperedges
         '''
-        if self.H_minus.shape == (0, 0):
+        if self._H_minus.shape == (0, 0):
             self.build_incidence_matrix(self)
         return np.diag(self.edgeWeight)
 
@@ -316,8 +316,8 @@ class DirectedHyperGraph(HyperGraph):
                 return P
         D_v_plus_inverse = np.linalg.inv(D_v_plus)
         D_e_minus_inverse = np.linalg.inv(D_e_minus)
-        H_minus_transpose = self.H_minus.transpose()
-        P = np.dot(D_v_plus_inverse, self.H_plus)
+        H_minus_transpose = self._H_minus.transpose()
+        P = np.dot(D_v_plus_inverse, self._H_plus)
         P = np.dot(P, W)
         P = np.dot(P, D_e_minus_inverse)
         P = np.dot(P, H_minus_transpose)

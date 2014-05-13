@@ -21,8 +21,8 @@ def test_directed_random_walk():
     directedHyperGraph.build_incidence_matrix()
     head= np.matrix('0 0 0 0; 1 0 0 0; 1 0 0 0; 0 1 0 0; 0 0 1 1')
     tail = np.matrix('1 0 1 0; 0 1 0 0; 0 0 1 0; 0 0 0 1; 0 0 0 0')     
-    assert np.shape(directedHyperGraph.H_minus)==(5, 4)
-    assert np.shape(directedHyperGraph.H_plus)==(5, 4)
+    assert np.shape(directedHyperGraph._H_minus)==(5, 4)
+    assert np.shape(directedHyperGraph._H_plus)==(5, 4)
 
     P = directedHyperGraph.build_transition_matrix()
     print(P)

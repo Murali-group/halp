@@ -324,6 +324,7 @@ class DirectedHyperGraph(HyperGraph):
         P = np.dot(P, D_e_minus_inverse)
         P = np.dot(P, H_minus_transpose)
         return P
+
 class DirectedBHyperGraph(DirectedHyperGraph):
 
     def __init__(self, nodes=set(), hyperedges=set()):
@@ -380,8 +381,8 @@ class DirectedBHyperGraph(DirectedHyperGraph):
 
     def flow(self, tree, demand, flow):
         '''
-        Given a demand vector for non-root nodes, 
-        a flow vector for external edges, and a 
+        Given a demand vector for non-root nodes,
+        a flow vector for external edges, and a
         spanning tree, this function returns a flow
         on tree edges and the root demand/supply.
         '''
@@ -415,7 +416,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 demand[v] = demand[v] - (mult*flow[e])
 
         unvisited = {}
-        leaves = tree_nodes
+        leaves = non_root_nodes
         for node in self.nodes:
             count = 0
             for e in tree_edges:
@@ -436,7 +437,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             flow[e] = demand[v] / v_mult
             for w in e.head.union(e.tail):
                 if v == w:
-                    continue                
+                    continue
                 if w in e.head:
                     w_mult = 1
                 elif w in e.tail:
@@ -450,8 +451,8 @@ class DirectedBHyperGraph(DirectedHyperGraph):
 
     def potential(self, tree, cost, potential):
         '''
-        Given a cost vector for tree edges, 
-        a potential vector for root nodes, and a 
+        Given a cost vector for tree edges,
+        a potential vector for root nodes, and a
         spanning tree, this function returns a potential
         on non-root nodes and a cost of external edges.
         '''
@@ -460,7 +461,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         root_nodes = tree[0]
         non_root_nodes = set()
         tree_edges = set()
-
+        predecessor = {}
         for i in range(1,len(tree)):
             if i % 2 == 1:
                 tree_edges.add(tree[i])
@@ -475,7 +476,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
 
         for v in root_nodes:
             for e in self.hyperedges:
-                if v in e.head.union(e.tail):    
+                if v in e.head.union(e.tail):
                     mult = 0
                     if v in e.head:
                         mult = 1
@@ -508,7 +509,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     f_mult = 1
                 elif v in f.tail:
                     f_mult = f.weight
-                cost[f] = cost[f] - w_mult * potential[v]
+                cost[f] = cost[f] - f_mult * potential[v]
                 unvisited[f].remove(v)
                 if len(unvisited[f]) == 1 and f not in ex_edges:
                     queue.append(f)
@@ -631,5 +632,5 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         except:
             raise ValueError("Invalid f-hyperedge set")
         HyperGraph.__init__(self, nodes, hyperedges)
-    
-    
+
+

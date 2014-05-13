@@ -50,6 +50,24 @@ class HyperEdge:
     def __repr__(self):
         return "head:" + str(self._head) + " tail:" + str(self._tail) + " weight: " + str(self._weight)
 
+    def cardinality(self):
+        '''
+        return the number of nodes in tail and head
+        '''
+        return len(self._head) + len(self._tail)
+
+    def cardinalityHead(self):
+        '''
+        return the number of nodes in head
+        '''
+        return len(self._head)
+
+    def cardinalityTail(self):
+        '''
+        return the number of nodes in tail
+        '''
+        return len(self._tail)
+
     def __str__(self):
         return "head:" + str(self._head) + " tail:" + str(self._tail) + " weight: " + str(self._weight)
 

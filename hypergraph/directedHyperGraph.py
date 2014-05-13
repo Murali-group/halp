@@ -263,6 +263,9 @@ class DirectedHyperGraph(HyperGraph):
         self.H_plus = incidenceMatrixTail            
 
     def build_diagonal_node_matrix(self):
+        '''
+        Constructs the diagonal matrix for nodes
+        '''
         #Enough to just check tail or head as both get set in one function
         if self.H_minus.shape == (0,0):
             self.build_incidence_matrix(self)
@@ -279,6 +282,9 @@ class DirectedHyperGraph(HyperGraph):
         return np.diag(degreesMinus),np.diag(degreesPlus)
 
     def build_diagonal_edge_matrix(self):
+        '''
+        Constructs the diagonal matrix for hyperedges
+        '''
         if self.H_minus.shape == (0,0):
             self.build_incidence_matrix(self)
         degreesMinus = np.sum(self.H_minus, axis = 0)
@@ -286,14 +292,31 @@ class DirectedHyperGraph(HyperGraph):
         return np.diag(degreesMinus),np.diag(degreesPlus)
 
     def build_diagonal_weight_matrix(self):
+        '''
+        Constructs the diagonal weight matrix for the hyperedges
+        '''
         if self.H_minus.shape == (0,0):
             self.build_incidence_matrix(self)
         return np.diag(self.edgeWeight)
     
     def build_transition_matrix(self):
+        '''
+        Constructs the P transition matrix for use in random walk algorithms 
+        Based on equation: P = D_{v^+}^{-1}H_+WD_{e^-}^{-1}H_-^T
+
+        Usage:
+            Will return P unless given dirhypergraph produces non-invertible
+            degree node matrix, in which case P is empty
+        '''
         D_v_minus,D_v_plus = self.build_diagonal_node_matrix()
         D_e_minus,D_e_plus = self.build_diagonal_edge_matrix()
         W = self.build_diagonal_weight_matrix()
+        mainDiag = D_v_plus.diagonal()
+        P = []
+        #Check matrix is invertible
+        for x in mainDiag:
+            if x == 0:
+                return P
         D_v_plus_inverse = np.linalg.inv(D_v_plus)
         D_e_minus_inverse = np.linalg.inv(D_e_minus)
         H_minus_transpose = self.H_minus.transpose()

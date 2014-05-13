@@ -426,9 +426,6 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 predecessor[tree[i]] = tree[i-1]
 
         ex_edges = self.hyperedges.difference(tree_edges)
-        print self.hyperedges
-        print tree_edges
-        print ex_edges
 
         for node in root_nodes:
             demand[node] = 0
@@ -439,9 +436,11 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 mult = 0
                 if v in e.head:
                     mult = 1
+                    demand[v] = demand[v] - (mult*flow[e])
                 elif v in e.tail:
-                    mult = - e.weight
-                demand[v] = demand[v] - (mult*flow[e])
+                    mult = -1 * e.weight
+                    demand[v] = demand[v] - (mult*flow[e])
+            print demand
 
         unvisited = {}
         leaves = set()
@@ -462,7 +461,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             if v in e.head:
                 v_mult = 1
             elif v in e.tail:
-                v_mult = e.weight
+                v_mult = -1 * e.weight
             flow[e] = demand[v] / v_mult
             for w in e.head.union(e.tail):
                 if v == w:
@@ -470,11 +469,13 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 if w in e.head:
                     w_mult = 1
                 elif w in e.tail:
-                    w_mult = e.weight
+                    w_mult = -1 * e.weight
                 demand[w] = demand[w] - w_mult * flow[e]
                 unvisited[w] = unvisited[w] - 1
                 if unvisited[w] == 1 and w not in root_nodes:
                     queue.append(w)
+            print demand
+            print flow
         for v in root_nodes:
             demand[v] = -1 * demand[v]
         return demand, flow
@@ -510,9 +511,10 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     mult = 0
                     if v in e.head:
                         mult = 1
+                        cost[e] = cost[e] - (mult*potential[v])
                     elif v in e.tail:
-                        mult = - e.weight
-                    cost[e] = cost[e] - (mult*potential[v])
+                        mult = -1 * e.weight
+                        cost[e] = cost[e] - (mult*potential[v])
 
         unvisited = {}
         branches = tree_edges
@@ -529,7 +531,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             if v in e.head:
                 e_mult = 1
             elif v in e.tail:
-                e_mult = e.weight
+                e_mult = -1 * e.weight
             potential[v] = cost[e] / e_mult
             for f in e.hyperedges:
                 if f == e:
@@ -538,7 +540,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 if v in f.head:
                     f_mult = 1
                 elif v in f.tail:
-                    f_mult = f.weight
+                    f_mult = -1 * f.weight
                 cost[f] = cost[f] - f_mult * potential[v]
                 unvisited[f].remove(v)
                 if len(unvisited[f]) == 1 and f not in ex_edges:

@@ -242,7 +242,6 @@ class DirectedHyperGraph(HyperGraph):
 
         hyperedgeId = 0
         nodeId = 0
-        self.nodeIdList = {}
         self.edgeWeight = np.zeros(edgeNum, dtype=int)
         for e in self.hyperedges:
             for n in e.head:

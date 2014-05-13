@@ -6,7 +6,7 @@ from .hypergraph import HyperGraph
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import HyperEdge, DirectedFHyperEdge, DirectedBHyperEdge
+from .hyperedge import HyperEdge, DirectedHyperEdge, DirectedFHyperEdge, DirectedBHyperEdge
 
 import numpy as np
 
@@ -61,7 +61,7 @@ class DirectedHyperGraph(HyperGraph):
         Adds a hyperedge to the graph by node names.
         '''
         # Create hypergraph from current line
-        hyperedge = HyperEdge(set(), set(), weight)
+        hyperedge = DirectedHyperEdge(set(), set(), weight)
 
         # Read Tail nodes
         for t in tail:
@@ -335,6 +335,31 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         except:
             raise ValueError("Invalid b-hyperedge set")
 
+    def add_hyperedgeByNames(self, head=set(), tail=set(), weight=0):
+        '''
+        Adds a hyperedge to the graph by node names.
+        '''
+        # Create hypergraph from current line
+        hyperedge = DirectedBHyperEdge(set(), set(), weight)
+
+        # Read Tail nodes
+        for t in tail:
+            node = self.get_node_by_name(t)
+            if (node is None):
+                node = Node(t)
+                self.add_node(node)
+            hyperedge.tail.add(node)
+
+        # Read Head nodes
+        for h in head:
+            node = self.get_node_by_name(h)
+            if (node is None):
+                node = Node(h)
+                self.add_node(node)
+            hyperedge.head.add(node)
+
+        self.add_hyperedge(hyperedge)
+
     def get_spanning_hypertree(self):
         rootNodes = set()
         nonRootNodes = set()
@@ -401,6 +426,9 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 predecessor[tree[i]] = tree[i-1]
 
         ex_edges = self.hyperedges.difference(tree_edges)
+        print self.hyperedges
+        print tree_edges
+        print ex_edges
 
         for node in root_nodes:
             demand[node] = 0
@@ -427,7 +455,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             unvisited[node] = count
 
         queue = list(leaves)
-        while queue.count != 0:
+        while len(queue) != 0:
             v = queue.pop(0)
             e = predecessor[v]
             v_mult = 0
@@ -494,7 +522,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 branches.remove(e)
 
         queue = list(branches)
-        while queue.count != 0:
+        while len(queue) != 0:
             e = queue.pop(0)
             v = unvisited[e].pop()
             e_mult = 0

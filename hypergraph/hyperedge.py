@@ -86,7 +86,7 @@ class DirectedHyperEdge(HyperEdge):
         return len(self.head) + len(self.tail)
     
     
-class DirectedBHyperEdge(HyperEdge):
+class DirectedBHyperEdge(DirectedHyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):
         try:
@@ -94,6 +94,8 @@ class DirectedBHyperEdge(HyperEdge):
         except:
             raise ValueError("Invalid head cardinality", tail)
         HyperEdge.__init__(self, head, tail, weight)
+
+
     
     
 class DirectedFHyperEdge(DirectedHyperEdge):

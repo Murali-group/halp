@@ -246,12 +246,12 @@ class DirectedHyperGraph(HyperGraph):
         self.edgeWeight = np.zeros(edgeNum, dtype=int)
         for e in self.hyperedges:
             for n in e.head:
-	        if not self.nodeIdList.has_key(n.name):
+                if not self.nodeIdList.has_key(n.name):
                     self.nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1
                 #print("head {0},{1}".format(n.name,nodeId))
                 incidenceMatrixHead[self.nodeIdList.get(n.name)][hyperedgeId] = 1
-	    for n in e.tail:
+            for n in e.tail:
                 if not self.nodeIdList.has_key(n.name):
                     self.nodeIdList[n.name] = nodeId
                     nodeId = nodeId + 1

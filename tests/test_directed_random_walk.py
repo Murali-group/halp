@@ -13,14 +13,16 @@ def test_directed_random_walk():
     directedHyperGraph.read('tests/data/dirhypergraph.txt')
 
     assert len(directedHyperGraph.nodes) == 5
-    assert len(directedHyperGraph.hyperedges) == 4
+    assert len(directedHyperGraph.hyperedges) == 5
 
     '''
     Test the incidence matrix 
     '''
-    headFile, tailFile = directedHyperGraph.build_incidence_matrix()
+    directedHyperGraph.build_incidence_matrix()
     head= np.matrix('0 0 0 0; 1 0 0 0; 1 0 0 0; 0 1 0 0; 0 0 1 1')
     tail = np.matrix('1 0 1 0; 0 1 0 0; 0 0 1 0; 0 0 0 1; 0 0 0 0')     
-    assert np.shape(headFile)==(5, 4)
-    assert np.shape(tailFile)==(5, 4)
+    assert np.shape(directedHyperGraph.H_minus)==(5, 5)
+    assert np.shape(directedHyperGraph.H_plus)==(5, 5)
 
+    P = directedHyperGraph.build_transition_matrix()
+    print(P)

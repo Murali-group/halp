@@ -253,19 +253,28 @@ class DirectedBHyperGraph(DirectedHyperGraph):
 
     def flow(self, tree, demand, flow):
         '''
-        Given a demand vector and a spanning tree, this function returns the
-        flow on the tree and the needed initial demand.
+        Given a demand vector for non-root nodes, 
+        a flow vector for external edges, and a 
+        spanning tree, this function returns a flow
+        on tree edges and the root demand/supply.
         '''
         assert len(tree) > 0
-        # Get root nad non root nodes
-        root = tree[0]
+        # Get root and non root nodes
+        root_nodes = tree[0]
+        non_root_nodes = set()
+        tree_edges = set()
+        predecessor = {}
 
-        # Get tree and external edges
-        tree_edges = set(tree[1::2])
-        tree_nodes = set(tree[::2])
-        ex_edges = tree_edges.difference(self.nodes)
+        for i in range(1,len(tree)):
+            if i % 2 == 1:
+                tree_edges.add(tree[i])
+            else:
+                non_root_nodes.add(tree[i])
+                predecessor[tree[i]] = tree[i-1]
 
-        for node in root:
+        ex_edges = self.hyperedges.difference(tree_edges)
+
+        for node in root_nodes:
             flow[node] = 0
 
         for e in ex_edges:
@@ -283,15 +292,101 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         for node in self.nodes:
             count = 0
             for e in tree_edges:
-                if node in e.head: count += 1
+                if node in e.head.union(e.tail):
+                    count += 1
                 leaves = leaves.difference(e.tail)
             unvisited[node] = count
 
         queue = list(leaves)
         while queue.count != 0:
             v = queue.pop(0)
+            e = predecessor[v]
+            v_mult = 0
+            if v in e.head:
+                v_mult = 1
+            elif v in e.tail:
+                v_mult = e.weight
+            flow[e] = demand[v] / v_mult
+            for w in e.head.union(e.tail):
+                if v == w:
+                    continue                
+                if w in e.head:
+                    w_mult = 1
+                elif w in e.tail:
+                    w_mult = e.weight
+                demand[w] = demand[w] - w_mult * flow[e]
+                unvisited[w] = unvisited[w] - 1
+                if unvisited[w] == 1 and w not in root_nodes:
+                    queue.append(w)
+        for v in root_nodes:
+            demand[v] = -1 * demand[v]
 
+    def potential(self, tree, cost, potential):
+        '''
+        Given a cost vector for tree edges, 
+        a potential vector for root nodes, and a 
+        spanning tree, this function returns a potential
+        on non-root nodes and a cost of external edges.
+        '''
+        assert len(tree) > 0
+        # Get root and non root nodes
+        root_nodes = tree[0]
+        non_root_nodes = set()
+        tree_edges = set()
 
+        for i in range(1,len(tree)):
+            if i % 2 == 1:
+                tree_edges.add(tree[i])
+            else:
+                non_root_nodes.add(tree[i])
+                predecessor[tree[i]] = tree[i-1]
+
+        ex_edges = self.hyperedges.difference(tree_edges)
+
+        for e in ex_edges:
+            cost[e] = 0
+
+        for v in root_nodes:
+            for e in self.hyperedges:
+                if v in e.head.union(e.tail):    
+                    mult = 0
+                    if v in e.head:
+                        mult = 1
+                    elif v in e.tail:
+                        mult = - e.weight
+                    cost[e] = cost[e] - (mult*potential[v])
+
+        unvisited = {}
+        branches = tree_edges
+        for e in self.hyperedges:
+            unvisited[e] = e.head.union(e.tail).intersection(non_root_nodes)
+            if len(unvisited[e]) > 1:
+                branches.remove(e)
+
+        queue = list(branches)
+        while queue.count != 0:
+            e = queue.pop(0)
+            v = unvisited[e].pop()
+            e_mult = 0
+            if v in e.head:
+                e_mult = 1
+            elif v in e.tail:
+                e_mult = e.weight
+            potential[v] = cost[e] / e_mult
+            for f in e.hyperedges:
+                if f == e:
+                    continue
+                f_mult = 0
+                if v in f.head:
+                    f_mult = 1
+                elif v in f.tail:
+                    f_mult = f.weight
+                cost[f] = cost[f] - w_mult * potential[v]
+                unvisited[f].remove(v)
+                if len(unvisited[f]) == 1 and f not in ex_edges:
+                    queue.append(f)
+        for e in ex_edges:
+            cost[e] = -1 * cost[e]
 
 class DirectedBHyperTree(DirectedBHyperGraph):
 

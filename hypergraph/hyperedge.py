@@ -48,7 +48,8 @@ class HyperEdge:
         return deepcopy(self)
 
     def __repr__(self):
-        return "head:" + str(self._head) + " tail:" + str(self._tail) + " weight: " + str(self._weight)
+        return "head:" + str(self._head) + " tail:" + \
+            str(self._tail) + " weight: " + str(self._weight)
 
     def cardinality(self):
         '''
@@ -69,9 +70,9 @@ class HyperEdge:
         return len(self._tail)
 
     def __str__(self):
-        return "head:" + str(self._head) + " tail:" + str(self._tail) + " weight: " + str(self._weight)
+        return "head:" + str(self._head) + " tail:" + \
+            str(self._tail) + " weight: " + str(self._weight)
 
-        
 
 class DirectedHyperEdge(HyperEdge):
 
@@ -82,10 +83,10 @@ class DirectedHyperEdge(HyperEdge):
         return self.head == other.head and self.tail == other.tail
 
     def __hash__(self):
-        #TODO
+        # TODO
         return len(self.head) + len(self.tail)
-    
-    
+
+
 class DirectedBHyperEdge(DirectedHyperEdge):
 
     def __init__(self, head=set(), tail=None, weight=0):
@@ -96,8 +97,6 @@ class DirectedBHyperEdge(DirectedHyperEdge):
         HyperEdge.__init__(self, head, tail, weight)
 
 
-    
-    
 class DirectedFHyperEdge(DirectedHyperEdge):
 
     def __init__(self, head=None, tail=set(), weight=0):

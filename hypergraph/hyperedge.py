@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from copy import deepcopy
-from .node import Node
 
 
 class HyperEdge:
@@ -72,6 +71,18 @@ class HyperEdge:
     def __str__(self):
         return "head:" + str(self._head) + " tail:" + \
             str(self._tail) + " weight: " + str(self._weight)
+
+    def __lt__(self, rhs):
+        return self.weight < rhs.weight
+
+    def __gt__(self, rhs):
+        return self.weight > rhs.weight
+
+    def __le__(self, rhs):
+        return self.weight <= rhs.weight
+
+    def __ge__(self, rhs):
+        return self.weight >= rhs.weight
 
 
 class DirectedHyperEdge(HyperEdge):

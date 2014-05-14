@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from copy import deepcopy
-from .node import Node
 
 
 class HyperEdge:
@@ -47,6 +46,10 @@ class HyperEdge:
         '''
         return deepcopy(self)
 
+    def __repr__(self):
+        return "head:" + str(self._head) + " tail:" + \
+            str(self._tail) + " weight: " + str(self._weight)
+
     def cardinality(self):
         '''
         return the number of nodes in tail and head
@@ -65,21 +68,54 @@ class HyperEdge:
         '''
         return len(self._tail)
 
+    def __str__(self):
+        return "head:" + str(self._head) + " tail:" + \
+            str(self._tail) + " weight: " + str(self._weight)
 
-class DirectedHyperArc(HyperEdge):
+    def __lt__(self, rhs):
+        return self.weight < rhs.weight
 
-    def __init__(self, head=set(), tail=None, weight=0):
-        try:
-            assert isinstance(tail, Node)
-        except:
-            raise ValueError("Invalid tail node %s", tail)
-        HyperEdge.__init__(head, tail, weight)
+    def __gt__(self, rhs):
+        return self.weight > rhs.weight
+
+    def __le__(self, rhs):
+        return self.weight <= rhs.weight
+
+    def __ge__(self, rhs):
+        return self.weight >= rhs.weight
 
 
 class DirectedHyperEdge(HyperEdge):
 
     def __init__(self, head=set(), tail=set(), weight=0):
-        HyperEdge.__init__(head, tail, weight)
+        HyperEdge.__init__(self, head, tail, weight)
+
+    def __eq__(self, other):
+        return self.head == other.head and self.tail == other.tail
+
+    def __hash__(self):
+        # TODO
+        return len(self.head) + len(self.tail)
+
+
+class DirectedBHyperEdge(DirectedHyperEdge):
+
+    def __init__(self, head=set(), tail=None, weight=0):
+        try:
+            assert len(head) <= 1
+        except:
+            raise ValueError("Invalid head cardinality", tail)
+        HyperEdge.__init__(self, head, tail, weight)
+
+
+class DirectedFHyperEdge(DirectedHyperEdge):
+
+    def __init__(self, head=None, tail=set(), weight=0):
+        try:
+            assert len(tail) <= 1
+        except:
+            raise ValueError("Invalid tail cardinality", head)
+        HyperEdge.__init__(self, head, tail, weight)
 
 
 class UndirectedHyperEdge(HyperEdge):
@@ -95,6 +131,12 @@ class UndirectedHyperEdge(HyperEdge):
 
     def __init__(self, nodes=set(), weight=0):
         HyperEdge.__init__(self, nodes, set(), weight)
+
+    def __eq__(self, other):
+        return self.nodes == other.nodes and self.weight == other.weight
+
+    def __hash__(self):
+        return len(self.nodes)
 
     @property
     def nodes(self):

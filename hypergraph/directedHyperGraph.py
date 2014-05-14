@@ -6,7 +6,8 @@ from .hypergraph import HyperGraph
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import DirectedHyperEdge, DirectedFHyperEdge, DirectedBHyperEdge
+from .hyperedge import DirectedHyperEdge
+from .hyperedge import DirectedFHyperEdge, DirectedBHyperEdge
 
 import numpy as np
 

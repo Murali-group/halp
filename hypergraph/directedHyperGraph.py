@@ -14,6 +14,7 @@ import numpy as np
 
 
 class DirectedHyperGraph(HyperGraph):
+
     @property
     def nodeIdList(self):
         '''
@@ -325,6 +326,7 @@ class DirectedHyperGraph(HyperGraph):
         P = np.dot(P, H_minus_transpose)
         return P
 
+
 class DirectedBHyperGraph(DirectedHyperGraph):
 
     def __init__(self, nodes=set(), hyperedges=set()):
@@ -370,16 +372,16 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         Q = dict()
         for e in self.hyperedges:
             Q[e] = e.head.union(e.tail)
-            eQueue.put((len(Q[e]),e))
+            eQueue.put((len(Q[e]), e))
 
         while len(vPrime) > 0:
             x = eQueue.get()
             a = x[1]
-            #print "chose", a
+            # print "chose", a
             if len(Q[a]) == 0:
                 continue
             v = next(iter(Q[a]))
-            #print "     chose", v
+            # print "     chose", v
             if len(Q[a]) == 1:
                 nonRootNodes.add(v)
                 if v in vPrime:
@@ -391,7 +393,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             ordering.append(a)
             ordering.append(v)
             ePrime.remove(a)
-            #print rootNodes
+            # print rootNodes
             eQueue = PriorityQueue()
             for e in ePrime:
                 Q[e] = Q[e].difference(Q[a])
@@ -400,8 +402,8 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     MAX_VAL = sys.maxsize
                     eQueue.put((MAX_VAL, e))
                 else:
-                    eQueue.put((len(Q[e]),e))
-        ordering.insert(0,rootNodes)
+                    eQueue.put((len(Q[e]), e))
+        ordering.insert(0, rootNodes)
         return ordering
 
     def flow(self, tree, demand, flow):
@@ -418,12 +420,12 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         tree_edges = set()
         predecessor = {}
 
-        for i in range(1,len(tree)):
+        for i in range(1, len(tree)):
             if i % 2 == 1:
                 tree_edges.add(tree[i])
             else:
                 non_root_nodes.add(tree[i])
-                predecessor[tree[i]] = tree[i-1]
+                predecessor[tree[i]] = tree[i - 1]
 
         ex_edges = self.hyperedges.difference(tree_edges)
 
@@ -436,10 +438,10 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                 mult = 0
                 if v in e.head:
                     mult = 1
-                    demand[v] = demand[v] - (mult*flow[e])
+                    demand[v] = demand[v] - (mult * flow[e])
                 elif v in e.tail:
                     mult = -1 * e.weight
-                    demand[v] = demand[v] - (mult*flow[e])
+                    demand[v] = demand[v] - (mult * flow[e])
             print demand
 
         unvisited = {}
@@ -493,12 +495,12 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         non_root_nodes = set()
         tree_edges = set()
         predecessor = {}
-        for i in range(1,len(tree)):
+        for i in range(1, len(tree)):
             if i % 2 == 1:
                 tree_edges.add(tree[i])
             else:
                 non_root_nodes.add(tree[i])
-                predecessor[tree[i]] = tree[i-1]
+                predecessor[tree[i]] = tree[i - 1]
 
         ex_edges = self.hyperedges.difference(tree_edges)
 
@@ -511,10 +513,10 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     mult = 0
                     if v in e.head:
                         mult = 1
-                        cost[e] = cost[e] - (mult*potential[v])
+                        cost[e] = cost[e] - (mult * potential[v])
                     elif v in e.tail:
                         mult = -1 * e.weight
-                        cost[e] = cost[e] - (mult*potential[v])
+                        cost[e] = cost[e] - (mult * potential[v])
             print cost
 
         unvisited = {}
@@ -555,10 +557,15 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             cost[e] = -1 * cost[e]
 
         return cost, potential
+
+
 class DirectedBHyperTree(DirectedBHyperGraph):
 
     def __init__(self, rootNodes=set(), nonRootNodes=set(), hyperedges=set()):
-        DirectedBHyperGraph.__init__(self, rootNodes.union(nonRootNodes), hyperedges)
+        DirectedBHyperGraph.__init__(
+            self,
+            rootNodes.union(nonRootNodes),
+            hyperedges)
         self.rootNodes = rootNodes
         self.nonRootNodes = nonRootNodes
         try:
@@ -623,7 +630,7 @@ class DirectedBHyperTree(DirectedBHyperGraph):
     def isCycleFree(self):
         queue = deque([])
         for n in self.rootNodes:
-            queue.append((n,set([n])))
+            queue.append((n, set([n])))
         while len(queue) > 0:
             curNode, curPath = queue.popleft()
             for e in self.hyperedges:
@@ -632,7 +639,8 @@ class DirectedBHyperTree(DirectedBHyperGraph):
                         print newNode, " from ", curNode, "(", curPath, ")"
                         if newNode in curPath:
                             return False
-                        queue.appendleft((newNode,curPath.union(set([newNode]))))
+                        queue.appendleft(
+                            (newNode, curPath.union(set([newNode]))))
         return True
 
     def define_root_nodes(self, nodes):
@@ -671,5 +679,3 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         except:
             raise ValueError("Invalid f-hyperedge set")
         HyperGraph.__init__(self, nodes, hyperedges)
-
-

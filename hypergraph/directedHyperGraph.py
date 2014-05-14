@@ -6,7 +6,7 @@ from .hypergraph import HyperGraph
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import HyperEdge, DirectedHyperEdge, DirectedFHyperEdge, DirectedBHyperEdge
+from .hyperedge import DirectedHyperEdge, DirectedFHyperEdge, DirectedBHyperEdge
 
 import numpy as np
 
@@ -515,10 +515,11 @@ class DirectedBHyperGraph(DirectedHyperGraph):
                     elif v in e.tail:
                         mult = -1 * e.weight
                         cost[e] = cost[e] - (mult*potential[v])
+            print cost
 
         unvisited = {}
-        branches = tree_edges
-        for e in self.hyperedges:
+        branches = tree_edges.copy()
+        for e in tree_edges:
             unvisited[e] = e.head.union(e.tail).intersection(non_root_nodes)
             if len(unvisited[e]) > 1:
                 branches.remove(e)
@@ -533,21 +534,27 @@ class DirectedBHyperGraph(DirectedHyperGraph):
             elif v in e.tail:
                 e_mult = -1 * e.weight
             potential[v] = cost[e] / e_mult
-            for f in e.hyperedges:
+            for f in self.hyperedges:
                 if f == e:
+                    continue
+                if v not in f.head.union(f.tail):
                     continue
                 f_mult = 0
                 if v in f.head:
                     f_mult = 1
                 elif v in f.tail:
                     f_mult = -1 * f.weight
-                cost[f] = cost[f] - f_mult * potential[v]
-                unvisited[f].remove(v)
-                if len(unvisited[f]) == 1 and f not in ex_edges:
-                    queue.append(f)
+                cost[f] = cost[f] - (f_mult * potential[v])
+                if f in unvisited:
+                    unvisited[f].remove(v)
+                    if len(unvisited[f]) == 1 and f not in ex_edges:
+                        queue.append(f)
+            print potential
+            print cost
         for e in ex_edges:
             cost[e] = -1 * cost[e]
 
+        return cost, potential
 class DirectedBHyperTree(DirectedBHyperGraph):
 
     def __init__(self, rootNodes=set(), nonRootNodes=set(), hyperedges=set()):

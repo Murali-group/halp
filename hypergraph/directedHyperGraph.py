@@ -1,5 +1,8 @@
 from __future__ import absolute_import
-from Queue import PriorityQueue
+try:
+    from queue import PriorityQueue
+except ImportError:
+    from Queue import PriorityQueue
 from collections import deque
 
 from .hypergraph import HyperGraph

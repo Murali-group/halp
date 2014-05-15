@@ -184,14 +184,14 @@ class DirectedHyperGraph(HyperGraph):
         Q=[s]
         while Q:
             v = Q.pop(0)
-            for e in FS(v):
+            for e in self.FS(v):
                 B[e] += 1
                 if B[e] == len(e.tail):
                     Pe[e] = v
                     for h in [x for x in e.head if Pv[x] == None]:
                         Pv[h] = e
                         Q.append(h)
-                        conneted.add(h)
+                        connected.add(h)
         return connected
 
     def b_connection(self, s):
@@ -279,7 +279,7 @@ class DirectedHyperGraph(HyperGraph):
         W[s] = 0 
         while Q:
             u = Q.pop(Q.index(min(Q, key=lambda node: W[node])))
-            for e in FS(u): 
+            for e in self.FS(u): 
                 B[e] += 1
                 if B[e] == len(e.tail):
                     f = F(e, W)
@@ -287,7 +287,7 @@ class DirectedHyperGraph(HyperGraph):
                         if y not in Q:
                             Q.append(y)
                             if W[y] < float('inf'): 
-                                for eh in FS(self, y):
+                                for eh in self.FS(self, y):
                                     B[eh] -= 1
                         W[y] = e.weight + f
                         Pv[y] = e

@@ -184,7 +184,7 @@ class DirectedHyperGraph(HyperGraph):
         Q=[s]
         while Q:
             v = Q.pop(0)
-            for e in FS(self, v):
+            for e in FS(v):
                 B[e] += 1
                 if B[e] == len(e.tail):
                     Pe[e] = v
@@ -279,7 +279,7 @@ class DirectedHyperGraph(HyperGraph):
         W[s] = 0 
         while Q:
             u = Q.pop(Q.index(min(Q, key=lambda node: W[node])))
-            for e in FS(self, u): 
+            for e in FS(u): 
                 B[e] += 1
                 if B[e] == len(e.tail):
                     f = F(e, W)

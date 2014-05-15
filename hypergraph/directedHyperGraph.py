@@ -160,14 +160,14 @@ class DirectedHyperGraph(HyperGraph):
         Returns the Forward Star set of edges for the vertex v
         which is the set of edges that v is in the tail of
         '''
-        return [e for e in self.hyperedges if v in e.tail]
+        return set([e for e in self.hyperedges if v in e.tail])
 
     def BS(self, v):
         '''
         Returns the Backward Star set of edges for the vertex v
         which is the set of edges that v is in the head of
         '''
-        return [e for e in self.hyperedges if v in e.head]
+        return set([e for e in self.hyperedges if v in e.head])
 
     def b_visit(self, s):
         '''

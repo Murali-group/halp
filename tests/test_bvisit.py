@@ -50,6 +50,6 @@ def test_bvisit():
     assert Bvisitx7 == set([x7])
     assert Bvisitx8 == set([x8])
     assert Bvisitx9 == set([x9])
-    assert Bvisitx10 == set([x10,x1,x2,x3,x4,x5,x6,x7,x8,x9])
+    assert Bvisitx10 == set([x10,x1,x2,x3])
     assert Bvisitx11 == set([x11])
     assert Bvisitx12 == set([x12])

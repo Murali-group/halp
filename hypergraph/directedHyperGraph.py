@@ -154,13 +154,45 @@ class DirectedHyperGraph(HyperGraph):
             e._tail, e._head = e.head, e.tail
         # what if it's now a DirectedHyperArcGraph?
         return DirectedHyperGraph(nodes, hyperedges)
+    
+    def FS(self, v):
+        '''
+        Returns the Forward Star set of edges for the vertex v
+        which is the set of edges that v is in the tail of
+        '''
+        return [e for e in self.hyperedges if v in e.tail]
+
+    def BS(self, v):
+        '''
+        Returns the Backward Star set of edges for the vertex v
+        which is the set of edges that v is in the head of
+        '''
+        return [e for e in self.hyperedges if v in e.head]
 
     def b_visit(self, s):
         '''
         Returns the set of all nodes that are B-Connected to s
         '''
-        # TODO: implement B-Visit method
-        pass
+        # TODO: decide what to do with the predecessor functions
+        connected = set()
+        Pv = {i: None for i in self.nodes}
+        Pe = {i: None for i in self.hyperedges}
+        B = {i: 0 for i in self.hyperedges}
+
+        Pv[s] = 0
+        connected.add(s)
+        Q=[s]
+        while Q:
+            v = Q.pop(0)
+            for e in FS(self, v):
+                B[e] += 1
+                if B[e] == len(e.tail):
+                    Pe[e] = v
+                    for h in [x for x in e.head if Pv[x] == None]:
+                        Pv[h] = e
+                        Q.append(h)
+                        conneted.add(h)
+        return connected
 
     def b_connection(self, s):
         '''
@@ -233,6 +265,33 @@ class DirectedHyperGraph(HyperGraph):
         else:
             raise ValueError(
                 'Invalid number of arguments {}'.format(len(arg)))
+
+    def SBT(self, s, F):
+        '''
+        Performs the SBT (Shortest B-Tree) algorithm from the 
+        Directed hypergraphs and applications paper
+        '''
+        W = {i: float('inf') for i in self.nodes}
+        Pv = {i: None for i in self.nodes}
+        B = {e: 0 for e in self.hyperedges}
+
+        Q = [s]
+        W[s] = 0 
+        while Q:
+            u = Q.pop(Q.index(min(Q, key=lambda node: W[node])))
+            for e in FS(self, u): 
+                B[e] += 1
+                if B[e] == len(e.tail):
+                    f = F(e, W)
+                    for y in [n for n in e.head if W[n] > e.weight + f]:
+                        if y not in Q:
+                            Q.append(y)
+                            if W[y] < float('inf'): 
+                                for eh in FS(self, y):
+                                    B[eh] -= 1
+                        W[y] = e.weight + f
+                        Pv[y] = e
+        return W
 
     def build_incidence_matrix(self):
         '''

@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 
 from hypergraph.directedHyperGraph import DirectedHyperGraph
-from hypergraph.hyperedge import HyperEdge
+from hypergraph.hyperedge import DirectedHyperEdge
+import copy
 
-def test_bvisit():
+def test_FSBS():
     '''
-        Test B-visiting a hypergraph from various starting vertices
+        Test FS and BS functions
     '''
     # read directed hypergraph
     graph = DirectedHyperGraph(set(), set())
@@ -29,16 +30,16 @@ def test_bvisit():
     assert len(nodes) == 12
     assert len(hyperedges) == 10
 
-    e1 = HyperEdge(set([x1]), set([x3]), 1)
-    e2 = HyperEdge(set([x1,v2]), set([x4]), 1)
-    e3 = HyperEdge(set([x2]), set([x5]), 1)
-    e4 = HyperEdge(set([x2]), set([x6]), 1)
-    e5 = HyperEdge(set([x2,v8]), set([x10]), 1)
-    e6 = HyperEdge(set([x5,v6]), set([x8]), 1)
-    e7 = HyperEdge(set([x4,v8]), set([x9]), 1)
-    e8 = HyperEdge(set([x10]), set([x1]), 1)
-    e9 = HyperEdge(set([x3]), set([x7]), 1)
-    e10 = HyperEdge(set([x1,x7,x11]), set([x12]), 1)
+    e1 = DirectedHyperEdge(set([x3]), set([x1]), 1)
+    e2 = DirectedHyperEdge(set([x4]), set([x1,x2]), 1)
+    e3 = DirectedHyperEdge(set([x5]), set([x2]), 1)
+    e4 = DirectedHyperEdge(set([x6]), set([x2]), 1)
+    e5 = DirectedHyperEdge(set([x10]), set([x2,x8]), 1)
+    e6 = DirectedHyperEdge(set([x8]), set([x5,x6]), 1)
+    e7 = DirectedHyperEdge(set([x9]), set([x4,x8]), 1)
+    e8 = DirectedHyperEdge(set([x1]), set([x10]), 1)
+    e9 = DirectedHyperEdge(set([x7]), set([x3]), 1)
+    e10 = DirectedHyperEdge(set([x12]), set([x1,x7,x11]), 1)
 
     BFSx1 = graph.FS(x1)
     BBSx1 = graph.BS(x1)
@@ -65,7 +66,7 @@ def test_bvisit():
     BFSx12 = graph.FS(x12)
     BBSx12 = graph.BS(x12)
 
-    assert BFSx1 == set([e1,e2,e10]) 
+    assert BFSx1 == set([e1,e2,e10])
     assert BBSx1 == set([e8]) 
     assert BFSx2 == set([e2,e3,e4,e5]) 
     assert BBSx2 == set() 
@@ -83,8 +84,8 @@ def test_bvisit():
     assert BBSx8 == set([e6]) 
     assert BFSx9 == set() 
     assert BBSx9 == set([e7]) 
-    assert BFSx10 == set([e5]) 
-    assert BBSx10 == set([e8]) 
+    assert BFSx10 == set([e8]) 
+    assert BBSx10 == set([e5]) 
     assert BFSx11 == set([e10]) 
     assert BBSx11 == set() 
     assert BFSx12 == set() 

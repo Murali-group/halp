@@ -21,7 +21,7 @@ def test_write_directedgraph():
     directedHyperGraph.read('tests/data/dirhypergraph2.txt')
 
     # remove written file for clean directory
-    os.remove('tests/data/dirhypergraph2.txt');
+    os.remove('tests/data/dirhypergraph2.txt')
 
     assert len(directedHyperGraph.nodes) == 5
     assert len(directedHyperGraph.hyperedges) == 4
@@ -43,7 +43,7 @@ def test_write_undirectedgraph():
     undirectedHyperGraph.read('tests/data/UnDirhypergraph2.txt')
 
     # remove written file for clean directory
-    os.remove('tests/data/UnDirhypergraph2.txt');
+    os.remove('tests/data/UnDirhypergraph2.txt')
 
     assert len(undirectedHyperGraph.nodes) == 6
     assert len(undirectedHyperGraph.hyperedges) == 5

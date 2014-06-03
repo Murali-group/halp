@@ -171,7 +171,7 @@ class DirectedHyperGraph(HyperGraph):
             e._tail, e._head = e.head, e.tail
         # what if it's now a DirectedHyperArcGraph?
         return DirectedHyperGraph(nodes, hyperedges)
-    
+
     def FS(self, v):
         '''
         Returns the Forward Star set of edges for the vertex v
@@ -198,14 +198,14 @@ class DirectedHyperGraph(HyperGraph):
 
         Pv[s] = 0
         connected.add(s)
-        Q=[s]
+        Q = [s]
         while Q:
             v = Q.pop(0)
             for e in self.FS(v):
                 B[e] += 1
                 if B[e] == len(e.tail):
                     Pe[e] = v
-                    for h in [x for x in e.head if Pv[x] == None]:
+                    for h in [x for x in e.head if Pv[x] is None]:
                         Pv[h] = e
                         Q.append(h)
                         connected.add(h)
@@ -285,7 +285,7 @@ class DirectedHyperGraph(HyperGraph):
 
     def SBT(self, s, F):
         '''
-        Performs the SBT (Shortest B-Tree) algorithm from the 
+        Performs the SBT (Shortest B-Tree) algorithm from the
         Directed hypergraphs and applications paper
         '''
         W = {i: float('inf') for i in self.nodes}
@@ -293,17 +293,17 @@ class DirectedHyperGraph(HyperGraph):
         B = {e: 0 for e in self.hyperedges}
 
         Q = [s]
-        W[s] = 0 
+        W[s] = 0
         while Q:
             u = Q.pop(Q.index(min(Q, key=lambda node: W[node])))
-            for e in self.FS(u): 
+            for e in self.FS(u):
                 B[e] += 1
                 if B[e] == len(e.tail):
                     f = F(e, W)
                     for y in [n for n in e.head if W[n] > e.weight + f]:
                         if y not in Q:
                             Q.append(y)
-                            if W[y] < float('inf'): 
+                            if W[y] < float('inf'):
                                 for eh in self.FS(self, y):
                                     B[eh] -= 1
                         W[y] = e.weight + f

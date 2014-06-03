@@ -6,7 +6,7 @@ from copy import deepcopy
 from .node import Node
 from .hyperedge import HyperEdge, UndirectedHyperEdge
 import numpy as np
-import scipy.linalg as linalg
+from scipy import linalg
 import random
 '''----------------------- UnDirected HyperGraph ---------------------------'''
 

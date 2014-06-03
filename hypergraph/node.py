@@ -6,7 +6,7 @@ class Node:
     def __init__(self, name="", nodeId=-1):
         try:
             hash(name)
-        except TypeError, e:
+        except TypeError as e:
             raise TypeError(str(e) + " node name must be hashable")
         self._name = name
         self._nodeId = nodeId

@@ -26,7 +26,7 @@ def test_incidence_matrix():
     assert w.shape == (5, 5)
     d_e = undirectedHyperGraph.getDiagonalEdgeMatrix()
     P = undirectedHyperGraph.randomWalkMatrix()
-    probs = [round(elem, 2) for elem in np.sum(P,axis=1)]
+    probs = [round(elem, 2) for elem in np.sum(P, axis=1)]
     '''
     assert to see if all the rows sum up to 1
     '''

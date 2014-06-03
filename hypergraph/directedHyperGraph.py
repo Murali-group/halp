@@ -797,16 +797,16 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         hes = sorted(self.hyperedges)
         ns = self.nodes
         H_tail, H_head = self.incidence_matrices(ns, hes)
-        print "Computed incidence matrices"
+        print("Computed incidence matrices")
 
         D_v_tail = self.positive_vertex_degree_matrix(hes)
-        print "Computed + vertex matrix"
+        print("Computed + vertex matrix")
 
         D_e_head = self.edge_degree_matrices(hes)
-        print "Computed - edge matrix"
+        print("Computed - edge matrix")
 
         W = self.weight_matrix(hes)
-        print "Computed weight matrix"
+        print("Computed weight matrix")
 
         P = numpy.memmap(TemporaryFile(), dtype='float16',
                          mode='w+', shape=(len(ns), len(ns)))
@@ -815,19 +815,19 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         P2 = numpy.memmap(TemporaryFile(), dtype='float16',
                           mode='w+', shape=(len(hes), len(hes)))
 
-        print "Allocated temp matrices"
+        print("Allocated temp matrices")
 
         # VxV * VxE = VxE
         numpy.dot(inv(D_v_tail), H_tail, out=P1)
-        print "1"
+        print("1")
 
         # ExE * ExE = ExE
         numpy.dot(W, inv(D_e_head), out=P2)
-        print "2"
+        print("2")
 
         # VxE * ExE = VxE
         numpy.dot(P1, P2, out=P2)
-        print "3"
+        print("3")
 
         # VxE * ExV = VxV
         numpy.dot(P2, H_head.T, out=P)
@@ -858,5 +858,5 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         for i in xrange(len_ns):
             for j in xrange(len_ns):
                 P[i, j] = self.__transition_value(hes, ns, i, j)
-            print i
+            print("{}".format(i))
         return P

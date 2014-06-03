@@ -6,7 +6,7 @@ from copy import deepcopy
 from .node import Node
 from .hyperedge import HyperEdge, UndirectedHyperEdge
 import numpy as np
-from scipy import linalg
+import scipy.linalg as linalg
 import random
 '''----------------------- UnDirected HyperGraph ---------------------------'''
 
@@ -139,7 +139,6 @@ class UndirectedHyperGraph(HyperGraph):
                keeping track of the orders correctly is to track them, manually
     (III) edge weight (self.edgeWeight): contains the weights of each hyperedge
     '''
-
     def getIncidenceMatrix(self):
         edgeNumber = len(self.hyperedges)
         nodeNumber = len(self.nodes)
@@ -164,7 +163,6 @@ class UndirectedHyperGraph(HyperGraph):
         which is basically the summation of the weights of each
         node's incident edges
     '''
-
     def getDiagonalNodeMatrix(self):
         if self.H.shape == (0, 0):
             self.getIncidenceMatrix(self)
@@ -180,7 +178,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Returns a diagonal matrix containing the hyperedge weights
     '''
-
     def getDiagonalWeightMatrix(self):
         if self.H.shape == (0, 0):
             self.getIncidenceMatrix(self)
@@ -189,7 +186,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Returns a diagonal matrix containing the hyperedge degrees
     '''
-
     def getDiagonalEdgeMatrix(self):
         if self.H.shape == (0, 0):
             self.getIncidenceMatrix(self)
@@ -199,7 +195,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Creates the transition matrix for the random walk
     '''
-
     def randomWalkMatrix(self):
         D_e = self.getDiagonalEdgeMatrix()
         D_v = self.getDiagonalNodeMatrix()
@@ -217,7 +212,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Creates a random vector as the starting point for doing the random walk
     '''
-
     def createRandomStarter(self):
         nodeNumber = len(self.nodes)
         pi = np.zeros(nodeNumber, dtype=float)
@@ -231,7 +225,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Finds the stationary distribution of a hypergraph
     '''
-
     def stationaryDistribution(self, P):
         nodeNumber = len(self.nodes)
         pi = self.createRandomStarter()
@@ -244,7 +237,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Checks whether the stationary distribution converged
     '''
-
     def converged(self, pi_star, pi):
         nodeNumber = pi.shape[0]
         for i in xrange(nodeNumber):
@@ -255,7 +247,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Finds the Normalized Laplacian Matrix
     '''
-
     def normalizedLaplacian(self):
         nodeNumber = len(self.nodes)
         D_e = self.getDiagonalEdgeMatrix()
@@ -277,7 +268,6 @@ class UndirectedHyperGraph(HyperGraph):
     '''
         Finds the index of second minimum value in a list
     '''
-
     def findSecondMinIndex(self, x):
         import operator
         min_index, min_value = min(enumerate(x), key=operator.itemgetter(1))
@@ -291,7 +281,7 @@ class UndirectedHyperGraph(HyperGraph):
         return second_min_index
 
     '''
-        Applys the Normalized MinCut algorithm.
+        Applies the Normalized MinCut algorithm.
         The result of this algorithm is a bipartition
         The return value is a two dimensional array containing
         the node names for the first and second partition

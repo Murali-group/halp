@@ -3,21 +3,25 @@ from __future__ import absolute_import
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import HyperEdge, UndirectedHyperEdge
+from .hyperedge import HyperEdge
 
 
 class HyperGraph:
 
-    def __init__(self, nodes=set(), hyperedges=set()):
+    def __init__(self, nodes=set(), hyperedges=set(), node_ordering=None):
         self._nodes = nodes
         self._hyperedges = hyperedges
+        self.node_ordering = node_ordering
 
     @property
     def nodes(self):
         '''
         Returns the nodes of the graph
         '''
-        return self._nodes
+        if self.node_ordering:
+            return sorted(self._nodes, key=self.node_ordering)
+        else:
+            return self._nodes
 
     @property
     def hyperedges(self):
@@ -39,21 +43,14 @@ class HyperGraph:
         '''
         if (isinstance(n, Node)):
             self.__add_node_by_object(n)
-        elif (isinstance(n, str)):
-            self.__add_node_by_name(n)
         else:
-            raise ValueError(
-                'Invalid arguments type{}'.format(n))
+            self.__add_node_by_name(n)
 
     def __add_node_by_name(self, nodeName):
         '''
             Add a node given the node name
         '''
-        if (self.get_node_by_name(nodeName) is None):
-            self.nodes.add(Node(nodeName))
-        else:
-            raise Exception(
-                'Node not added, Duplicate Node name: {}'.format(nodeName))
+        self.nodes.add(Node(nodeName))
 
     def __add_node_by_object(self, n):
         '''
@@ -64,11 +61,7 @@ class HyperGraph:
         except AssertionError:
             raise ValueError('Invalid node {}'.format(n))
 
-        if (self.get_node_by_name(n.name) is None):
-            self.nodes.add(n)
-        else:
-            raise Exception(
-                'Node not added, Duplicate Node name: {}'.format(n.name))
+        self.nodes.add(n)
 
     def get_node_by_name(self, nodeName):
         '''

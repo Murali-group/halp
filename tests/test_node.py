@@ -23,5 +23,5 @@ def test_node():
     assert node1 != node
 
     # Test __str__
-    assert str(node1) == "bob"
-    assert repr(node1) == "bob"
+    assert str(node1) == "<Node name=bob nodeId=1>"
+    assert repr(node1) == "<Node name=bob nodeId=1>"

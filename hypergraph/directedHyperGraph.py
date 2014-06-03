@@ -5,14 +5,24 @@ except ImportError:
     from Queue import PriorityQueue
 from collections import deque
 
+import numpy
+from numpy.linalg import inv
+import numpy as np
+
+from tempfile import TemporaryFile
+# from tempfile import imkdtemp
+# import os.path as path
+
+from operator import attrgetter
+
 from .hypergraph import HyperGraph
 from copy import deepcopy
 
 from .node import Node
 from .hyperedge import DirectedHyperEdge
 from .hyperedge import DirectedFHyperEdge, DirectedBHyperEdge
+from .hyperedge import HyperEdge
 
-import numpy as np
 
 '''----------------------- Directed HyperGraph -----------------------------'''
 
@@ -85,6 +95,13 @@ class DirectedHyperGraph(HyperGraph):
             hyperedge.head.add(node)
 
         self.add_hyperedge(hyperedge)
+
+    def add_hyperedgeByObject(self, he):
+        for t in he.tail:
+            self.add_node(t)
+        for h in he.head:
+            self.add_node(h)
+        self._hyperedges.add(he)
 
     def read(self, fileName, sep='\t', delim=','):
         '''
@@ -676,3 +693,111 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         except:
             raise ValueError("Invalid f-hyperedge set")
         HyperGraph.__init__(self, nodes, hyperedges)
+
+    def __gen_diagnonal_matrix(self, xs, dtype='float16'):
+        M = numpy.memmap(TemporaryFile(), dtype=dtype,
+                         mode='w+', shape=(len(xs), len(xs)))
+        for i, x in enumerate(xs):
+            M[i, i] = x
+        return M
+
+    def __incidence_matrix(self, vs, hes, ag):
+        M = numpy.memmap(TemporaryFile(), dtype='uint8',
+                         mode='w+', shape=(len(vs), len(hes)))
+
+        def incidence_row(v):
+            return [int(v in ag(he)) for he in hes]
+
+        for i, v in enumerate(vs):
+            M[i, :] = incidence_row(v)
+        return M
+
+    def incidence_matrices(self, ns, hes):
+        return (self.__incidence_matrix(ns, hes, attrgetter('tail')),
+                self.__incidence_matrix(ns, hes, attrgetter('head')))
+
+    def __vertex_degree(self, v, hes, ag):
+        weights = (he.weight for he in hes if v in ag(he))
+        return sum(weights)
+
+    def __vertex_degree_matrix(self, hes, ag):
+        return self.__gen_diagnonal_matrix(
+            [self.__vertex_degree(v, hes, ag) for v in self.nodes])
+
+    def positive_vertex_degree_matrix(self, hes):
+        return self.__vertex_degree_matrix(hes, attrgetter('tail'))
+
+    def negative_edge_degree_matrix(self, hes):
+        len_heads = [len(he.head) for he in hes]
+        return self.__gen_diagnonal_matrix(len_heads, 'uint8')
+
+    def weight_matrix(self, hes):
+        return self.__gen_diagnonal_matrix([he.weight for (he, e) in hes])
+
+    def _transition_matrix(self):
+        hes = sorted(self.hyperedges)
+        ns = self.nodes
+        H_tail, H_head = self.incidence_matrices(ns, hes)
+        print "Computed incidence matrices"
+
+        D_v_tail = self.positive_vertex_degree_matrix(hes)
+        print "Computed + vertex matrix"
+
+        D_e_head = self.edge_degree_matrices(hes)
+        print "Computed - edge matrix"
+
+        W = self.weight_matrix(hes)
+        print "Computed weight matrix"
+
+        P = numpy.memmap(TemporaryFile(), dtype='float16',
+                         mode='w+', shape=(len(ns), len(ns)))
+        P1 = numpy.memmap(TemporaryFile(), dtype='float16',
+                          mode='w+', shape=(len(ns), len(hes)))
+        P2 = numpy.memmap(TemporaryFile(), dtype='float16',
+                          mode='w+', shape=(len(hes), len(hes)))
+
+        print "Allocated temp matrices"
+
+        # VxV * VxE = VxE
+        numpy.dot(inv(D_v_tail), H_tail, out=P1)
+        print "1"
+
+        # ExE * ExE = ExE
+        numpy.dot(W, inv(D_e_head), out=P2)
+        print "2"
+
+        # VxE * ExE = VxE
+        numpy.dot(P1, P2, out=P2)
+        print "3"
+
+        # VxE * ExV = VxV
+        numpy.dot(P2, H_head.T, out=P)
+        return P
+
+    def __transition_value(self, hes, ns, i, j):
+        valSum = 0
+        vertex_degree = self.__vertex_degree(ns[i], hes, attrgetter('tail'))
+        for he in hes:
+            val = he.weight * int(ns[i] in he.tail)
+            val /= vertex_degree
+            val *= int(ns[j] in he.head) / len(he.head)
+            valSum += val
+        return valSum
+
+    def transition_matrix(self):
+        hes = sorted(self.hyperedges)
+        if self.node_ordering is None:
+            self.node_ordering = id
+        ns = self.nodes
+        len_ns = len(self.nodes)
+        # filename = path.join(mkdtemp(), 'transition_matrix.dat')
+        # P = numpy.memmap(filename, dtype='float32',
+        #                 mode='w+', shape=(len_ns, len_ns))
+        P = numpy.zeros((len_ns, len_ns))
+        if self.node_ordering is None:
+            self.node_ordering = id
+        for i in xrange(len_ns):
+            for j in xrange(len_ns):
+                P[i, j] = self.__transition_value(hes, ns, i, j)
+            print i
+        return P

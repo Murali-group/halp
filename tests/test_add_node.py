@@ -48,7 +48,6 @@ def test_addNodeToHypergraph():
         raise Exception(
             '__add_node_by_object should raise Exception, but it did not')
 
-
     # Test wrong input type
     try:
         graph.add_node(set())

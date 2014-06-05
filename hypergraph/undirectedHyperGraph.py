@@ -20,6 +20,13 @@ class UndirectedHyperGraph(HyperGraph):
         '''
         return self._nodeIdList
 
+    @nodeIdList.setter
+    def nodeIdList(self, value):
+        '''
+        Sets the name of the nodes
+        '''
+        self._nodeIdList = value
+
     @property
     def H(self):
         '''
@@ -27,12 +34,26 @@ class UndirectedHyperGraph(HyperGraph):
         '''
         return self._incidenceMatrix
 
+    @H.setter
+    def H(self, value):
+        '''
+        Stores the incidence matrix
+        '''
+        self._incidenceMatrix = value
+
     @property
     def edgeWeight(self):
         '''
-        Stores a diagonal matrix containing the hyperedge weight
+        Returns a diagonal matrix containing the hyperedge weight
         '''
         return self._edgeWeight
+
+    @edgeWeight.setter
+    def edgeWeight(self, value):
+        '''
+        Stores a diagonal matrix containing the hyperedge weight
+        '''
+        self._edgeWeight = value
 
     def __init__(self, nodes=set(), hyperedges=set()):
         HyperGraph.__init__(self, nodes, hyperedges)
@@ -169,8 +190,8 @@ class UndirectedHyperGraph(HyperGraph):
         nodeNumber = len(self.nodes)
         edgeNumber = len(self.hyperedges)
         degrees = np.zeros(nodeNumber, dtype=int)
-        for row in xrange(nodeNumber):
-            for col in xrange(edgeNumber):
+        for row in range(nodeNumber):
+            for col in range(edgeNumber):
                 if self.H[row][col] == 1:
                     degrees[row] = degrees[row] + self.edgeWeight[col]
         return np.diag(degrees)
@@ -215,10 +236,10 @@ class UndirectedHyperGraph(HyperGraph):
     def createRandomStarter(self):
         nodeNumber = len(self.nodes)
         pi = np.zeros(nodeNumber, dtype=float)
-        for i in xrange(nodeNumber):
+        for i in range(nodeNumber):
             pi[i] = random.random()
         summation = np.sum(pi)
-        for i in xrange(nodeNumber):
+        for i in range(nodeNumber):
             pi[i] = pi[i] / summation
         return pi
 
@@ -239,7 +260,7 @@ class UndirectedHyperGraph(HyperGraph):
     '''
     def converged(self, pi_star, pi):
         nodeNumber = pi.shape[0]
-        for i in xrange(nodeNumber):
+        for i in range(nodeNumber):
             if pi[i] - pi_star[i] > 10e-5:
                 return False
         return True
@@ -274,7 +295,7 @@ class UndirectedHyperGraph(HyperGraph):
         max_index, max_value = max(enumerate(x), key=operator.itemgetter(1))
         second_min = max_value
         second_min_index = max_index
-        for i in xrange(len(x)):
+        for i in range(len(x)):
             if x[i] > min_value and x[i] < second_min:
                 second_min = x[i]
                 second_min_index = i
@@ -298,7 +319,7 @@ class UndirectedHyperGraph(HyperGraph):
         eigenVectors = eigens[1]
         secondEigenVector = eigenVectors[:, secondMinIndex]
         partitionIndex = [
-            i for i in xrange(
+            i for i in range(
                 len(secondEigenVector)) if secondEigenVector[i] >= threshold]
         Partition = [list() for x in range(2)]
         for (key, value) in self.nodeIdList.items():

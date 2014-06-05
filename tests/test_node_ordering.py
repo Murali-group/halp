@@ -14,5 +14,4 @@ def test_node_ordering():
     d.add_node('x0')
 
     d.node_ordering = attrgetter('name')
-
-    assert map(attrgetter('name'), d.nodes) == ['x0', 'x1', 'x2', 'x3', 'x4']
+    assert list(map(attrgetter('name'), d.nodes)) == ['x0', 'x1', 'x2', 'x3', 'x4']

@@ -20,7 +20,7 @@ def test_node():
 
     # Test copy
     node1 = node.copy()
-    assert node1 != node
+    assert node1 == node
 
     # Test __str__
     assert str(node1) == "<Node name=bob nodeId=1>"

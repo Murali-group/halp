@@ -1,8 +1,7 @@
 from __future__ import absolute_import
+from operator import attrgetter
 
 from hypergraph.directedHyperGraph import DirectedHyperGraph
-
-from operator import attrgetter
 
 
 def test_node_ordering():
@@ -14,4 +13,5 @@ def test_node_ordering():
     d.add_node('x0')
 
     d.node_ordering = attrgetter('name')
-    assert list(map(attrgetter('name'), d.nodes)) == ['x0', 'x1', 'x2', 'x3', 'x4']
+    assert list(map(attrgetter('name'), d.nodes)) \
+        == ['x0', 'x1', 'x2', 'x3', 'x4']

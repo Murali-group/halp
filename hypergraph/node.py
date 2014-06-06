@@ -1,45 +1,97 @@
+"""
+.. module:: node
+   :synopsis: Defines Node class and other useful properties associated
+   with nodes.
+
+"""
+
 from copy import deepcopy
 
 
 class Node:
+    """
+    Node class provides a node object which is identified by a name and tag.
 
-    def __init__(self, name="", nodeId=-1):
+    """
+
+    def __init__(self, name=""):
+        """
+        Node class constructor.
+        :param name: Name to reference the node by.
+        :type name: str.
+        :raises: TypeError
+
+        """
+
         try:
             hash(name)
         except TypeError as e:
             raise TypeError(str(e) + " node name must be hashable")
+
         self._name = name
-        self._nodeId = nodeId
 
     @property
     def name(self):
-        '''
-        Returns the name of the node
-        '''
+        """
+        Returns the name of the node.
+        :returns:   str -- name of the node
+
+        """
+
         return self._name
 
-    @property
-    def nodeId(self):
-        '''
-        Returns the id of the node
-        '''
-        return self._nodeId
+    @name.setter
+    def name(self, value):
+        """
+        Sets the name of the node.
+        :param value: name to set the node.
+        :type value: str.
+
+        """
+
+        self._name = value
 
     def copy(self):
-        '''
-        Returns a copy of the node
-        '''
+        """
+        Returns a deep copy of the node.
+        :returns:   Node -- new node with same name
+
+        """
+
         return deepcopy(self)
 
+    def __str__(self):
+        """
+        Returns overriden Node to-string as: <Node name="node_name">
+        :returns:   str -- node representation
+
+        """
+
+        return ''.join(["<Node name=", str(self.name), ">"])
+
     def __repr__(self):
+        """
+        Returns overriden Node representation to be equivalent to __str__
+        :returns:   str -- node representation as __str__
+
+        """
+
         return str(self)
 
-    def __str__(self):
-        return ''.join(["<Node name=", str(self.name),
-                        " nodeId=", str(self.nodeId), ">"])
+    def __eq__(self, other):
+        """
+        Returns overriden Node equality to be true iff names match
+        :returns:   bool. -- whether nodes are equal based on names
 
-    def __eq__(self, n2):
-        return self.name == n2.name and self.nodeId == n2.nodeId
+        """
+
+        return self.name == other.name
 
     def __hash__(self):
-        return hash((self.name, self.nodeId))
+        """
+        Returns overriden Node hash to be the hash of the node's name
+        :returns:   int -- hash of the node object
+
+        """
+
+        return hash(self.name)

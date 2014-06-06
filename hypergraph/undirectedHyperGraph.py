@@ -6,8 +6,9 @@ from copy import deepcopy
 from .node import Node
 from .hyperedge import HyperEdge, UndirectedHyperEdge
 import numpy as np
-from scipy import linalg
+from numpy import linalg
 import random
+
 '''----------------------- UnDirected HyperGraph ---------------------------'''
 
 
@@ -266,13 +267,19 @@ class UndirectedHyperGraph(HyperGraph):
         return True
 
     '''
+        Returns the square root of a given diagonal matrix
+    '''
+    def diagonal_matrix_sqrt(self, D):
+        return np.diagflat(np.sqrt(np.diag(D)))
+
+    '''
         Finds the Normalized Laplacian Matrix
     '''
     def normalizedLaplacian(self):
         nodeNumber = len(self.nodes)
         D_e = self.getDiagonalEdgeMatrix()
         D_v = self.getDiagonalNodeMatrix()
-        D_v_sqrt_inverse = np.real(linalg.inv(linalg.sqrtm(D_v)))
+        D_v_sqrt_inverse = np.real(linalg.inv(self.diagonal_matrix_sqrt(D_v)))
         D_e_inverse = linalg.inv(D_e)
         W = self.getDiagonalWeightMatrix()
         H = self.H
@@ -322,7 +329,7 @@ class UndirectedHyperGraph(HyperGraph):
             i for i in range(
                 len(secondEigenVector)) if secondEigenVector[i] >= threshold]
         Partition = [list() for x in range(2)]
-        for (key, value) in self.nodeIdList.items():
+        for (key, value) in list(self.nodeIdList.items()):
             if value in partitionIndex:
                 Partition[0].append(key)
             else:

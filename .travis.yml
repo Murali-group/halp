@@ -4,8 +4,9 @@ python:
   - "3.2"
 virtualenv:
   system_site_packages: true
-before_install:
- - sudo apt-get install -qq python3-numpy python3-scipy
+before-install:
+  - sudo apt-get install -qq python3-numpy
+  - sudo apt-get install -qq python-numpy
 install:
   - pip install coveralls
   - pip install pep8

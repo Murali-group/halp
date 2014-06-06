@@ -10,8 +10,6 @@ from numpy.linalg import inv
 import numpy as np
 
 from tempfile import TemporaryFile
-# from tempfile import imkdtemp
-# import os.path as path
 
 from operator import attrgetter
 
@@ -855,8 +853,8 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         P = numpy.zeros((len_ns, len_ns))
         if self.node_ordering is None:
             self.node_ordering = id
-        for i in xrange(len_ns):
-            for j in xrange(len_ns):
+        for i in range(len_ns):
+            for j in range(len_ns):
                 P[i, j] = self.__transition_value(hes, ns, i, j)
             print("{}".format(i))
         return P

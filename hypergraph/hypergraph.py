@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import HyperEdge
+from .hyperedge import Hyperedge
 
 
 class HyperGraph:
@@ -105,7 +105,7 @@ class HyperGraph:
     def add_hyperedge(self, *args):
         '''
         Adds a hyperedge to the graph.
-        Can be called with HyperEdge object or with edge names
+        Can be called with Hyperedge object or with edge names
         This method chooses the right class to call to hide this task
         complexity from the user.
         usage:
@@ -121,7 +121,7 @@ class HyperGraph:
                 nodes = {'x1', 'x2', ...}
         '''
         if (len(args) == 1):
-            if (isinstance(args[0], HyperEdge)):
+            if (isinstance(args[0], Hyperedge)):
                 self.add_hyperedgeByObject(args[0])
             else:
                 self.add_hyperedgeByNames(args[0])
@@ -142,10 +142,10 @@ class HyperGraph:
 
     def add_hyperedgeByObject(self, h):
         '''
-        Adds a hyperedge to the graph as a class h of HyperEdge.
+        Adds a hyperedge to the graph as a class h of Hyperedge.
         '''
         try:
-            assert isinstance(h, HyperEdge)
+            assert isinstance(h, Hyperedge)
         except AssertionError:
             # raise ValueError('Invalid hyperedge %s' % h)
             raise ValueError('Invalid hyperedge {}'.format(h))

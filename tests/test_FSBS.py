@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from hypergraph.directedHyperGraph import DirectedHyperGraph
-from hypergraph.hyperedge import DirectedHyperEdge
+from hypergraph.hyperedge import DirectedHyperedge
 import copy
 
 
@@ -31,16 +31,16 @@ def test_FSBS():
     assert len(nodes) == 12
     assert len(hyperedges) == 10
 
-    e1 = DirectedHyperEdge(set([x3]), set([x1]), 1)
-    e2 = DirectedHyperEdge(set([x4]), set([x1, x2]), 1)
-    e3 = DirectedHyperEdge(set([x5]), set([x2]), 1)
-    e4 = DirectedHyperEdge(set([x6]), set([x2]), 1)
-    e5 = DirectedHyperEdge(set([x10]), set([x2, x8]), 1)
-    e6 = DirectedHyperEdge(set([x8]), set([x5, x6]), 1)
-    e7 = DirectedHyperEdge(set([x9]), set([x4, x8]), 1)
-    e8 = DirectedHyperEdge(set([x1]), set([x10]), 1)
-    e9 = DirectedHyperEdge(set([x7]), set([x3]), 1)
-    e10 = DirectedHyperEdge(set([x12]), set([x1, x7, x11]), 1)
+    e1 = DirectedHyperedge(set([x3]), set([x1]), 1)
+    e2 = DirectedHyperedge(set([x4]), set([x1, x2]), 1)
+    e3 = DirectedHyperedge(set([x5]), set([x2]), 1)
+    e4 = DirectedHyperedge(set([x6]), set([x2]), 1)
+    e5 = DirectedHyperedge(set([x10]), set([x2, x8]), 1)
+    e6 = DirectedHyperedge(set([x8]), set([x5, x6]), 1)
+    e7 = DirectedHyperedge(set([x9]), set([x4, x8]), 1)
+    e8 = DirectedHyperedge(set([x1]), set([x10]), 1)
+    e9 = DirectedHyperedge(set([x7]), set([x3]), 1)
+    e10 = DirectedHyperedge(set([x12]), set([x1, x7, x11]), 1)
 
     BFSx1 = graph.FS(x1)
     BBSx1 = graph.BS(x1)

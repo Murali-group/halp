@@ -4,22 +4,18 @@ try:
 except ImportError:
     from Queue import PriorityQueue
 from collections import deque
-
-import numpy
-from numpy.linalg import inv
-import numpy as np
-
-from tempfile import TemporaryFile
-
 from operator import attrgetter
-
-from .hypergraph import HyperGraph
+from tempfile import TemporaryFile
 from copy import deepcopy
 
+import numpy as np
+from numpy.linalg import inv
+
 from .node import Node
-from .hyperedge import DirectedHyperEdge
-from .hyperedge import DirectedFHyperEdge, DirectedBHyperEdge
-from .hyperedge import HyperEdge
+from .hyperedge import Hyperedge
+from .hyperedge import DirectedHyperedge
+from .hyperedge import FHyperedge, BHyperedge
+from .hypergraph import HyperGraph
 
 
 '''----------------------- Directed HyperGraph -----------------------------'''
@@ -74,7 +70,7 @@ class DirectedHyperGraph(HyperGraph):
         Adds a hyperedge to the graph by node names.
         '''
         # Create hypergraph from current line
-        hyperedge = DirectedHyperEdge(set(), set(), weight)
+        hyperedge = DirectedHyperedge(set(), set(), weight)
 
         # Read Tail nodes
         for t in tail:
@@ -411,7 +407,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         HyperGraph.__init__(self, nodes, hyperedges)
         try:
             for e in hyperedges:
-                assert isinstance(e, DirectedBHyperEdge)
+                assert isinstance(e, BHyperedge)
         except:
             raise ValueError("Invalid b-hyperedge set")
 
@@ -420,7 +416,7 @@ class DirectedBHyperGraph(DirectedHyperGraph):
         Adds a hyperedge to the graph by node names.
         '''
         # Create hypergraph from current line
-        hyperedge = DirectedBHyperEdge(set(), set(), weight)
+        hyperedge = BHyperedge(set(), set(), weight)
 
         # Read Tail nodes
         for t in tail:
@@ -746,21 +742,21 @@ class DirectedFHyperGraph(DirectedHyperGraph):
     def __init__(self, nodes=set(), hyperedges=set()):
         try:
             for e in hyperedges:
-                assert isinstance(e, DirectedFHyperEdge)
+                assert isinstance(e, DirectedFHyperedge)
         except:
             raise ValueError("Invalid f-hyperedge set")
         HyperGraph.__init__(self, nodes, hyperedges)
 
     def __gen_diagnonal_matrix(self, xs, dtype='float16'):
-        M = numpy.memmap(TemporaryFile(), dtype=dtype,
-                         mode='w+', shape=(len(xs), len(xs)))
+        M = np.memmap(TemporaryFile(), dtype=dtype,
+                      mode='w+', shape=(len(xs), len(xs)))
         for i, x in enumerate(xs):
             M[i, i] = x
         return M
 
     def __incidence_matrix(self, vs, hes, ag):
-        M = numpy.memmap(TemporaryFile(), dtype='uint8',
-                         mode='w+', shape=(len(vs), len(hes)))
+        M = np.memmap(TemporaryFile(), dtype='uint8',
+                      mode='w+', shape=(len(vs), len(hes)))
 
         def incidence_row(v):
             return [int(v in ag(he)) for he in hes]
@@ -806,29 +802,29 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         W = self.weight_matrix(hes)
         print("Computed weight matrix")
 
-        P = numpy.memmap(TemporaryFile(), dtype='float16',
-                         mode='w+', shape=(len(ns), len(ns)))
-        P1 = numpy.memmap(TemporaryFile(), dtype='float16',
-                          mode='w+', shape=(len(ns), len(hes)))
-        P2 = numpy.memmap(TemporaryFile(), dtype='float16',
-                          mode='w+', shape=(len(hes), len(hes)))
+        P = np.memmap(TemporaryFile(), dtype='float16',
+                      mode='w+', shape=(len(ns), len(ns)))
+        P1 = np.memmap(TemporaryFile(), dtype='float16',
+                       mode='w+', shape=(len(ns), len(hes)))
+        P2 = np.memmap(TemporaryFile(), dtype='float16',
+                       mode='w+', shape=(len(hes), len(hes)))
 
         print("Allocated temp matrices")
 
         # VxV * VxE = VxE
-        numpy.dot(inv(D_v_tail), H_tail, out=P1)
+        np.dot(inv(D_v_tail), H_tail, out=P1)
         print("1")
 
         # ExE * ExE = ExE
-        numpy.dot(W, inv(D_e_head), out=P2)
+        np.dot(W, inv(D_e_head), out=P2)
         print("2")
 
         # VxE * ExE = VxE
-        numpy.dot(P1, P2, out=P2)
+        np.dot(P1, P2, out=P2)
         print("3")
 
         # VxE * ExV = VxV
-        numpy.dot(P2, H_head.T, out=P)
+        np.dot(P2, H_head.T, out=P)
         return P
 
     def __transition_value(self, hes, ns, i, j):
@@ -848,9 +844,9 @@ class DirectedFHyperGraph(DirectedHyperGraph):
         ns = self.nodes
         len_ns = len(self.nodes)
         # filename = path.join(mkdtemp(), 'transition_matrix.dat')
-        # P = numpy.memmap(filename, dtype='float32',
+        # P = np.memmap(filename, dtype='float32',
         #                 mode='w+', shape=(len_ns, len_ns))
-        P = numpy.zeros((len_ns, len_ns))
+        P = np.zeros((len_ns, len_ns))
         if self.node_ordering is None:
             self.node_ordering = id
         for i in range(len_ns):

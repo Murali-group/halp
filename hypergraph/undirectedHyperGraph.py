@@ -4,7 +4,7 @@ from .hypergraph import HyperGraph
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import HyperEdge, UndirectedHyperEdge
+from .hyperedge import Hyperedge, UndirectedHyperedge
 import numpy as np
 from numpy import linalg
 import random
@@ -74,7 +74,7 @@ class UndirectedHyperGraph(HyperGraph):
         Adds a hyperedge to the graph by node names.
         '''
         # Create hypergraph from current line
-        hyperedge = UndirectedHyperEdge(set(), weight)
+        hyperedge = UndirectedHyperedge(set(), weight)
 
         # Read edge nodes
         for n in nodes:

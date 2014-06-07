@@ -10,7 +10,7 @@ from copy import deepcopy
 
 class Node:
     """
-    Node class provides a node object which is identified by a name and tag.
+    Node class provides a basic node object which is identified by a name.
 
     """
 
@@ -34,7 +34,7 @@ class Node:
     def name(self):
         """
         Returns the name of the node.
-        :returns:   str -- name of the node
+        :returns: str -- name of the node.
 
         """
 
@@ -54,7 +54,7 @@ class Node:
     def copy(self):
         """
         Returns a deep copy of the node.
-        :returns:   Node -- new node with same name
+        :returns: Node -- new node with same name.
 
         """
 
@@ -62,8 +62,9 @@ class Node:
 
     def __str__(self):
         """
-        Returns overriden Node to-string as: <Node name="node_name">
-        :returns:   str -- node representation
+        Returns overriden Node to-string as:
+            <Node name="node_name">
+        :returns: str -- node representation string.
 
         """
 
@@ -71,8 +72,8 @@ class Node:
 
     def __repr__(self):
         """
-        Returns overriden Node representation to be equivalent to __str__
-        :returns:   str -- node representation as __str__
+        Returns overriden Node representation to be equivalent to __str__.
+        :returns: str -- node representation as __str__.
 
         """
 
@@ -80,8 +81,8 @@ class Node:
 
     def __eq__(self, other):
         """
-        Returns overriden Node equality to be true iff names match
-        :returns:   bool. -- whether nodes are equal based on names
+        Returns overriden Node equality to be true iff names match.
+        :returns: bool. -- whether nodes are equal based on names.
 
         """
 
@@ -89,8 +90,8 @@ class Node:
 
     def __hash__(self):
         """
-        Returns overriden Node hash to be the hash of the node's name
-        :returns:   int -- hash of the node object
+        Returns overriden Node hash to be the hash of the node's name.
+        :returns: int -- hash of the node object.
 
         """
 

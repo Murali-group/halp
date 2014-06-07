@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from hypergraph.directedHyperGraph import DirectedBHyperGraph
-from hypergraph.hyperedge import DirectedHyperEdge
+from hypergraph.hyperedge import DirectedHyperedge
 
 
 def test_get_spanning_hypertree():
@@ -16,9 +16,9 @@ def test_get_spanning_hypertree():
     x2 = graph.get_node_by_name('x2')
     x3 = graph.get_node_by_name('x3')
     x4 = graph.get_node_by_name('x4')
-    e1 = DirectedHyperEdge(set([x2]), set([x1]))
-    e2 = DirectedHyperEdge(set([x4]), set([x1, x2]))
-    e3 = DirectedHyperEdge(set([x4]), set([x1, x3]))
+    e1 = DirectedHyperedge(set([x2]), set([x1]))
+    e2 = DirectedHyperedge(set([x4]), set([x1, x2]))
+    e3 = DirectedHyperedge(set([x4]), set([x1, x3]))
     root1 = set([x1])
     root2 = set([x2])
     ordering = graph.get_spanning_hypertree()

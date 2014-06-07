@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from hypergraph.directedHyperGraph import DirectedBHyperGraph
-from hypergraph.hyperedge import DirectedBHyperEdge
+from hypergraph.hyperedge import BHyperedge
 
 EPSILON = 10
 
@@ -18,11 +18,11 @@ def test_flow_directedbhypergraph():
     x2 = graph.get_node_by_name('x2')
     x3 = graph.get_node_by_name('x3')
     x4 = graph.get_node_by_name('x4')
-    e1 = DirectedBHyperEdge(set([x2]), set([x1]), 1.0)
-    e2 = DirectedBHyperEdge(set([x1]), set([x3]), 4.0)
-    e3 = DirectedBHyperEdge(set([x1]), set([x2, x4]), 7.0)
-    e4 = DirectedBHyperEdge(set([x3]), set([x4]), 5.0)
-    e5 = DirectedBHyperEdge(set([x2]), set([x4]), 0.5)
+    e1 = BHyperedge(set([x2]), set([x1]), 1.0)
+    e2 = BHyperedge(set([x1]), set([x3]), 4.0)
+    e3 = BHyperedge(set([x1]), set([x2, x4]), 7.0)
+    e4 = BHyperedge(set([x3]), set([x4]), 5.0)
+    e5 = BHyperedge(set([x2]), set([x4]), 0.5)
     root = set([x1])
     ordering = [root, e2, x3, e4, x4, e3, x2]
     flow = {}

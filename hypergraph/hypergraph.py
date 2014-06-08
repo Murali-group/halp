@@ -3,21 +3,25 @@ from __future__ import absolute_import
 from copy import deepcopy
 
 from .node import Node
-from .hyperedge import HyperEdge, UndirectedHyperEdge
+from .hyperedge import Hyperedge
 
 
 class HyperGraph:
 
-    def __init__(self, nodes=set(), hyperedges=set()):
+    def __init__(self, nodes=set(), hyperedges=set(), node_ordering=None):
         self._nodes = nodes
         self._hyperedges = hyperedges
+        self.node_ordering = node_ordering
 
     @property
     def nodes(self):
         '''
         Returns the nodes of the graph
         '''
-        return self._nodes
+        if self.node_ordering:
+            return sorted(self._nodes, key=self.node_ordering)
+        else:
+            return self._nodes
 
     @property
     def hyperedges(self):
@@ -39,21 +43,14 @@ class HyperGraph:
         '''
         if (isinstance(n, Node)):
             self.__add_node_by_object(n)
-        elif (isinstance(n, str)):
-            self.__add_node_by_name(n)
         else:
-            raise ValueError(
-                'Invalid arguments type{}'.format(n))
+            self.__add_node_by_name(n)
 
     def __add_node_by_name(self, nodeName):
         '''
             Add a node given the node name
         '''
-        if (self.get_node_by_name(nodeName) is None):
-            self.nodes.add(Node(nodeName))
-        else:
-            raise Exception(
-                'Node not added, Duplicate Node name: {}'.format(nodeName))
+        self.nodes.add(Node(nodeName))
 
     def __add_node_by_object(self, n):
         '''
@@ -64,11 +61,7 @@ class HyperGraph:
         except AssertionError:
             raise ValueError('Invalid node {}'.format(n))
 
-        if (self.get_node_by_name(n.name) is None):
-            self.nodes.add(n)
-        else:
-            raise Exception(
-                'Node not added, Duplicate Node name: {}'.format(n.name))
+        self.nodes.add(n)
 
     def get_node_by_name(self, nodeName):
         '''
@@ -112,7 +105,7 @@ class HyperGraph:
     def add_hyperedge(self, *args):
         '''
         Adds a hyperedge to the graph.
-        Can be called with HyperEdge object or with edge names
+        Can be called with Hyperedge object or with edge names
         This method chooses the right class to call to hide this task
         complexity from the user.
         usage:
@@ -128,7 +121,7 @@ class HyperGraph:
                 nodes = {'x1', 'x2', ...}
         '''
         if (len(args) == 1):
-            if (isinstance(args[0], HyperEdge)):
+            if (isinstance(args[0], Hyperedge)):
                 self.add_hyperedgeByObject(args[0])
             else:
                 self.add_hyperedgeByNames(args[0])
@@ -149,10 +142,10 @@ class HyperGraph:
 
     def add_hyperedgeByObject(self, h):
         '''
-        Adds a hyperedge to the graph as a class h of HyperEdge.
+        Adds a hyperedge to the graph as a class h of Hyperedge.
         '''
         try:
-            assert isinstance(h, HyperEdge)
+            assert isinstance(h, Hyperedge)
         except AssertionError:
             # raise ValueError('Invalid hyperedge %s' % h)
             raise ValueError('Invalid hyperedge {}'.format(h))

@@ -7,7 +7,7 @@ from copy import deepcopy
 from hypergraph.directedHyperGraph import DirectedBHyperGraph
 from hypergraph.directedHyperGraph import DirectedHyperGraph
 from hypergraph.node import Node
-from hypergraph.hyperedge import HyperEdge
+from hypergraph.hyperedge import Hyperedge
 
 
 class InvalidArgumentError(Exception):
@@ -72,7 +72,7 @@ def get_hyperpath_from_hypertree(T, s, t):
         get the shortest B-hyperpath from s and t
     '''
     # check that T is a valid predecessor function:
-    # It must be a map from Nodes to HyperEdges
+    # It must be a map from Nodes to Hyperedges
     # with exactly one Node mapping to None
     if type(T) != dict:
         raise InvalidArgumentError(
@@ -80,7 +80,7 @@ def get_hyperpath_from_hypertree(T, s, t):
     noneCounter = 0
     for node, hyperedge in T.items():
         if (not isinstance(node, Node) or
-                not (isinstance(hyperedge, HyperEdge) or hyperedge is None)):
+                not (isinstance(hyperedge, Hyperedge) or hyperedge is None)):
             raise InvalidArgumentError(
                 "T must be a map from nodes to hyperedges. %s received" % T)
         if hyperedge is None:

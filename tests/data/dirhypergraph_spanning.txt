@@ -1,0 +1,4 @@
+T	H	weight
+x1	x2
+x1,x2	x4
+x1,x3	x4

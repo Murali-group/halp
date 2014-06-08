@@ -4,7 +4,7 @@ from hypergraph.algorithms import kShortestHyperpaths as ksh
 from hypergraph.directedHyperGraph import DirectedHyperGraph
 from hypergraph.directedHyperGraph import DirectedBHyperGraph
 from hypergraph.node import Node
-from hypergraph.hyperedge import HyperEdge
+from hypergraph.hyperedge import Hyperedge
 
 
 class TestGetHyperpathFromHypertree(unittest.TestCase):
@@ -19,13 +19,13 @@ class TestGetHyperpathFromHypertree(unittest.TestCase):
     def test_raises_exception_if_more_than_one_node_does_not_have_predecessor(
             self):
         s1, s2, s3 = Node('1'), Node('2'), Node('3')
-        T = {s1: None, s2: None, s3: HyperEdge(head={s2}, tail={s1})}
+        T = {s1: None, s2: None, s3: Hyperedge(head={s2}, tail={s1})}
         self.assertRaises(ksh.InvalidArgumentError,
                           ksh.get_hyperpath_from_hypertree, T, s1, s2)
 
     def test_raises_exception_if_all_nodes_have_predecessor(self):
         s1, s2, s3 = Node('1'), Node('2'), Node('3')
-        e = HyperEdge(head={s2}, tail={s1})
+        e = Hyperedge(head={s2}, tail={s1})
         T = {s1: e, s2: e, s3: e}
         self.assertRaises(ksh.InvalidArgumentError,
                           ksh.get_hyperpath_from_hypertree, T, s1, s2)
@@ -46,9 +46,9 @@ class TestGetHyperpathFromHypertree(unittest.TestCase):
 
     def test_returns_hyperpath_for_simple_tree(self):
         s1, s2, s3, s4 = Node('1'), Node('2'), Node('3'), Node('4')
-        e1 = HyperEdge({s2}, {s1})
-        e2 = HyperEdge({s3}, {s1})
-        e3 = HyperEdge({s4}, {s3})
+        e1 = Hyperedge({s2}, {s1})
+        e2 = Hyperedge({s3}, {s1})
+        e3 = Hyperedge({s4}, {s3})
         T = {s4: e3, s3: e2, s2: e1, s1: None}
         G = ksh.get_hyperpath_from_hypertree(T, s1, s4)
         # validate nodes
@@ -64,11 +64,11 @@ class TestGetHyperpathFromHypertree(unittest.TestCase):
     def test_returns_hyperpath_for_tree_with_multiple_nodes_in_tail(self):
         s1, s2, s3 = Node('1'), Node('2'), Node('3')
         s4, s5, s6 = Node('4'), Node('5'), Node('6')
-        e1 = HyperEdge({s2}, {s1})
-        e2 = HyperEdge({s3}, {s1})
-        e3 = HyperEdge({s4}, {s1})
-        e4 = HyperEdge({s5}, {s2, s3})
-        e5 = HyperEdge({s6}, {s5})
+        e1 = Hyperedge({s2}, {s1})
+        e2 = Hyperedge({s3}, {s1})
+        e3 = Hyperedge({s4}, {s1})
+        e4 = Hyperedge({s5}, {s2, s3})
+        e5 = Hyperedge({s6}, {s5})
 
         T = {s6: e5, s5: e4, s4: e3, s3: e2, s2: e1, s1: None}
         G = ksh.get_hyperpath_from_hypertree(T, s1, s6)
@@ -87,9 +87,9 @@ class TestGetHyperpathFromHypertree(unittest.TestCase):
     def test_returns_hyperpath_when_node_is_in_tail_of_two_edges(self):
         s1, s2, s3 = Node('1'), Node('2'), Node('3')
         s4 = Node('4')
-        e1 = HyperEdge({s2}, {s1})
-        e2 = HyperEdge({s3}, {s2})
-        e3 = HyperEdge({s4}, {s2, s3})
+        e1 = Hyperedge({s2}, {s1})
+        e2 = Hyperedge({s3}, {s2})
+        e3 = Hyperedge({s4}, {s2, s3})
 
         T = {s4: e3, s3: e2, s2: e1, s1: None}
         G = ksh.get_hyperpath_from_hypertree(T, s1, s4)
@@ -129,7 +129,7 @@ class TestBranchingStep(unittest.TestCase):
         G = DirectedBHyperGraph(set(), set())
         s = Node('s')
         t = Node('t')
-        e1 = HyperEdge({t}, {s}, 1)
+        e1 = Hyperedge({t}, {s}, 1)
         G.add_node(s)
         G.add_node(t)
         G.add_hyperedge(e1)

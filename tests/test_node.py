@@ -11,12 +11,10 @@ def test_node():
     # Test defailt node values
     node = Node()
     assert node.name == ""
-    assert node.nodeId == -1
 
     # Test node non defaults
-    node = Node(name="bob", nodeId=1)
+    node = Node(name="bob")
     assert node.name == "bob"
-    assert node.nodeId == 1
 
     # Test copy
     node1 = node.copy()
@@ -24,13 +22,13 @@ def test_node():
     assert not (node1 is node)
     assert node2 is node
 
-    # Test __str__
-    assert str(node1) == "bob"
-    assert repr(node1) == "bob"
-
     # Test __eq__
-    node1 = Node(name="s", nodeId=1)
-    node2 = Node(name="s", nodeId=1)
-    node3 = Node(name="t", nodeId=1)
+    node1 = Node(name="s")
+    node2 = Node(name="s")
+    node3 = Node(name="t")
     assert node1 == node2
     assert node1 != node3
+
+    # Test __str__
+    assert str(node1) == "<Node name=s>"
+    assert repr(node1) == "<Node name=s>"

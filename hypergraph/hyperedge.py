@@ -161,6 +161,8 @@ class Hyperedge:
 
         return "head:" + str(self._head) + " tail:" + \
             str(self._tail) + " weight: " + str(self._weight)
+        #return 'Tail: %s, Head: %s, weight: %s' % (self._tail, self._head,
+        #                                           self._weight)
 
     def __repr__(self):
         """
@@ -170,6 +172,7 @@ class Hyperedge:
         """
 
         return str(self)
+        #return str((self._head,  self._tail, self._weight))
 
     def __lt__(self, other):
         """
@@ -385,6 +388,26 @@ class UndirectedHyperedge(Hyperedge):
 
         raise AttributeError("Undirected hyperedges have no tail attribute")
 
+    '''
+    def __str__(self):
+    	"""
+        Returns overriden Hyperedge to-string as:
+            head: str(head_set) tail: str(tail_set) hyperedge_weight
+        :returns: str -- hyperedge representation string.
+        """
+
+        return 'nodes: %s, weight: %s' % (self._nodes, self._weight)
+
+    def __repr__(self):
+    	"""
+        Returns overriden Hyperedge representation to be equivalent to __str__.
+        :returns: str -- hyperedge representation as __str__.
+
+        """
+
+        return str((self.nodes, self.weight))
+    '''
+
     def __eq__(self, other):
         """
         Returns overriden UndirectedHyperedge equality to be true iff both the
@@ -394,7 +417,7 @@ class UndirectedHyperedge(Hyperedge):
 
         """
 
-        return self.nodes == other.nodes and self.weight == other.weight
+        return (self.nodes == other.nodes) and (self.weight == other.weight)
 
     def __hash__(self):
         """

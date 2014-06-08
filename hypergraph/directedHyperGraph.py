@@ -404,12 +404,12 @@ class DirectedHyperGraph(HyperGraph):
 class DirectedBHyperGraph(DirectedHyperGraph):
 
     def __init__(self, nodes=set(), hyperedges=set()):
-        HyperGraph.__init__(self, nodes, hyperedges)
         try:
             for e in hyperedges:
                 assert isinstance(e, BHyperedge)
         except:
             raise ValueError("Invalid b-hyperedge set")
+        HyperGraph.__init__(self, nodes, hyperedges)
 
     def add_hyperedgeByNames(self, head=set(), tail=set(), weight=0):
         '''

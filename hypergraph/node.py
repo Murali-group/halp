@@ -8,7 +8,7 @@
 from copy import deepcopy
 
 
-class Node:
+class Node(object):
     """
     Node class provides a basic node object which is identified by a name.
 
@@ -68,7 +68,7 @@ class Node:
 
         """
 
-        return ''.join(["<Node name=", str(self.name), ">"])
+        return "<Node name=" + str(self.name) + ">"
 
     def __repr__(self):
         """
@@ -86,7 +86,7 @@ class Node:
 
         """
 
-        return self.name == other.name
+        return isinstance(other, self.__class__) and (self.name == other.name)
 
     def __hash__(self):
         """

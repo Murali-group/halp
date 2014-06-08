@@ -161,7 +161,7 @@ class Hyperedge:
 
         return "head:" + str(self._head) + " tail:" + \
             str(self._tail) + " weight: " + str(self._weight)
-        #return 'Tail: %s, Head: %s, weight: %s' % (self._tail, self._head,
+        # return 'Tail: %s, Head: %s, weight: %s' % (self._tail, self._head,
         #                                           self._weight)
 
     def __repr__(self):
@@ -172,7 +172,7 @@ class Hyperedge:
         """
 
         return str(self)
-        #return str((self._head,  self._tail, self._weight))
+        # return str((self._head,  self._tail, self._weight))
 
     def __lt__(self, other):
         """
@@ -390,7 +390,7 @@ class UndirectedHyperedge(Hyperedge):
 
     '''
     def __str__(self):
-    	"""
+        """
         Returns overriden Hyperedge to-string as:
             head: str(head_set) tail: str(tail_set) hyperedge_weight
         :returns: str -- hyperedge representation string.
@@ -399,7 +399,7 @@ class UndirectedHyperedge(Hyperedge):
         return 'nodes: %s, weight: %s' % (self._nodes, self._weight)
 
     def __repr__(self):
-    	"""
+        """
         Returns overriden Hyperedge representation to be equivalent to __str__.
         :returns: str -- hyperedge representation as __str__.
 

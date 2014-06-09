@@ -3,15 +3,12 @@ Status](https://travis-ci.org/tmmurali/hypergraph.svg?branch=master)](https://tr
 [![Coverage
 Status](https://coveralls.io/repos/tmmurali/hypergraph/badge.png?branch=master)](https://coveralls.io/r/tmmurali/hypergraph?branch=master)
 
-hypergraph
+hypergraph  [Under Construction]
 ==========
 
-The style guide I think it would be best to use is pep8: http://legacy.python.org/dev/peps/pep-0008/
+This library provides a general hypergraph implementation, as well as several important and canonical algorithms that operate on hypergraphs.
 
-You can get the style checker here: https://pypi.python.org/pypi/pep8
-
-You can get an auto formatter here: https://pypi.python.org/pypi/autopep8/
-
+Expected v1.0 release: Aug 2014
 
 Testing
 ---------

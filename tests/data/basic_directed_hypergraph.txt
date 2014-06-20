@@ -1,0 +1,8 @@
+tail	head	weight
+s	x	1
+s	y,x	2
+s	z	2
+z,y,x	u,t	3
+a	u,t	1
+x	s	1
+b,t	a	1

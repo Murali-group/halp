@@ -874,6 +874,7 @@ def test_read_and_write():
         pass
     except BaseException as e:
         assert False, e
+<<<<<<< .merge_file_jHY1La
 
 def test_consistency():
     # make test hypergraph
@@ -910,3 +911,5 @@ def test_consistency():
 
     # this should not fail.
     H._check_consistency()
+=======
+>>>>>>> .merge_file_bwUHU8

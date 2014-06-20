@@ -1402,6 +1402,98 @@ class DirectedHypergraph(object):
 
         out_file.close()
 
+    # TODO: make reading more extensible (attributes, variable ordering, etc.)
+    def read(self, file_name, delim=',', sep='\t'):
+        """Read a directed hypergraph from a file, where nodes are
+        represented as strings.
+        Each column is separated by "sep", and the individual
+        tail nodes and head nodes are delimited by "delim".
+        The header line is currently ignored, but columns should be of
+        the format:
+        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+            x1,x2    x3,x4,x5    12
+        which defines a hyperedge of weight 12 from a tail set containing
+        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
+
+        """
+        in_file = open(file_name, 'r')
+
+        # Skip the header line
+        in_file.readline()
+
+        line_number = 2
+        for line in in_file.readlines():
+            line = line.strip()
+            # Skip empty lines
+            if not line:
+                continue
+
+            words = line.split(sep)
+            if not (2 <= len(words) <= 3):
+                raise \
+                    IOError("File format error at line {}".format(line_number))
+
+            tail = set(words[0].split(delim))
+            head = set(words[1].split(delim))
+            if len(words) == 3:
+                weight = float(words[2].split(delim)[0])
+            else:
+                weight = 1
+            self.add_hyperedge(tail, head, weight=weight)
+
+            line_number += 1
+
+        in_file.close()
+
+    # TODO: make writing more extensible (attributes, variable ordering, etc.)
+    def write(self, file_name, delim=',', sep='\t'):
+        """Write a directed hypergraph to a file, where nodes are
+        represented as strings.
+        Each column is separated by "sep", and the individual
+        tail nodes and head nodes are delimited by "delim".
+        The header line is currently ignored, but columns should be of
+        the format:
+        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+            x1,x2    x3,x4,x5    12
+        which defines a hyperedge of weight 12 from a tail set containing
+        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
+
+        """
+        out_file = open(file_name, 'w')
+
+        # write first header line
+        out_file.write("tail" + sep + "head" + sep + "weight\n")
+
+        for hyperedge_id in self.get_hyperedge_id_set():
+            line = ""
+            # Write each tail node to the line, separated by delim
+            for tail_node in self.get_hyperedge_tail(hyperedge_id):
+                line += tail_node + delim
+            # Remove last (extra) delim
+            line = line[:-1]
+
+            # Add sep between columns
+            line += sep
+
+            # Write each head node to the line, separated by delim
+            for head_node in self.get_hyperedge_head(hyperedge_id):
+                line += head_node + delim
+            # Remove last (extra) delim
+            line = line[:-1]
+
+            # Write the weight to the line and end the line
+            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
+
+            out_file.write(line)
+
+        out_file.close()
+
     # TODO: decide good way to get/use/process the hypergraph's symmetric image
     # def get_symmetric_image(self):
     #     symmetric_hypergraph = DirectedHypergraph()

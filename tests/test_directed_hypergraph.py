@@ -751,3 +751,48 @@ def test_get_predecessors():
     assert 'e4' in H.get_predecessors("F")
 
     assert H.get_predecessors([node_a]) == set()
+
+
+def test_copy():
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    H = DirectedHypergraph()
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    new_H = H.copy()
+
+    assert new_H._node_attributes == H._node_attributes
+    assert new_H._hyperedge_attributes == H._hyperedge_attributes
+
+    assert new_H._backward_star == H._backward_star
+    assert new_H._forward_star == H._forward_star
+
+    assert new_H._successors == H._successors
+    assert new_H._predecessors == H._predecessors

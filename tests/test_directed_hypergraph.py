@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from os import remove
 
 from hypergraph.directed_hypergraph import DirectedHypergraph
 
@@ -73,6 +74,10 @@ def test_add_nodes():
     assert node_d in H._node_attributes
     assert H._node_attributes[node_d]['label'] == 'black'
     assert H._node_attributes[node_d]['sink'] is True
+
+    node_set = H.get_node_set()
+    assert node_set == set(['A', 'B', 'C', 'D'])
+    assert len(node_set) == len(node_list)
 
 
 def test_add_hyperedge():
@@ -168,6 +173,8 @@ def test_add_hyperedges():
     assert H._hyperedge_attributes['e2']['weight'] == 1
     assert H._hyperedge_attributes['e2']['color'] == 'white'
     assert H._hyperedge_attributes['e2']['sink'] is False
+
+    assert set(hyperedge_names) == H.get_hyperedge_id_set()
 
 
 def test_remove_node():
@@ -782,7 +789,6 @@ def test_copy():
 
     hyperedges = [(tail1, head1, attrib), (tail2, head2)]
 
-    H = DirectedHypergraph()
     hyperedge_names = \
         H.add_hyperedges(hyperedges, common_attrib, color='white')
 
@@ -797,12 +803,21 @@ def test_copy():
     assert new_H._successors == H._successors
     assert new_H._predecessors == H._predecessors
 
-def test_check_consistency():
+def test_read_and_write():
+    # Try writing the following hypergraph to a file
     node_a = 'A'
     node_b = 'B'
     node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
     node_d = 'D'
- 
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
     tail1 = set([node_a, node_b])
     head1 = set([node_c, node_d])
     frozen_tail1 = frozenset(tail1)
@@ -818,9 +833,80 @@ def test_check_consistency():
 
     hyperedges = [(tail1, head1, attrib), (tail2, head2)]
 
-    H = DirectedHypergraph()
     hyperedge_names = \
         H.add_hyperedges(hyperedges, common_attrib, color='white')
 
-    ## should not throw an error.
+    H.write("test_read_and_write.txt")
+
+    # Try reading the hypergraph that was just written into a new hypergraph
+    new_H = DirectedHypergraph()
+    new_H.read("test_read_and_write.txt")
+
+    assert H._node_attributes.keys() == new_H._node_attributes.keys()
+
+    for new_hyperedge_id in new_H.get_hyperedge_id_set():
+        new_hyperedge_tail = new_H.get_hyperedge_tail(new_hyperedge_id)
+        new_hyperedge_head = new_H.get_hyperedge_head(new_hyperedge_id)
+        new_hyperedge_weight = new_H.get_hyperedge_weight(new_hyperedge_id)
+
+        found_matching_hyperedge = False
+        for hyperedge_id in H.get_hyperedge_id_set():
+            hyperedge_tail = H.get_hyperedge_tail(hyperedge_id)
+            hyperedge_head = H.get_hyperedge_head(hyperedge_id)
+            hyperedge_weight = H.get_hyperedge_weight(hyperedge_id)
+
+            if new_hyperedge_tail == hyperedge_tail and \
+               new_hyperedge_head == hyperedge_head and \
+               new_hyperedge_weight == hyperedge_weight:
+                found_matching_hyperedge = True
+                continue
+
+        assert found_matching_hyperedge
+
+    remove("test_read_and_write.txt")
+
+    # Try reading an invalid hypergraph file
+    invalid_H = DirectedHypergraph()
+    try:
+        invalid_H.read("tests/data/invalid_directed_hypergraph.txt")
+        assert False
+    except IOError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+def test_consistency():
+    # make test hypergraph
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    # this should not fail.
     H._check_consistency()

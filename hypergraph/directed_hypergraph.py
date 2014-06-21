@@ -865,12 +865,450 @@ class DirectedHypergraph(object):
         return new_hypergraph
 
     def _check_consistency(self):
-        """[Method description.]
+        """Compares the contents of the six dictionaries and ensures
+        that they are consistent with each other, raising a ValueError
+        if there is any inconsistency among the dictionaries. This
+        function is used in testing when modifying hypergraphs.  The
+        consistency checks are divided into the following groups:
 
-        :returns: bool -- [is the graph consistent]
+        1. hyperedge_id consistency (using hyperedge_attribute keys)
+        2. node consistency (using node_attribute keys)
+        3. successor/predecessor symmetry
+        4. check for misplaced hyperedge ids
+        5. check for misplaced nodes
+
+        :raises: ValueError -- detected inconsistency among dictionaries
 
         """
-        pass
+
+        # TODO: is ValueError the proper exception to raise? Should
+        # we make a new exception ("ConsistencyException")?
+
+        # TODO: many of these for loops can be replaced by list
+        # comprehension; however the errors currently report the exact
+        # condition that fails.  Using list comprehension would allow
+        # us to report which check fails, but not which node/hyperedge
+        # id/etc.x
+
+        # required_attrs are attributes that every hyperedge must have.
+        required_attrs = ['weight', 'tail', 'head',
+                          '__frozen_tail', '__frozen_head']
+
+        ######
+        # Consistency Check 1: consider all hyperedge ids listed in
+        # self._hyperedge_attributes
+        ######
+
+        # Get list of hyperedge_ids from the hyperedge attributes dict
+        hyperedge_ids_from_attributes = set(self._hyperedge_attributes.keys())
+
+        # Perform consistency checks on each hyperedge id.
+        for hyperedge_id in hyperedge_ids_from_attributes:
+
+            # Check 1.1: make sure every hyperedge id has a weight,
+            # tail, head, frozen tail, and frozen head
+            hyperedge_attr_dict = self._hyperedge_attributes[hyperedge_id]
+            for required_attr in required_attrs:
+                if required_attr not in hyperedge_attr_dict:
+                    raise ValueError(
+                        'Consistency Check 1.1 Failed: hyperedge ' +
+                        'attribute dictionary for hyperedge_id ' +
+                        '%s is missing required attribute %s' %
+                        (hyperedge_id, required_attr))
+
+            # Check 1.2: make sure frozenset(tail) == __frozen_tail
+            if frozenset(hyperedge_attr_dict['tail']) != \
+                    hyperedge_attr_dict['__frozen_tail']:
+                raise ValueError(
+                    'Consistency Check 1.2 Failed: frozenset ' +
+                    'tail is different from __frozen_tail ' +
+                    'attribute for hyperedge id %s' % (hyperedge_id))
+
+            # Check 1.3: make sure frozenset(head) == __frozen_head
+            if frozenset(hyperedge_attr_dict['head']) != \
+                    hyperedge_attr_dict['__frozen_head']:
+                raise ValueError(
+                    'Consistency Check 1.3 Failed: frozenset ' +
+                    'head is different from __frozen_head ' +
+                    'attribute for hyperedge id %s' % (hyperedge_id))
+
+            # get tail and head frozenset
+            tailset = hyperedge_attr_dict['__frozen_tail']
+            headset = hyperedge_attr_dict['__frozen_head']
+
+            # Check 1.4: make sure successors dictionary contains the
+            # hyperedge id.  Need to also check that tailset and
+            # headset are entries into the dict.
+            if tailset not in self._successors or \
+                    headset not in self._successors[tailset] or \
+                    self._successors[tailset][headset] != hyperedge_id:
+                raise ValueError(
+                    'Consistency Check 1.4 Failed: hyperedge ' +
+                    'id %s not in self._successors.' % (hyperedge_id))
+
+            # Check 1.5: make sure predecessors dictionary contains
+            # the hyperedge id.  Need to also check that headset and
+            # tailset are entries into the dict.
+            if headset not in self._predecessors or \
+                    tailset not in self._predecessors[headset] or \
+                    self._predecessors[headset][tailset] != hyperedge_id:
+                raise ValueError(
+                    'Consistency Check 1.5 Failed: hyperedge ' +
+                    'id %s not in self._predecessors.' % (hyperedge_id))
+
+            # Check 1.6: make sure every tail node in tailset
+            # contains the hyperedge_id in the forward star.
+            for tail_node in tailset:
+                if hyperedge_id not in self._forward_star[tail_node]:
+                    raise ValueError(
+                        'Consistency Check 1.6 Failed: hyperedge ' +
+                        'id %s is not in the forward star of tail ' +
+                        'node %s' % (hyperedge_id, tail_node))
+
+            # Check 1.7: make sure every head node in headset
+            # contains the hyperedge_id in the backward star.
+            for head_node in headset:
+                if hyperedge_id not in self._backward_star[head_node]:
+                    raise ValueError(
+                        'Consistency Check 1.7 Failed: hyperedge ' +
+                        'id %s is not in the backward star of head ' +
+                        'node %s' % (hyperedge_id, head_node))
+
+        ######
+        # Consistency Check 2: consider all nodes listed in
+        # self._node_attributes
+        ######
+
+        # Get list of nodes from the node attributes dict
+        nodes_from_attributes = set(self._node_attributes.keys())
+
+        # Perform consistency checks on each node.
+        for node in nodes_from_attributes:
+
+            # Check 2.1: make sure that the forward star for the node
+            # exists.
+            if node not in self._forward_star:
+                raise ValueError(
+                    'Consistency Check 2.1 Failed: node ' +
+                    '%s not in forward star dict' % (str(node)))
+
+            # Check 2.2: make sure that the backward star for the node
+            # exists.
+            if node not in self._backward_star:
+                raise ValueError(
+                    'Consistency Check 2.2 Failed: node ' +
+                    '%s not in backward star dict' % (str(node)))
+
+            # Get backward star and forward star
+            node_fstar = self._forward_star[node]
+            node_bstar = self._backward_star[node]
+
+            # Check 2.3: make sure every hyperedge id in the forward
+            # star contains the node in the tail
+            for hyperedge_id in node_fstar:
+                if node not in \
+                        self._hyperedge_attributes[hyperedge_id]['tail']:
+                    raise ValueError(
+                        'Consistency Check 2.3 Failed: node ' +
+                        '%d has hyperedge id %s in the forward ' +
+                        'star, but %s is not in the tail of %s.' %
+                        (str(node), hyperedge_id, str(node), hyperedge_id))
+
+            # Check 2.4: make sure every hyperedge id in the backward
+            # star contains the node in the head
+            for hyperedge_id in node_bstar:
+                if node not in \
+                        self._hyperedge_attributes[hyperedge_id]['head']:
+                    raise ValueError(
+                        'Consistency Check 2.4 Failed: node ' +
+                        '%d has hyperedge id %s in the backward ' +
+                        'star, but %s is not in the head of %s.' %
+                        (str(node), hyperedge_id, str(node), hyperedge_id))
+
+        ######
+        # Consistency Check 3: predecessor/successor symmetry
+        ######
+
+        # Check 3.1: iterate through predecessors; check successor
+        # symmetry
+        for headset in self._predecessors.keys():
+            for tailset in self._predecessors[headset].keys():
+                if self._predecessors[headset][tailset] != \
+                        self._successors[tailset][headset]:
+                    raise ValueError(
+                        'Consistency Check 3.1 Failed: headset ' +
+                        '= %s, tailset = %s, but ' +
+                        'predecessors[headset][tailset]=%s and ' +
+                        'successors[tailset][headset]=%s' %
+                        (str(headset), str(tailset),
+                         self._predecessors[headset][tailset],
+                         self._successors[tailset][headset]))
+
+        # Check 3.2: iterate through successors; check predecessor
+        # symmetry
+        for tailset in self._successors.keys():
+            for headset in self._successors[tailset].keys():
+                if self._successors[tailset][headset] != \
+                        self._predecessors[headset][tailset]:
+                    raise ValueError(
+                        'Consistency Check 3.2 Failed: tailset ' +
+                        '= %s, headset = %s, but ' +
+                        'successors[tailset][headset]=%s and ' +
+                        'predecessors[headset][tailset]=%s' %
+                        (str(tailset), str(headset),
+                         self._successors[tailset][headset],
+                         self._predecessors[headset][tailset]))
+
+        ######
+        # Consistency Check 4: check for misplaced hyperedge ids
+        ######
+
+        # the set "hyperedge_ids_from_attributes" is already defined.
+
+        # get hyperedge ids in the forward star
+        forward_star_hyperedge_ids = set()
+        for hyperedge_id_set in self._forward_star.values():
+            forward_star_hyperedge_ids.update(hyperedge_id_set)
+
+        # get hyperedge ids in the backward star
+        backward_star_hyperedge_ids = set()
+        for hyperedge_id_set in self._backward_star.values():
+            backward_star_hyperedge_ids.update(hyperedge_id_set)
+
+        # Check 4.1: hyperedge ids in the forward star must be the
+        # same as the hyperedge ids from attributes
+        if forward_star_hyperedge_ids != hyperedge_ids_from_attributes:
+            raise ValueError(
+                'Consistency Check 4.1 Failed: hyperedge ids ' +
+                'are different in the forward star ' +
+                'values and the hyperedge ids from ' +
+                'attribute keys.')
+
+        # Check 4.2: hyperedge ids in the backward star must be the
+        # same as the hyperedge ids from attributes
+        if backward_star_hyperedge_ids != hyperedge_ids_from_attributes:
+            raise ValueError(
+                'Consistency Check 4.2 Failed: hyperedge ids ' +
+                'are different in the backward star ' +
+                'values and the hyperedge ids from ' +
+                'attribute keys.')
+
+        # Note that by Check 4.1 and 4.2, forward_star_hyperedge_ids =
+        # backward_star_hyperedge_ids
+
+        # get hyperedge ids in the predecessors dict
+        predecessor_hyperedge_ids = set()
+        for all_tails_from_predecessor in self._predecessors.values():
+            for hyperedge_id in all_tails_from_predecessor.values():
+                predecessor_hyperedge_ids.add(hyperedge_id)
+
+        # get hyperedge ids in the successors dict
+        successor_hyperedge_ids = set()
+        for all_heads_from_successor in self._successors.values():
+            for hyperedge_id in all_heads_from_successor.values():
+                successor_hyperedge_ids.add(hyperedge_id)
+
+        # Check 4.3: hyperedge ids in the predecessor dict must be the
+        # same as the hyperedge ids from attributes
+        if predecessor_hyperedge_ids != hyperedge_ids_from_attributes:
+            raise ValueError(
+                'Consistency Check 4.3 Failed: hyperedge ids are ' +
+                'different in the predecessor values and ' +
+                'hyperedege ids from attribute keys.')
+
+        # Check 4.4: hyperedge ids in the successor dict must be the
+        # same as the hyperedge ids from attributes
+        if successor_hyperedge_ids != hyperedge_ids_from_attributes:
+            raise ValueError(
+                'Consistency Check 4.4 Failed: hyperedge ids are ' +
+                'different in the successor values and ' +
+                'hyperedege ids from attribute keys.')
+
+        # Note that by Check 4.3 and 4.4, predecessor_hyperedge_ids =
+        # successor_hyperedge_ids
+
+        # Note that by Check 4.1 - 4.4,
+        # predecessor_hyperedge_ids = successor_hyperedge_ids =
+        # forward_star_hyperedge_ids = backward_star_hyperedge_ids
+
+        ######
+        # Consistency Check 5: check for misplaced nodes
+        ######
+
+        # the set "nodes_from_attributes" is already defined.
+
+        # Check 5.1: all nodes in the forward star must be in the
+        # nodes from attributes
+        if set(self._forward_star.keys()) != nodes_from_attributes:
+            raise ValueError(
+                'Consistency Check 5.1 Failed: node %s (from ' +
+                'forward star keys) is not in the node ' +
+                'attribute dict.' % (str(node)))
+
+        # Check 5.2: all nodes in the backward star must be in the
+        # nodes from attributes
+        if set(self._backward_star.keys()) != nodes_from_attributes:
+            raise ValueError(
+                'Consistency Check 5.2 Failed: node %s (from ' +
+                'backward star keys) is not in the ' +
+                'node attribute dict.' % (str(node)))
+
+        # Note that, by Check 5.1 and 5.2, self._forward_star.keys() =
+        # self._backward_star.keys().
+
+        # Check 5.3: all nodes in hyperedge_attributes dictionary must
+        # be in the nodes from attributes.
+        for hyperedge_id in hyperedge_ids_from_attributes:
+            for tailnode in \
+                    self._hyperedge_attributes[hyperedge_id]['tail']:
+                if tailnode not in nodes_from_attributes:
+                    raise ValueError(
+                        'Consistency Check 5.3 Failed: tail ' +
+                        'node %s of hyperedge id %s is not ' +
+                        'in node attribute dict' %
+                        (tailnode, hyperedge_id))
+
+            for headnode in self._hyperedge_attributes[hyperedge_id]['head']:
+                if headnode not in nodes_from_attributes:
+                    raise ValueError(
+                        'Consistency Check 5.3 Failed: head ' +
+                        'node %s of hyperedge id %s is not ' +
+                        'in node attribute dict' %
+                        (headnode, hyperedge_id))
+
+        # get set of nodes in predecessor dictionary.
+        # adds both nodes in headset and nodes in tailset.
+        nodes_in_predecessor_dict = set()
+        for headset in self._predecessors.keys():
+            nodes_in_predecessor_dict.update(headset)
+            for tailset in self._predecessors[headset].keys():
+                nodes_in_predecessor_dict.update(tailset)
+
+        # get set of nodes in successor dictionary.
+        # adds both nodes in headset and nodes in tailset.
+        nodes_in_successor_dict = set()
+        for headset in self._successors.keys():
+            nodes_in_successor_dict.update(headset)
+            for tailset in self._successors[headset].keys():
+                nodes_in_successor_dict.update(tailset)
+
+        # Check 5.4: the set of nodes in successor dict is the same as
+        # the set of nodes in the predecessor dict
+        if nodes_in_predecessor_dict != nodes_in_successor_dict:
+            raise ValueError(
+                'Consistency Check 5.4 Failed: nodes in ' +
+                'successor dict are different than nodes ' +
+                'in predecessor dict')
+
+        # Check 5.5: all nodes in predecessor dict must be in the
+        # nodes from attributes
+        for node in nodes_in_predecessor_dict:
+            if node not in nodes_from_attributes:
+                raise ValueError(
+                    'Consistency Check 5.5 Failed: node %s ' +
+                    'from predecessor dictionary is not ' +
+                    'in node attribute dict' % (node))
+
+        # Check 5.6: all nodes in successor dict must be in the nodes
+        # from attributes
+        for node in nodes_in_successor_dict:
+            if node not in nodes_from_attributes:
+                raise ValueError(
+                    'Consistency Check 5.6 Failed: node %s ' +
+                    'from successor dictionary is not in ' +
+                    'node attribute dict' % (node))
+
+    # TODO: make reading more extensible (attributes, variable ordering, etc.)
+    def read(self, file_name, delim=',', sep='\t'):
+        """Read a directed hypergraph from a file, where nodes are
+        represented as strings.
+        Each column is separated by "sep", and the individual
+        tail nodes and head nodes are delimited by "delim".
+        The header line is currently ignored, but columns should be of
+        the format:
+        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+            x1,x2    x3,x4,x5    12
+        which defines a hyperedge of weight 12 from a tail set containing
+        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
+
+        """
+        in_file = open(file_name, 'r')
+
+        # Skip the header line
+        in_file.readline()
+
+        line_number = 2
+        for line in in_file.readlines():
+            line = line.strip()
+            # Skip empty lines
+            if not line:
+                continue
+
+            words = line.split(sep)
+            if not (2 <= len(words) <= 3):
+                raise \
+                    IOError("File format error at line {}".format(line_number))
+
+            tail = set(words[0].split(delim))
+            head = set(words[1].split(delim))
+            if len(words) == 3:
+                weight = float(words[2].split(delim)[0])
+            else:
+                weight = 1
+            self.add_hyperedge(tail, head, weight=weight)
+
+            line_number += 1
+
+        in_file.close()
+
+    # TODO: make writing more extensible (attributes, variable ordering, etc.)
+    def write(self, file_name, delim=',', sep='\t'):
+        """Write a directed hypergraph to a file, where nodes are
+        represented as strings.
+        Each column is separated by "sep", and the individual
+        tail nodes and head nodes are delimited by "delim".
+        The header line is currently ignored, but columns should be of
+        the format:
+        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+            x1,x2    x3,x4,x5    12
+        which defines a hyperedge of weight 12 from a tail set containing
+        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
+
+        """
+        out_file = open(file_name, 'w')
+
+        # write first header line
+        out_file.write("tail" + sep + "head" + sep + "weight\n")
+
+        for hyperedge_id in self.get_hyperedge_id_set():
+            line = ""
+            # Write each tail node to the line, separated by delim
+            for tail_node in self.get_hyperedge_tail(hyperedge_id):
+                line += tail_node + delim
+            # Remove last (extra) delim
+            line = line[:-1]
+
+            # Add sep between columns
+            line += sep
+
+            # Write each head node to the line, separated by delim
+            for head_node in self.get_hyperedge_head(hyperedge_id):
+                line += head_node + delim
+            # Remove last (extra) delim
+            line = line[:-1]
+
+            # Write the weight to the line and end the line
+            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
+
+            out_file.write(line)
+
+        out_file.close()
 
     # TODO: make reading more extensible (attributes, variable ordering, etc.)
     def read(self, file_name, delim=',', sep='\t'):

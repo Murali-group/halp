@@ -875,3 +875,40 @@ def test_read_and_write():
         pass
     except BaseException as e:
         assert False, e
+
+
+def test_consistency():
+    # make test hypergraph
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    # this should not fail.
+    H._check_consistency()

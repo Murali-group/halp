@@ -1031,8 +1031,8 @@ class DirectedHypergraph(object):
 
         # Check 3.1: iterate through predecessors; check successor
         # symmetry
-        for headset in self._predecessors.iterkeys():
-            for tailset in self._predecessors[headset].iterkeys():
+        for headset in self._predecessors.keys():
+            for tailset in self._predecessors[headset].keys():
                 if self._predecessors[headset][tailset] != \
                         self._successors[tailset][headset]:
                     raise ValueError(
@@ -1046,8 +1046,8 @@ class DirectedHypergraph(object):
 
         # Check 3.2: iterate through successors; check predecessor
         # symmetry
-        for tailset in self._successors.iterkeys():
-            for headset in self._successors[tailset].iterkeys():
+        for tailset in self._successors.keys():
+            for headset in self._successors[tailset].keys():
                 if self._successors[tailset][headset] != \
                         self._predecessors[headset][tailset]:
                     raise ValueError(
@@ -1067,12 +1067,12 @@ class DirectedHypergraph(object):
 
         # get hyperedge ids in the forward star
         forward_star_hyperedge_ids = set()
-        for hyperedge_id_set in self._forward_star.itervalues():
+        for hyperedge_id_set in self._forward_star.values():
             forward_star_hyperedge_ids.update(hyperedge_id_set)
 
         # get hyperedge ids in the backward star
         backward_star_hyperedge_ids = set()
-        for hyperedge_id_set in self._backward_star.itervalues():
+        for hyperedge_id_set in self._backward_star.values():
             backward_star_hyperedge_ids.update(hyperedge_id_set)
 
         # Check 4.1: hyperedge ids in the forward star must be the
@@ -1098,14 +1098,14 @@ class DirectedHypergraph(object):
 
         # get hyperedge ids in the predecessors dict
         predecessor_hyperedge_ids = set()
-        for all_tails_from_predecessor in self._predecessors.itervalues():
-            for hyperedge_id in all_tails_from_predecessor.itervalues():
+        for all_tails_from_predecessor in self._predecessors.values():
+            for hyperedge_id in all_tails_from_predecessor.values():
                 predecessor_hyperedge_ids.add(hyperedge_id)
 
         # get hyperedge ids in the successors dict
         successor_hyperedge_ids = set()
-        for all_heads_from_successor in self._successors.itervalues():
-            for hyperedge_id in all_heads_from_successor.itervalues():
+        for all_heads_from_successor in self._successors.values():
+            for hyperedge_id in all_heads_from_successor.values():
                 successor_hyperedge_ids.add(hyperedge_id)
 
         # Check 4.3: hyperedge ids in the predecessor dict must be the
@@ -1179,17 +1179,17 @@ class DirectedHypergraph(object):
         # get set of nodes in predecessor dictionary.
         # adds both nodes in headset and nodes in tailset.
         nodes_in_predecessor_dict = set()
-        for headset in self._predecessors.iterkeys():
+        for headset in self._predecessors.keys():
             nodes_in_predecessor_dict.update(headset)
-            for tailset in self._predecessors[headset].iterkeys():
+            for tailset in self._predecessors[headset].keys():
                 nodes_in_predecessor_dict.update(tailset)
 
         # get set of nodes in successor dictionary.
         # adds both nodes in headset and nodes in tailset.
         nodes_in_successor_dict = set()
-        for headset in self._successors.iterkeys():
+        for headset in self._successors.keys():
             nodes_in_successor_dict.update(headset)
-            for tailset in self._successors[headset].iterkeys():
+            for tailset in self._successors[headset].keys():
                 nodes_in_successor_dict.update(tailset)
 
         # Check 5.4: the set of nodes in successor dict is the same as
@@ -1217,190 +1217,6 @@ class DirectedHypergraph(object):
                     'Consistency Check 5.6 Failed: node %s ' +
                     'from successor dictionary is not in ' +
                     'node attribute dict' % (node))
-
-    # TODO: make reading more extensible (attributes, variable ordering, etc.)
-    def read(self, file_name, delim=',', sep='\t'):
-        """Read a directed hypergraph from a file, where nodes are
-        represented as strings.
-        Each column is separated by "sep", and the individual
-        tail nodes and head nodes are delimited by "delim".
-        The header line is currently ignored, but columns should be of
-        the format:
-        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
-
-        As a concrete example, an arbitrary line with delim=',' and
-        sep='    ' (4 spaces) may look like:
-            x1,x2    x3,x4,x5    12
-        which defines a hyperedge of weight 12 from a tail set containing
-        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
-        """
-        in_file = open(file_name, 'r')
-
-        # Skip the header line
-        in_file.readline()
-
-        line_number = 2
-        for line in in_file.readlines():
-            line = line.strip()
-            # Skip empty lines
-            if not line:
-                continue
-
-            words = line.split(sep)
-            if not (2 <= len(words) <= 3):
-                raise \
-                    IOError("File format error at line {}".format(line_number))
-
-            tail = set(words[0].split(delim))
-            head = set(words[1].split(delim))
-            if len(words) == 3:
-                weight = float(words[2].split(delim)[0])
-            else:
-                weight = 1
-            self.add_hyperedge(tail, head, weight=weight)
-
-            line_number += 1
-
-        in_file.close()
-
-    # TODO: make writing more extensible (attributes, variable ordering, etc.)
-    def write(self, file_name, delim=',', sep='\t'):
-        """Write a directed hypergraph to a file, where nodes are
-        represented as strings.
-        Each column is separated by "sep", and the individual
-        tail nodes and head nodes are delimited by "delim".
-        The header line is currently ignored, but columns should be of
-        the format:
-        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
-
-        As a concrete example, an arbitrary line with delim=',' and
-        sep='    ' (4 spaces) may look like:
-            x1,x2    x3,x4,x5    12
-        which defines a hyperedge of weight 12 from a tail set containing
-        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
-        """
-        out_file = open(file_name, 'w')
-
-        # write first header line
-        out_file.write("tail" + sep + "head" + sep + "weight\n")
-
-        for hyperedge_id in self.get_hyperedge_id_set():
-            line = ""
-            # Write each tail node to the line, separated by delim
-            for tail_node in self.get_hyperedge_tail(hyperedge_id):
-                line += tail_node + delim
-            # Remove last (extra) delim
-            line = line[:-1]
-
-            # Add sep between columns
-            line += sep
-
-            # Write each head node to the line, separated by delim
-            for head_node in self.get_hyperedge_head(hyperedge_id):
-                line += head_node + delim
-            # Remove last (extra) delim
-            line = line[:-1]
-
-            # Write the weight to the line and end the line
-            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
-
-            out_file.write(line)
-
-        out_file.close()
-
-    # TODO: make reading more extensible (attributes, variable ordering, etc.)
-    def read(self, file_name, delim=',', sep='\t'):
-        """Read a directed hypergraph from a file, where nodes are
-        represented as strings.
-        Each column is separated by "sep", and the individual
-        tail nodes and head nodes are delimited by "delim".
-        The header line is currently ignored, but columns should be of
-        the format:
-        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
-
-        As a concrete example, an arbitrary line with delim=',' and
-        sep='    ' (4 spaces) may look like:
-            x1,x2    x3,x4,x5    12
-        which defines a hyperedge of weight 12 from a tail set containing
-        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
-        """
-        in_file = open(file_name, 'r')
-
-        # Skip the header line
-        in_file.readline()
-
-        line_number = 2
-        for line in in_file.readlines():
-            line = line.strip()
-            # Skip empty lines
-            if not line:
-                continue
-
-            words = line.split(sep)
-            if not (2 <= len(words) <= 3):
-                raise \
-                    IOError("File format error at line {}".format(line_number))
-
-            tail = set(words[0].split(delim))
-            head = set(words[1].split(delim))
-            if len(words) == 3:
-                weight = float(words[2].split(delim)[0])
-            else:
-                weight = 1
-            self.add_hyperedge(tail, head, weight=weight)
-
-            line_number += 1
-
-        in_file.close()
-
-    # TODO: make writing more extensible (attributes, variable ordering, etc.)
-    def write(self, file_name, delim=',', sep='\t'):
-        """Write a directed hypergraph to a file, where nodes are
-        represented as strings.
-        Each column is separated by "sep", and the individual
-        tail nodes and head nodes are delimited by "delim".
-        The header line is currently ignored, but columns should be of
-        the format:
-        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
-
-        As a concrete example, an arbitrary line with delim=',' and
-        sep='    ' (4 spaces) may look like:
-            x1,x2    x3,x4,x5    12
-        which defines a hyperedge of weight 12 from a tail set containing
-        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
-        """
-        out_file = open(file_name, 'w')
-
-        # write first header line
-        out_file.write("tail" + sep + "head" + sep + "weight\n")
-
-        for hyperedge_id in self.get_hyperedge_id_set():
-            line = ""
-            # Write each tail node to the line, separated by delim
-            for tail_node in self.get_hyperedge_tail(hyperedge_id):
-                line += tail_node + delim
-            # Remove last (extra) delim
-            line = line[:-1]
-
-            # Add sep between columns
-            line += sep
-
-            # Write each head node to the line, separated by delim
-            for head_node in self.get_hyperedge_head(hyperedge_id):
-                line += head_node + delim
-            # Remove last (extra) delim
-            line = line[:-1]
-
-            # Write the weight to the line and end the line
-            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
-
-            out_file.write(line)
-
-        out_file.close()
 
     # TODO: make reading more extensible (attributes, variable ordering, etc.)
     def read(self, file_name, delim=',', sep='\t'):

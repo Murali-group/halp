@@ -877,7 +877,7 @@ def test_read_and_write():
         assert False, e
 
 
-def test_consistency():
+def test_check_hyperedge_attributes_consistency():
     # make test hypergraph
     node_a = 'A'
     node_b = 'B'
@@ -910,5 +910,435 @@ def test_consistency():
     hyperedge_names = \
         H.add_hyperedges(hyperedges, common_attrib, color='white')
 
-    # this should not fail.
+    # This should not fail
     H._check_consistency()
+
+    # The following consistency checks should fail
+    # Check 1.1
+    new_H = H.copy()
+    del new_H._hyperedge_attributes["e1"]["weight"]
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 1.2
+    new_H = H.copy()
+    new_H._hyperedge_attributes["e1"]["tail"] = head1
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 1.3
+    new_H = H.copy()
+    new_H._hyperedge_attributes["e1"]["head"] = tail1
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 1.4
+    new_H = H.copy()
+    del new_H._successors[frozen_tail1]
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 1.5
+    new_H = H.copy()
+    del new_H._predecessors[frozen_head1]
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 1.6
+    new_H = H.copy()
+    new_H._forward_star["A"].pop()
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 1.7
+    new_H = H.copy()
+    new_H._backward_star["C"].pop()
+    try:
+        new_H._check_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
+def test_check_node_attributes_consistency():
+    # make test hypergraph
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    # This should not fail
+    H._check_consistency()
+
+    # Check 2.1
+    new_H = H.copy()
+    new_H._node_attributes["E"] = {}
+    try:
+        new_H._check_node_attributes_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 2.2
+    new_H = H.copy()
+    new_H._node_attributes["E"] = {}
+    new_H._forward_star["E"] = set()
+    try:
+        new_H._check_node_attributes_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 2.3
+    new_H = H.copy()
+    new_H._forward_star["A"].add("e10")
+    try:
+        new_H._check_node_attributes_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 2.4
+    new_H = H.copy()
+    new_H._backward_star["A"].add("e10")
+    try:
+        new_H._check_node_attributes_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
+def test_check_predecessor_successor_consistency():
+    # make test hypergraph
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    # This should not fail
+    H._check_consistency()
+
+    # Check 3.1
+    new_H = H.copy()
+    new_H._predecessors[frozenset(["X"])] = {}
+    try:
+        new_H._check_predecessor_successor_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 3.2
+    new_H = H.copy()
+    new_H._successors[frozenset(["X"])] = {}
+    try:
+        new_H._check_predecessor_successor_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 3.3
+    new_H = H.copy()
+    new_frozentail = frozenset("A")
+    new_frozenhead = frozenset("C")
+    new_H._successors[new_frozentail] = {}
+    new_H._successors[new_frozentail][new_frozenhead] = "e1"
+    new_H._predecessors[new_frozenhead] = {}
+    new_H._predecessors[new_frozenhead][new_frozentail] = "e2"
+    try:
+        new_H._check_predecessor_successor_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
+def test_check_hyperedge_id_consistency():
+    # make test hypergraph
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    # This should not fail
+    H._check_consistency()
+
+    # Check 4.1
+    new_H = H.copy()
+    new_H._forward_star["X"] = set("e0")
+    try:
+        new_H._check_hyperedge_id_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 4.2
+    new_H = H.copy()
+    new_H._backward_star["X"] = set("e0")
+    try:
+        new_H._check_hyperedge_id_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 4.3
+    new_H = H.copy()
+    new_H._predecessors[frozen_head1][frozen_tail1] = "e0"
+    try:
+        new_H._check_hyperedge_id_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 4.4
+    new_H = H.copy()
+    new_H._successors[frozen_tail1][frozen_head1] = "e0"
+    try:
+        new_H._check_hyperedge_id_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
+def test_check_node_consistency():
+    # make test hypergraph
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    common_attrib = {'common': True, 'source': False}
+
+    node_list = [node_a, (node_b, {'source': True}), (node_c, attrib_c)]
+
+    node_d = 'D'
+
+    H = DirectedHypergraph()
+    H.add_nodes(node_list, common_attrib)
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    attrib = {'weight': 6, 'color': 'black'}
+    common_attrib = {'sink': False}
+
+    hyperedges = [(tail1, head1, attrib), (tail2, head2)]
+
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    # This should not fail
+    H._check_consistency()
+
+    # Check 5.1
+    new_H = H.copy()
+    new_H._forward_star["X"] = {}
+    try:
+        new_H._check_node_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 5.2
+    new_H = H.copy()
+    new_H._backward_star["X"] = {}
+    try:
+        new_H._check_node_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 5.3.1
+    new_H = H.copy()
+    new_H.add_hyperedge("X", "Y")
+    del new_H._node_attributes["X"]
+    del new_H._forward_star["X"]
+    del new_H._forward_star["Y"]
+    del new_H._backward_star["X"]
+    del new_H._backward_star["Y"]
+    try:
+        new_H._check_node_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 5.3.2
+    new_H = H.copy()
+    new_H.add_hyperedge("X", "Y")
+    del new_H._node_attributes["Y"]
+    del new_H._forward_star["X"]
+    del new_H._forward_star["Y"]
+    del new_H._backward_star["X"]
+    del new_H._backward_star["Y"]
+    try:
+        new_H._check_node_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 5.4
+    new_H = H.copy()
+    new_H._predecessors[frozenset("X")] = {}
+    try:
+        new_H._check_node_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+    # Check 5.5
+    new_H = H.copy()
+    new_H._successors[frozenset("X")] = {}
+    new_H._predecessors[frozenset("X")] = {}
+    try:
+        new_H._check_node_consistency()
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e

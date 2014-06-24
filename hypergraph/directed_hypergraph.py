@@ -801,7 +801,7 @@ class DirectedHypergraph(object):
     def copy(self):
         """Creates a new DirectedHypergraph object with the same node and
         hyperedge structure.
-        Copies of each of the node's and hyperedge's attributes are stored
+        Copies of the nodes' and hyperedges' attributes are stored
         and used in the new hypergraph.
 
         :returns: DirectedHypergraph -- a new hypergraph that is a copy of
@@ -813,60 +813,187 @@ class DirectedHypergraph(object):
     def __copy__(self):
         """Creates a new DirectedHypergraph object with the same node and
         hyperedge structure.
-        Copies of each of the node's and hyperedge's attributes are stored
+        Copies of the nodes' and hyperedges' attributes are stored
         and used in the new hypergraph.
 
         :returns: DirectedHypergraph -- a new hypergraph that is a copy of
                 the current hypergraph
 
         """
-        new_hypergraph = DirectedHypergraph()
+        new_H = DirectedHypergraph()
 
         # Loop over every node and its corresponding attribute dict
         # in the original hypergraph's _node_attributes dict
         for node, attr_dict in self._node_attributes.items():
             # Create a new dict for that node to store that node's attributes
-            new_hypergraph._node_attributes[node] = {}
+            new_H._node_attributes[node] = {}
             # Loop over each attribute of that node in the original hypergraph
             # and, for each key, copy the corresponding value into the new
             # hypergraph's dictionary using the same key
             for attr_name, attr_value in attr_dict.items():
-                new_hypergraph._node_attributes[node][attr_name] = \
+                new_H._node_attributes[node][attr_name] = \
                     copy.copy(attr_value)
 
         # Loop over every hyperedge_id and its corresponding attribute dict
         # in the original hypergraph's _hyperedge_attributes dict
         for hyperedge_id, attr_dict in self._hyperedge_attributes.items():
             # Create a new dict for that node to store that node's attributes
-            new_hypergraph._hyperedge_attributes[hyperedge_id] = {}
+            new_H._hyperedge_attributes[hyperedge_id] = {}
             # Loop over each attribute of that hyperedge in the original
             # hypergraph and, for each key, copy the corresponding value
             # the new hypergraph's dictionary
             for attr_name, attr_value in attr_dict.items():
-                new_hypergraph.\
+                new_H.\
                     _hyperedge_attributes[hyperedge_id][attr_name] = \
                     copy.copy(attr_value)
 
         # Copy the original hypergraph's forward star and backward star
-        new_hypergraph._backward_star = self._backward_star.copy()
+        new_H._backward_star = self._backward_star.copy()
         for node in self._node_attributes.keys():
-            new_hypergraph._backward_star[node] = \
+            new_H._backward_star[node] = \
                 self._backward_star[node].copy()
-            new_hypergraph._forward_star[node] = \
+            new_H._forward_star[node] = \
                 self._forward_star[node].copy()
 
         # Copy the original hypergraph's successors
         for frozen_tail, successor_dict in self._successors.items():
-            new_hypergraph._successors[frozen_tail] = successor_dict.copy()
+            new_H._successors[frozen_tail] = successor_dict.copy()
         # Copy the original hypergraph's predecessors
         for frozen_head, predecessor_dict in self._predecessors.items():
-            new_hypergraph._predecessors[frozen_head] = predecessor_dict.copy()
+            new_H._predecessors[frozen_head] = predecessor_dict.copy()
 
         # Start assigning edge labels at the same
-        new_hypergraph._current_hyperedge_id = \
+        new_H._current_hyperedge_id = \
             self._current_hyperedge_id
 
-        return new_hypergraph
+        return new_H
+
+    # TODO: decide good way to get/use/process the hypergraph's symmetric image
+    def get_symmetric_image(self):
+        """Creates a new DirectedHypergraph object that is the symmetric
+        image of this hypergraph (i.e., identical hypergraph with all
+        edge directions reversed).
+        Copies of each of the nodes' and hyperedges' attributes are stored
+        and used in the new hypergraph.
+
+        :returns: DirectedHypergraph -- a new hypergraph that is the symmetric
+                image of the current hypergraph.
+
+        """
+        new_H = self.copy()
+
+        # No change to _node_attributes necessary, as nodes remain the same
+
+        # Reverse the tail and head (and __frozen_tail and __frozen_head) for
+        # every hyperedge
+        for hyperedge_id in self.get_hyperedge_id_set():
+            attr_dict = new_H._hyperedge_attributes[hyperedge_id]
+            attr_dict["tail"], attr_dict["head"] = \
+                attr_dict["head"], attr_dict["tail"]
+            attr_dict["__frozen_tail"], attr_dict["__frozen_head"] = \
+                attr_dict["__frozen_head"], attr_dict["__frozen_tail"]
+
+        # Reverse the definition of forward star and backward star
+        new_H._forward_star, new_H._backward_star = \
+            new_H._backward_star, new_H._forward_star
+
+        # Reverse the definition of successor and predecessor
+        new_H._successors, new_H._predecessors = \
+            new_H._predecessors, new_H._successors
+
+        return new_H
+
+    # TODO: make reading more extensible (attributes, variable ordering, etc.)
+    def read(self, file_name, delim=',', sep='\t'):
+        """Read a directed hypergraph from a file, where nodes are
+        represented as strings.
+        Each column is separated by "sep", and the individual
+        tail nodes and head nodes are delimited by "delim".
+        The header line is currently ignored, but columns should be of
+        the format:
+        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+            x1,x2    x3,x4,x5    12
+        which defines a hyperedge of weight 12 from a tail set containing
+        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
+
+        """
+        in_file = open(file_name, 'r')
+
+        # Skip the header line
+        in_file.readline()
+
+        line_number = 2
+        for line in in_file.readlines():
+            line = line.strip()
+            # Skip empty lines
+            if not line:
+                continue
+
+            words = line.split(sep)
+            if not (2 <= len(words) <= 3):
+                raise \
+                    IOError("File format error at line {}".format(line_number))
+
+            tail = set(words[0].split(delim))
+            head = set(words[1].split(delim))
+            if len(words) == 3:
+                weight = float(words[2].split(delim)[0])
+            else:
+                weight = 1
+            self.add_hyperedge(tail, head, weight=weight)
+
+            line_number += 1
+
+        in_file.close()
+
+    # TODO: make writing more extensible (attributes, variable ordering, etc.)
+    def write(self, file_name, delim=',', sep='\t'):
+        """Write a directed hypergraph to a file, where nodes are
+        represented as strings.
+        Each column is separated by "sep", and the individual
+        tail nodes and head nodes are delimited by "delim".
+        The header line is currently ignored, but columns should be of
+        the format:
+        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+            x1,x2    x3,x4,x5    12
+        which defines a hyperedge of weight 12 from a tail set containing
+        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
+
+        """
+        out_file = open(file_name, 'w')
+
+        # write first header line
+        out_file.write("tail" + sep + "head" + sep + "weight\n")
+
+        for hyperedge_id in self.get_hyperedge_id_set():
+            line = ""
+            # Write each tail node to the line, separated by delim
+            for tail_node in self.get_hyperedge_tail(hyperedge_id):
+                line += tail_node + delim
+            # Remove last (extra) delim
+            line = line[:-1]
+
+            # Add sep between columns
+            line += sep
+
+            # Write each head node to the line, separated by delim
+            for head_node in self.get_hyperedge_head(hyperedge_id):
+                line += head_node + delim
+            # Remove last (extra) delim
+            line = line[:-1]
+
+            # Write the weight to the line and end the line
+            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
+
+            out_file.write(line)
+
+        out_file.close()
 
     def _check_hyperedge_attributes_consistency(self):
         """Consistency Check 1: consider all hyperedge IDs listed in
@@ -1114,7 +1241,7 @@ class DirectedHypergraph(object):
             raise ValueError(
                 'Consistency Check 4.3 Failed: hyperedge ids are ' +
                 'different in the predecessor values and ' +
-                'hyperedege ids from attribute keys.')
+                'hyperedge ids from attribute keys.')
 
         # Check 4.4: hyperedge ids in the successor dict must be the
         # same as the hyperedge ids from attributes
@@ -1122,7 +1249,7 @@ class DirectedHypergraph(object):
             raise ValueError(
                 'Consistency Check 4.4 Failed: hyperedge ids are ' +
                 'different in the successor values and ' +
-                'hyperedege ids from attribute keys.')
+                'hyperedge ids from attribute keys.')
 
         # Note that by Check 4.3 and 4.4, predecessor_hyperedge_ids =
         # successor_hyperedge_ids
@@ -1246,129 +1373,3 @@ class DirectedHypergraph(object):
         self._check_predecessor_successor_consistency()
         self._check_hyperedge_id_consistency()
         self._check_node_consistency()
-
-    # TODO: make reading more extensible (attributes, variable ordering, etc.)
-    def read(self, file_name, delim=',', sep='\t'):
-        """Read a directed hypergraph from a file, where nodes are
-        represented as strings.
-        Each column is separated by "sep", and the individual
-        tail nodes and head nodes are delimited by "delim".
-        The header line is currently ignored, but columns should be of
-        the format:
-        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
-
-        As a concrete example, an arbitrary line with delim=',' and
-        sep='    ' (4 spaces) may look like:
-            x1,x2    x3,x4,x5    12
-        which defines a hyperedge of weight 12 from a tail set containing
-        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
-        """
-        in_file = open(file_name, 'r')
-
-        # Skip the header line
-        in_file.readline()
-
-        line_number = 2
-        for line in in_file.readlines():
-            line = line.strip()
-            # Skip empty lines
-            if not line:
-                continue
-
-            words = line.split(sep)
-            if not (2 <= len(words) <= 3):
-                raise \
-                    IOError("File format error at line {}".format(line_number))
-
-            tail = set(words[0].split(delim))
-            head = set(words[1].split(delim))
-            if len(words) == 3:
-                weight = float(words[2].split(delim)[0])
-            else:
-                weight = 1
-            self.add_hyperedge(tail, head, weight=weight)
-
-            line_number += 1
-
-        in_file.close()
-
-    # TODO: make writing more extensible (attributes, variable ordering, etc.)
-    def write(self, file_name, delim=',', sep='\t'):
-        """Write a directed hypergraph to a file, where nodes are
-        represented as strings.
-        Each column is separated by "sep", and the individual
-        tail nodes and head nodes are delimited by "delim".
-        The header line is currently ignored, but columns should be of
-        the format:
-        tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight
-
-        As a concrete example, an arbitrary line with delim=',' and
-        sep='    ' (4 spaces) may look like:
-            x1,x2    x3,x4,x5    12
-        which defines a hyperedge of weight 12 from a tail set containing
-        nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
-        """
-        out_file = open(file_name, 'w')
-
-        # write first header line
-        out_file.write("tail" + sep + "head" + sep + "weight\n")
-
-        for hyperedge_id in self.get_hyperedge_id_set():
-            line = ""
-            # Write each tail node to the line, separated by delim
-            for tail_node in self.get_hyperedge_tail(hyperedge_id):
-                line += tail_node + delim
-            # Remove last (extra) delim
-            line = line[:-1]
-
-            # Add sep between columns
-            line += sep
-
-            # Write each head node to the line, separated by delim
-            for head_node in self.get_hyperedge_head(hyperedge_id):
-                line += head_node + delim
-            # Remove last (extra) delim
-            line = line[:-1]
-
-            # Write the weight to the line and end the line
-            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
-
-            out_file.write(line)
-
-        out_file.close()
-
-    # TODO: decide good way to get/use/process the hypergraph's symmetric image
-    # def get_symmetric_image(self):
-    #     symmetric_hypergraph = DirectedHypergraph()
-    #     for node, attributes in self._node_attributes.items():
-    #         symmetric_hypergraph._node_attributes[node] = {}
-    #         for attribute in attributes:
-    #             symmetric_hypergraph._node_attributes[node] = \
-    #                 self._node_attributes[node].copy()
-    #     symmetric_hypergraph._backward_star = self._forward_star.copy()
-    #     symmetric_hypergraph._forward_star = self._backward_star.copy()
-    #
-    #     # Stuff
-    #     for attr_name, attr_value in attr_dict.items():
-    #         if attr_name == "tail":
-    #             new_hypergraph.\
-    #             _hyperedge_attributes[hyperedge_id]["head"] = \
-    #                 copy.copy(attr_value)
-    #         elif attr_name == "__frozen_tail":
-    #             new_hypergraph.\
-    #             _hyperedge_attributes[hyperedge_id]["__frozen_head"] = \
-    #                 copy.copy(attr_value)
-    #         elif attr_name == "head":
-    #             new_hypergraph.\
-    #             _hyperedge_attributes[hyperedge_id]["tail"] = \
-    #                 copy.copy(attr_value)
-    #         elif attr_name == "__frozen_head":
-    #             new_hypergraph.\
-    #             _hyperedge_attributes[hyperedge_id]["__frozen_tail"] = \
-    #                 copy.copy(attr_value)
-    #         else:
-    #             new_hypergraph.\
-    #             _hyperedge_attributes[hyperedge_id][attr_name] = \
-    #                 copy.copy(attr_value)

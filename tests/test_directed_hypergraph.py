@@ -1342,3 +1342,62 @@ def test_check_node_consistency():
         pass
     except BaseException as e:
         assert False, e
+
+
+def test_get_symmetric_image():
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    node_d = 'D'
+    node_e = 'E'
+
+    tail1 = set([node_a, node_b])
+    head1 = set([node_c, node_d])
+    frozen_tail1 = frozenset(tail1)
+    frozen_head1 = frozenset(head1)
+
+    tail2 = set([node_b, node_c])
+    head2 = set([node_d, node_a])
+    frozen_tail2 = frozenset(tail2)
+    frozen_head2 = frozenset(head2)
+
+    tail3 = set([node_d])
+    head3 = set([node_e])
+    frozen_tail3 = frozenset(tail3)
+    frozen_head3 = frozenset(head3)
+
+    hyperedges = [(tail1, head1), (tail2, head2), (tail3, head3)]
+
+    H = DirectedHypergraph()
+    hyperedge_names = H.add_hyperedges(hyperedges)
+
+    sym_H = H.get_symmetric_image()
+
+    sym_H._check_consistency()
+
+    assert sym_H._node_attributes == H._node_attributes
+
+    assert sym_H._hyperedge_attributes["e1"]["tail"] == head1
+    assert sym_H._hyperedge_attributes["e1"]["head"] == tail1
+    assert sym_H._hyperedge_attributes["e1"]["__frozen_tail"] == frozen_head1
+    assert sym_H._hyperedge_attributes["e1"]["__frozen_head"] == frozen_tail1
+    assert sym_H._hyperedge_attributes["e2"]["tail"] == head2
+    assert sym_H._hyperedge_attributes["e2"]["head"] == tail2
+    assert sym_H._hyperedge_attributes["e2"]["__frozen_tail"] == frozen_head2
+    assert sym_H._hyperedge_attributes["e2"]["__frozen_head"] == frozen_tail2
+    assert sym_H._hyperedge_attributes["e3"]["tail"] == head3
+    assert sym_H._hyperedge_attributes["e3"]["head"] == tail3
+    assert sym_H._hyperedge_attributes["e3"]["__frozen_tail"] == frozen_head3
+    assert sym_H._hyperedge_attributes["e3"]["__frozen_head"] == frozen_tail3
+
+    assert sym_H._forward_star[node_a] == set(["e2"])
+    assert sym_H._forward_star[node_b] == set()
+    assert sym_H._forward_star[node_c] == set(["e1"])
+    assert sym_H._forward_star[node_d] == set(["e1", "e2"])
+    assert sym_H._forward_star[node_e] == set(["e3"])
+
+    assert sym_H._backward_star[node_a] == set(["e1"])
+    assert sym_H._backward_star[node_b] == set(["e1", "e2"])
+    assert sym_H._backward_star[node_c] == set(["e2"])
+    assert sym_H._backward_star[node_d] == set(["e3"])
+    assert sym_H._backward_star[node_e] == set()

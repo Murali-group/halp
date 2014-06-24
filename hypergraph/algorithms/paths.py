@@ -1,15 +1,17 @@
 """
-.. module:: connectivity
-   :synopsis: Defines several functions for executing various connectivity
-            queries on a directed hypergraph.
+.. module:: paths
+   :synopsis: Defines several functions for executing various
+   path/connectivity queries on a directed hypergraph.
 
 """
 
 from __future__ import absolute_import
 try:
     from queue import Queue
+    from queue import PriorityQueue
 except ImportError:
     from Queue import Queue
+    from Queue import PriorityQueue
 
 from hypergraph.directed_hypergraph import DirectedHypergraph
 
@@ -167,8 +169,7 @@ def _x_visit(hypergraph, source_node, b_visit):
             k[hyperedge_id] += 1
             # Traverse this hyperedge only when we have reached all the nodes
             # in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)
-            if k[hyperedge_id] == \
-               len(hyperedge_tail(hyperedge_id)):
+            if k[hyperedge_id] == len(hyperedge_tail(hyperedge_id)):
                 Pe[hyperedge_id] = current_node
                 # Traversing the hyperedge yields the set of head nodes of
                 # the hyperedge; B-visit each head node
@@ -262,3 +263,129 @@ def is_f_connected(hypergraph, source_node, target_node):
     """
     f_visited_nodes, Pv, Pe, v = f_visit(hypergraph, source_node)
     return target_node in f_visited_nodes
+
+
+def sum_function(tail_nodes, W):
+    """Additive sum function for nodes in the tail of a hyperedge.
+
+    :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction
+                    with the weight of the hyperedge, will additively
+                    constitute the weight of the head node
+    :param W: node weighting function
+    :returns: int -- sum of the weights of tail_nodes
+
+    """
+    return sum(W[node] for node in tail_nodes)
+
+
+def distance_function(tail_nodes, W):
+    """Additive distance function for nodes in the tail of a hyperedge.
+
+    :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction
+                    with the weight of the hyperedge, will additively
+                    constitute the weight of the head node
+    :param W: node weighting function
+    :returns: int -- max of the weights of tail_nodes
+
+    """
+    return max(W[node] for node in tail_nodes)
+
+
+def shortest_b_tree(hypergraph, source_node,
+                    F=sum_function, valid_ordering=False):
+    """Finds a set of minimum weight B-paths from a source node to all
+    the nodes y which are B-connected to it, as described in the paper:
+    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
+    Directed hypergraphs and applications, Discrete Applied Mathematics,
+    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
+    http://dx.doi.org/10.1016/0166-218X(93)90045-P.
+    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
+
+    :param hypergraph: the hypergraph to perform the 'SBT' algorithm on
+    :param source_node: the root of the tree to be found
+    :param F: function pointer to any additive weight function; that is,
+            any function that is only a function of the weights of the
+            nodes in the tail of a hyperedge
+    :param valid_ordering: a boolean flag to signal whether or not a valid
+                        ordering of the nodes should be returned
+    :returns:   dict -- mapping from nodes to the ID hyperedges that preceeded
+                    them in this traversal
+                dict -- mapping from nodes to the weight of those nodes
+                list -- [only if valid_ordering argument is passed] a valid
+                        ordering of the nodes
+
+    """
+    # TODO: implement generalization for Shortest-F-Tree?
+    # Not sure if that's a thing.
+    forward_star = hypergraph.get_forward_star
+    hyperedge_tail = hypergraph.get_hyperedge_tail
+    hyperedge_head = hypergraph.get_hyperedge_head
+    hyperedge_weight = hypergraph.get_hyperedge_weight
+
+    node_set = hypergraph.get_node_set()
+    # Pv keeps track of the ID of the hyperedge that directely
+    # preceeded each node in the traversal
+    Pv = {node: None for node in node_set}
+
+    hyperedge_ids = hypergraph.get_hyperedge_id_set()
+    # W keeps track of the smallest weight path from the source node
+    # to each node
+    W = {node: float("inf") for node in node_set}
+    W[source_node] = 0
+
+    # k keeps track of how many nodes in the tail of each hyperedge are
+    # B-connected (when all nodes in a tail are B-connected, that hyperedge
+    # can then be traversed)
+    k = {hyperedge_id: 0 for hyperedge_id in hyperedge_ids}
+
+    # List of nodes removed from the priority queue in the order that
+    # they were removed
+    ordering = []
+
+    Q = PriorityQueue()
+    Q.put((W[source_node], source_node))
+    # Since PriorityQueue doesn't support "contains" operations we,
+    # need another structure to keep track of what is currently in
+    # the priority queue Q
+    inQ = {source_node: W[source_node]}
+
+    while not Q.empty():
+        # At current_node, we can traverse each hyperedge in its forward star
+        current_node_weight, current_node = Q.get()
+        del inQ[current_node]
+        ordering.append(current_node)
+        for hyperedge_id in forward_star(current_node):
+            # Since we're arrived at a new node, we increment
+            # k[hyperedge_id] to indicate that we've reached 1 new
+            # node in this hyperedge's tail
+            k[hyperedge_id] += 1
+            # Traverse this hyperedge only when we have reached all the nodes
+            # in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)
+            if k[hyperedge_id] == len(hyperedge_tail(hyperedge_id)):
+                f = F(hyperedge_tail(hyperedge_id), W)
+                # For each node in the head of the newly-traversed hyperedge,
+                # if the previous weight of the node is more than the new
+                # weight...
+                for head_node in \
+                    [node for node in hyperedge_head(hyperedge_id) if
+                     W[node] > hyperedge_weight(hyperedge_id) + f]:
+                    # If it's not already in the priority queue...
+                    if head_node not in inQ:
+                        # Add it to the priority queue
+                        Q.put((W[head_node], head_node))
+                        inQ[head_node] = W[head_node]
+                        # If it has been visited before...
+                        if W[head_node] < float("inf"):
+                            # "Unmark" that node from the outgoing
+                            # hyperedges of that node (signal that
+                            # are not yet traversable)
+                            for head_hyperedge_id in forward_star(head_node):
+                                k[head_hyperedge_id] -= 1
+                    # Update its weight to the new, smaller weight
+                    W[head_node] = hyperedge_weight(hyperedge_id) + f
+                    Pv[head_node] = hyperedge_id
+
+    if valid_ordering:
+        return Pv, W, ordering
+    else:
+        return Pv, W

@@ -18,11 +18,13 @@ def test_visit():
     assert Pv['y'] == 'e2'
     assert Pv['z'] == 'e3'
     assert Pe['e4'] in ('x', 'y', 'z')
-    assert (Pv['u'], Pv['t']) == ('e4', 'e4')
+    assert Pv['u'] == 'e4'
+    assert Pv['t'] == 'e8'
     assert Pv['a'] == 'e7'
     assert Pe['e5'] == 'a'
     assert Pe['e6'] == 'x'
     assert Pe['e7'] == 't'
+    assert Pe['e8'] == 's'
     assert Pv['b'] is None
 
     try:
@@ -64,12 +66,15 @@ def test_b_visit():
     assert Pv['z'] == 'e3'
     assert (v['x'], v['y'], v['z']) == (1, 1, 1)
     assert Pe['e4'] in ('x', 'y', 'z')
-    assert (Pv['u'], Pv['t']) == ('e4', 'e4')
-    assert (v['u'], v['t']) == (2, 2)
+    assert Pv['u'] == 'e4'
+    assert Pv['t'] == 'e8'
+    assert v['t'] == 1
+    assert v['u'] == 2
     assert Pv['a'] is None
     assert Pe['e5'] is None
     assert Pe['e6'] == 'x'
     assert Pe['e7'] is None
+    assert Pe['e8'] == 's'
     assert Pv['b'] is None
 
     # Let 't' be the source node:
@@ -128,14 +133,19 @@ def test_f_visit():
     # Let 't' be the source node:
     f_visited_nodes, Pv, Pe, v = paths.f_visit(H, 't')
 
-    assert f_visited_nodes == set(['t'])
+    assert f_visited_nodes == set(['t', 's', 'x'])
 
     assert Pv['t'] is None
-    assert (Pv['s'], Pv['x'], Pv['y'], Pv['z'], Pv['u'], Pv['a'], Pv['b']) == \
-        (None, None, None, None, None, None, None)
-    assert (Pe["e1"], Pe["e2"], Pe["e3"], Pe["e4"],
-            Pe["e5"], Pe["e6"], Pe["e7"]) == \
-        (None, None, None, None, None, None, None)
+    assert Pv['s'] == 'e8'
+    assert Pv['x'] == 'e6'
+    assert (Pv['y'], Pv['z'], Pv['u'], Pv['a'], Pv['b']) == \
+        (None, None, None, None, None)
+    assert Pe["e8"] == 't'
+    assert Pe["e6"] == 's'
+    assert Pe["e1"] == 'x'
+    assert (Pe["e2"], Pe["e3"], Pe["e4"],
+            Pe["e5"], Pe["e7"]) == \
+        (None, None, None, None, None)
 
     # Try invalid F-visit
     try:
@@ -196,6 +206,15 @@ def test_shortest_sum_b_tree():
     assert Pv['u'] == 'e4'
     assert (Pv['a'], Pv['b']) == (None, None)
 
+    assert W['s'] == 0
+    assert W['x'] == 1
+    assert W['y'] == 2
+    assert W['z'] == 2
+    assert W['u'] == 8
+    assert W['t'] == 8
+    assert W['a'] == float('inf')
+    assert W['b'] == float('inf')
+
 
 def test_shortest_distance_b_tree():
     H = DirectedHypergraph()
@@ -211,3 +230,12 @@ def test_shortest_distance_b_tree():
     assert Pv['t'] == 'e4'
     assert Pv['u'] == 'e4'
     assert (Pv['a'], Pv['b']) == (None, None)
+
+    assert W['s'] == 0
+    assert W['x'] == 1
+    assert W['y'] == 2
+    assert W['z'] == 2
+    assert W['u'] == 5
+    assert W['t'] == 5
+    assert W['a'] == float('inf')
+    assert W['b'] == float('inf')

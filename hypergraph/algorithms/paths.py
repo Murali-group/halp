@@ -353,6 +353,10 @@ def shortest_b_tree(hypergraph, source_node,
         # At current_node, we can traverse each hyperedge in its forward star
         current_node_weight, current_node = Q.get()
         del inQ[current_node]
+        # If node was at an earlier position in the valid ordering,
+        # move it to the end of the ordering
+        if ordering.count(current_node) != 0:
+            ordering.remove(current_node)
         ordering.append(current_node)
         for hyperedge_id in forward_star(current_node):
             # Since we're arrived at a new node, we increment

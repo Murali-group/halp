@@ -1,0 +1,6 @@
+nodes	weight
+s,x
+s,y,x	2
+
+z,y,x		3
+x

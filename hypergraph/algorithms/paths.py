@@ -5,7 +5,6 @@
 
 """
 
-from __future__ import absolute_import
 try:
     from queue import Queue
     from queue import PriorityQueue

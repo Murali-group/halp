@@ -6,7 +6,6 @@
 
 """
 
-from __future__ import absolute_import
 import copy
 
 
@@ -33,7 +32,7 @@ class DirectedHypergraph(object):
 
     Examples
     --------
-    Create an empty graph (no nodes or hyperedges).
+    Create an empty directed hypergraph (no nodes or hyperedges).
 
     >>> H = DirectedHypergraph()
 
@@ -289,9 +288,7 @@ class DirectedHypergraph(object):
         # Loop over every hyperedge in the forward star of the node;
         # i.e., over every hyperedge that contains the node in the tail
         frozen_tails = set()
-        for hyperedge_id in \
-                self._forward_star[node]:
-            # Compute the frozenset for the tail and head of hyperedge_id
+        for hyperedge_id in self._forward_star[node]:
             frozen_tail = \
                 self._hyperedge_attributes[hyperedge_id]["__frozen_tail"]
             frozen_head = \
@@ -492,13 +489,13 @@ class DirectedHypergraph(object):
     def add_hyperedges(self, hyperedges, attr_dict=None, **attr):
         """Adds multiple hyperedges to the graph, along with any related
             attributes of the hyperedges.
-            If any node of a hyperedge has not previously been added to the
-            hypergraph, it will automatically be added here.
-            Hyperedges without a "weight" attribute specified will be
-            assigned the default value of 1.
+            If any node in the tail or head of any hyperedge has not
+            previously been added to the hypergraph, it will automatically
+            be added here. Hyperedges without a "weight" attribute specified
+            will be assigned the default value of 1.
 
-        :param hyperedges: iterable container to either references
-                    of the hyperedges OR tuples of
+        :param hyperedges: iterable container to either tuples of
+                    (tail reference, head reference) OR tuples of
                     (tail reference, head reference, attribute dictionary);
                     if an attribute dictionary is provided in the tuple,
                     its values will override both attr_dict's and attr's
@@ -509,7 +506,7 @@ class DirectedHypergraph(object):
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: list -- the IDs of the hyperedges added in the order
-                    specified by the container's iterator.
+                    specified by the hyperedges container's iterator.
 
         See also
         --------
@@ -566,7 +563,6 @@ class DirectedHypergraph(object):
         if not self.has_hyperedge_id(hyperedge_id):
             raise ValueError("No such hyperedge exists.")
 
-        # Get frozen tail and head of this hyperedge
         frozen_tail = \
             self._hyperedge_attributes[hyperedge_id]["__frozen_tail"]
         frozen_head = \
@@ -863,8 +859,7 @@ class DirectedHypergraph(object):
             new_H._predecessors[frozen_head] = predecessor_dict.copy()
 
         # Start assigning edge labels at the same
-        new_H._current_hyperedge_id = \
-            self._current_hyperedge_id
+        new_H._current_hyperedge_id = self._current_hyperedge_id
 
         return new_H
 
@@ -1358,7 +1353,6 @@ class DirectedHypergraph(object):
         5. check for misplaced nodes
 
         """
-
         # TODO: is ValueError the proper exception to raise? Should
         # we make a new exception ("ConsistencyException")?
 

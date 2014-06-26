@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from hypergraph.directed_hypergraph import DirectedHypergraph
 from hypergraph.algorithms import paths
 

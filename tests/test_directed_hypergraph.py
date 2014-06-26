@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from os import remove
 
 from hypergraph.directed_hypergraph import DirectedHypergraph
@@ -837,11 +836,11 @@ def test_read_and_write():
     hyperedge_names = \
         H.add_hyperedges(hyperedges, common_attrib, color='white')
 
-    H.write("test_read_and_write.txt")
+    H.write("test_directed_read_and_write.txt")
 
     # Try reading the hypergraph that was just written into a new hypergraph
     new_H = DirectedHypergraph()
-    new_H.read("test_read_and_write.txt")
+    new_H.read("test_directed_read_and_write.txt")
 
     assert H._node_attributes.keys() == new_H._node_attributes.keys()
 
@@ -864,7 +863,7 @@ def test_read_and_write():
 
         assert found_matching_hyperedge
 
-    remove("test_read_and_write.txt")
+    remove("test_directed_read_and_write.txt")
 
     # Try reading an invalid hypergraph file
     invalid_H = DirectedHypergraph()

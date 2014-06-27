@@ -104,8 +104,8 @@ class UndirectedHypergraph(object):
         # of the hyperedge they belong to/compose. We represent the node set
         # by a frozenset, so that the structure is hashable.
         #
-        # Provides O(1) time access to the ID of the of the hyperedge
-        # a specific frozenset of nodes.
+        # Provides O(1) time access to the ID of the hyperedge that
+        # a specific frozenset of nodes composes.
         #
         self._compose_hyperedge = {}
 
@@ -423,9 +423,9 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"]), \
-                                    (("A", "D"), \
-                                    (set(["B", "D"]))
+        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+                                    ("A", "D"), \
+                                    set(["B", "D"]))
         >>> H.add_hyperedges(hyperedge_list)
 
         """
@@ -448,9 +448,9 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"]), \
-                                    (("A", "D"), \
-                                    (set(["B", "D"]))
+        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+                                    ("A", "D"), \
+                                    set(["B", "D"]))
         >>> H.add_hyperedges(hyperedge_list)
         >>> H.remove_hyperedge(xyz[0])
 
@@ -486,9 +486,9 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"]), \
-                                    (("A", "D"), \
-                                    (set(["B", "D"]))
+        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+                                    ("A", "D"), \
+                                    set(["B", "D"]))
         >>> H.add_hyperedges(hyperedge_list)
         >>> H.remove_hyperedges(xyz)
 
@@ -541,9 +541,9 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"]), \
-                                    (("A", "D"), \
-                                    (set(["B", "D"]))
+        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+                                    ("A", "D"), \
+                                    set(["B", "D"]))
         >>> H.add_hyperedges(hyperedge_list)
         >>> x = H.get_hyperedge_id(["A", "B", "C"])
 
@@ -569,9 +569,9 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"]), \
-                                    (("A", "D"), \
-                                    (set(["B", "D"]))
+        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+                                    ("A", "D"), \
+                                    set(["B", "D"]))
         >>> H.add_hyperedges(hyperedge_list)
         >>> attribute = H.get_hyperedge_attribute(xyz[0])
 

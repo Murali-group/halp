@@ -46,8 +46,8 @@ class DirectedHypergraph(object):
 
     >>> H.add_hyperedges((["A"], ["B"]), (["A", "B"], ["C", "D"]))
 
-    Add attributes of nodes and hyperedges by [re]adding the node
-    or hyperedge with the [potentially new] attribute appended.
+    Update attributes of existing nodes and hyperedges by simulating adding the
+    node or hyperedge again, with the [potentially new] attribute appended.
 
     >>> H.add_node("A", label="sink")
     >>> H.add_hyperedge((["A", "B"], ["C", "D"]), weight=5)
@@ -193,6 +193,12 @@ class DirectedHypergraph(object):
         return attr_dict
 
     def has_node(self, node):
+        """Determines if a specific node is present in the hypergraph.
+
+        :param node: reference to the node whose presence is being checked.
+        :returns: bool -- true iff the node exists in the hypergraph.
+
+        """
         return node in self._node_attributes
 
     def add_node(self, node, attr_dict=None, **attr):
@@ -598,11 +604,11 @@ class DirectedHypergraph(object):
         Examples
         --------
         >>> H = DirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A"], ["B", "C"]), \
+        >>> hyperedge_list = (["A"], ["B", "C"]), \
                                     (("A", "B"), ("C"), {weight: 2}), \
                                     (set(["B"]), set(["A", "C"])))
-        >>> H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedges(xyz)
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+        >>> H.remove_hyperedges(hyperedge_ids)
 
         """
         for hyperedge_id in hyperedge_ids:
@@ -660,10 +666,10 @@ class DirectedHypergraph(object):
         Examples
         --------
         >>> H = DirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A"], ["B", "C"]), \
+        >>> hyperedge_list = (["A"], ["B", "C"]), \
                                     (("A", "B"), ("C"), {weight: 2}), \
                                     (set(["B"]), set(["A", "C"])))
-        >>> H.add_hyperedges(hyperedge_list)
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
         >>> x = H.get_hyperedge_id(["A"], ["B", "C"])
 
         """
@@ -689,11 +695,11 @@ class DirectedHypergraph(object):
         Examples
         --------
         >>> H = DirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A"], ["B", "C"]), \
+        >>> hyperedge_list = (["A"], ["B", "C"]), \
                                     (("A", "B"), ("C"), {weight: 2}), \
                                     (set(["B"]), set(["A", "C"])))
-        >>> H.add_hyperedges(hyperedge_list)
-        >>> attribute = H.get_hyperedge_attribute(xyz[0])
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+        >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -930,7 +936,8 @@ class DirectedHypergraph(object):
             words = line.split(sep)
             if not (2 <= len(words) <= 3):
                 raise \
-                    IOError("File format error at line {}".format(line_number))
+                    IOError("Line {} contains {} columns -- \
+                            must contain only 1 or 2.".format(line_number))
 
             tail = set(words[0].split(delim))
             head = set(words[1].split(delim))

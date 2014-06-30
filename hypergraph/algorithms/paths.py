@@ -30,14 +30,14 @@ def visit(hypergraph, source_node):
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
-    :param hypergraph: the hypergraph to perform the 'Visit' algorithm on
-    :param source_node: the initial node to begin traversal from
-    :returns: set -- nodes that were visited in this traversal
-              dict -- mapping from nodes to the ID hyperedges that preceeded
-                    them in this traversal; will map a node to None if that
-                    node wasn't visited or if that node is the source node
-              dict -- mapping from hyperedge IDs to the nodes that preceeded
-                    them in this traversal
+    :param hypergraph: the hypergraph to perform the 'Visit' algorithm on.
+    :param source_node: the initial node to begin traversal from.
+    :returns: set -- nodes that were visited in this traversal.
+              dict -- mapping from each node to the ID of the hyperedge that
+                    preceeded it in this traversal; will map a node to None if that
+                    node wasn't visited or if that node is the source node.
+              dict -- mapping from each hyperedge ID to the node that preceeded
+                    it in this traversal.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -85,10 +85,10 @@ def is_connected(hypergraph, source_node, target_node):
     node in the sense of the 'Visit' algorithm. Refer to 'Visit's
     documentation for more details.
 
-    :param hypergraph: the hypergraph to check connectedness on
-    :param source_node: the node to check connectedness to
-    :param target_node: the node to check connectedness of
-    :returns: bool -- whether target_node can be visited from source_node
+    :param hypergraph: the hypergraph to check connectedness on.
+    :param source_node: the node to check connectedness to.
+    :param target_node: the node to check connectedness of.
+    :returns: bool -- whether target_node can be visited from source_node.
 
     """
     visited_nodes, Pv, Pe = visit(hypergraph, source_node)
@@ -101,18 +101,17 @@ def _x_visit(hypergraph, source_node, b_visit):
     time/memory performance than explcitily taking the hypergraph's
     symmetric image and then performing the B-Visit on that).
 
-    :param hypergraph: the hypergraph to perform the 'B-Visit' algorithm on
-    :param source_node: the initial node to begin traversal from
+    :param hypergraph: the hypergraph to perform the 'B-Visit' algorithm on.
+    :param source_node: the initial node to begin traversal from.
     :param b_visit: boolean flag representing whether a B-Visit should
-                    be performed
-    :returns: set -- nodes that were visited in this traversal
-              dict -- mapping from nodes to the ID hyperedges that preceeded
-                    them in this traversal
-              dict -- mapping from hyperedge IDs to the nodes that preceeded
-                    them in this traversal
-              dict -- mapping from nodes to an integer representing the
-                    cardinality of the path from the source node to each
-                    of the nodes
+                    be performed.
+    :returns: set -- nodes that were x-visited in this traversal.
+              dict -- mapping from each node visited to the ID of the hyperedge
+                    that preceeded it in this traversal.
+              dict -- mapping from each hyperedge ID to the node that preceeded
+                    it in this traversal.
+              dict -- mapping from each node to an integer representing the
+                    cardinality of the path from the source node to that node.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -191,16 +190,15 @@ def b_visit(hypergraph, source_node):
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
-    :param hypergraph: the hypergraph to perform the 'B-Visit' algorithm on
-    :param source_node: the initial node to begin traversal from
-    :returns: set -- nodes that were visited in this traversal
-              dict -- mapping from nodes to the ID hyperedges that preceeded
-                    them in this traversal
-              dict -- mapping from hyperedge IDs to the nodes that preceeded
-                    them in this traversal
-              dict -- mapping from nodes to an integer representing the
-                    cardinality of the path from the source node to each
-                    of the nodes
+    :param hypergraph: the hypergraph to perform the 'B-Visit' algorithm on.
+    :param source_node: the initial node to begin traversal from.
+    :returns: set -- nodes that were B-visited in this traversal.
+              dict -- mapping from each node visited to the ID of the hyperedge
+                    that preceeded it in this traversal.
+              dict -- mapping from each hyperedge ID to the node that preceeded
+                    it in this traversal.
+              dict -- mapping from each node to an integer representing the
+                    cardinality of the path from the source node to that node.
 
     """
     return _x_visit(hypergraph, source_node, True)
@@ -216,10 +214,10 @@ def is_b_connected(hypergraph, source_node, target_node):
     from the source node in the sense of the 'B-Visit' algorithm. Refer to
     'B-Visit's documentation for more details.
 
-    :param hypergraph: the hypergraph to check B-connectedness on
-    :param source_node: the node to check B-connectedness to
-    :param target_node: the node to check B-connectedness of
-    :returns: bool -- whether target_node can be visited from source_node
+    :param hypergraph: the hypergraph to check B-connectedness on.
+    :param source_node: the node to check B-connectedness to.
+    :param target_node: the node to check B-connectedness of.
+    :returns: bool -- whether target_node can be visited from source_node.
 
     """
     b_visited_nodes, Pv, Pe, v = b_visit(hypergraph, source_node)
@@ -234,16 +232,15 @@ def f_visit(hypergraph, source_node):
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
-    :param hypergraph: the hypergraph to perform the 'F-Visit' algorithm on
-    :param source_node: the initial node to begin traversal from
-    :returns: set -- nodes that were visited in this traversal
-              dict -- mapping from nodes to the ID hyperedges that preceeded
-                    them in this traversal
-              dict -- mapping from hyperedge IDs to the nodes that preceeded
-                    them in this traversal
-              dict -- mapping from nodes to an integer representing the
-                    cardinality of the path from the source node to each
-                    of the nodes
+    :param hypergraph: the hypergraph to perform the 'F-Visit' algorithm on.
+    :param source_node: the initial node to begin traversal from.
+    :returns: set -- nodes that were F-visited in this traversal.
+              dict -- mapping from each node to the ID of the hyperedge that
+                    preceeded it in this traversal.
+              dict -- mapping from each hyperedge ID to the node that preceeded
+                    it in this traversal.
+              dict -- mapping from each node to an integer representing the
+                    cardinality of the path from the source node to that node.
 
     """
     return _x_visit(hypergraph, source_node, False)
@@ -254,10 +251,10 @@ def is_f_connected(hypergraph, source_node, target_node):
     A node t is F-connected to a node s iff s if B-connected to t.
     Refer to 'B-connected's documentation for more details.
 
-    :param hypergraph: the hypergraph to check F-connectedness on
-    :param source_node: the node to check F-connectedness to
-    :param target_node: the node to check F-connectedness of
-    :returns: bool -- whether target_node can be visited from source_node
+    :param hypergraph: the hypergraph to check F-connectedness on.
+    :param source_node: the node to check F-connectedness to.
+    :param target_node: the node to check F-connectedness of.
+    :returns: bool -- whether target_node can be visited from source_node.
 
     """
     f_visited_nodes, Pv, Pe, v = f_visit(hypergraph, source_node)
@@ -270,8 +267,8 @@ def sum_function(tail_nodes, W):
     :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction
                     with the weight of the hyperedge, will additively
                     constitute the weight of the head node
-    :param W: node weighting function
-    :returns: int -- sum of the weights of tail_nodes
+    :param W: node weighting function.
+    :returns: int -- sum of the weights of tail_nodes.
 
     """
     return sum(W[node] for node in tail_nodes)
@@ -283,9 +280,9 @@ def distance_function(tail_nodes, W):
 
     :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction
                     with the weight of the hyperedge, will additively
-                    constitute the weight of the head node
-    :param W: node weighting function
-    :returns: int -- max of the weights of tail_nodes
+                    constitute the weight of the head node.
+    :param W: node weighting function.
+    :returns: int -- max of the weights of tail_nodes.
 
     """
     return max(W[node] for node in tail_nodes)
@@ -314,18 +311,18 @@ def shortest_b_tree(hypergraph, source_node,
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
-    :param hypergraph: the hypergraph to perform the 'SBT' algorithm on
-    :param source_node: the root of the tree to be found
+    :param hypergraph: the hypergraph to perform the 'SBT' algorithm on.
+    :param source_node: the root of the tree to be found.
     :param F: function pointer to any additive weight function; that is,
             any function that is only a function of the weights of the
-            nodes in the tail of a hyperedge
+            nodes in the tail of a hyperedge.
     :param valid_ordering: a boolean flag to signal whether or not a valid
-                        ordering of the nodes should be returned
-    :returns:   dict -- mapping from nodes to the ID hyperedges that preceeded
-                    them in this traversal
-                dict -- mapping from nodes to the weight of those nodes
+                        ordering of the nodes should be returned.
+    :returns:   dict -- mapping from each node to the ID of the hyperedge that
+                     preceeded it in this traversal.
+                dict -- mapping from each node to the node's weight.
                 list -- [only if valid_ordering argument is passed] a valid
-                        ordering of the nodes
+                        ordering of the nodes.
 
     """
     # TODO: implement generalization for Shortest-F-Tree?

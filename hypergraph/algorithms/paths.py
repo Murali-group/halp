@@ -34,8 +34,9 @@ def visit(hypergraph, source_node):
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were visited in this traversal.
               dict -- mapping from each node to the ID of the hyperedge that
-                    preceeded it in this traversal; will map a node to None if that
-                    node wasn't visited or if that node is the source node.
+                    preceeded it in this traversal; will map a node to None
+                    if that node wasn't visited or if that node is the source
+                    node.
               dict -- mapping from each hyperedge ID to the node that preceeded
                     it in this traversal.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs

@@ -623,7 +623,8 @@ class UndirectedHypergraph(object):
         """Given a hyperedge ID, get that hyperedge's weight.
 
         :param hyperedge: ID of the hyperedge to retrieve the weight from.
-        :returns: int -- the weight of the hyperedge referenced as hyperedge_id.
+        :returns: int -- the weight of the hyperedge referenced as
+                hyperedge_id.
 
         """
         return self.get_hyperedge_attribute(hyperedge_id, "weight")
@@ -699,7 +700,8 @@ class UndirectedHypergraph(object):
 
         # Copy the original hypergraph's composed hyperedges
         for frozen_nodes, hyperedge_id in self._node_set_to_hyperedge.items():
-            new_H._node_set_to_hyperedge[frozen_nodes] = copy.copy(hyperedge_id)
+            new_H._node_set_to_hyperedge[frozen_nodes] = \
+                copy.copy(hyperedge_id)
 
         # Start assigning edge labels at the same
         new_H._current_hyperedge_id = self._current_hyperedge_id
@@ -738,8 +740,9 @@ class UndirectedHypergraph(object):
             words = line.split(sep)
             if not (2 <= len(words) <= 3):
                 raise \
-                    IOError("Line {} contains {} columns -- \
-                            must contain only 1 or 2.".format(line_number))
+                    IOError("Line {} ".format(line_number) +
+                            "contains {} ".format(len(words)) +
+                            "columns -- must contain only 1 or 2.")
 
             nodes = set(words[0].split(delim))
             if len(words) == 2:

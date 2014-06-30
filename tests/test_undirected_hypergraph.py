@@ -104,8 +104,8 @@ def test_add_hyperedge():
     assert H._hyperedge_attributes[hyperedge_name]['color'] == 'black'
 
     # Test that compose_hyperedge list contains the correct info
-    assert frozen_nodes1 in H._compose_hyperedge
-    assert hyperedge_name == H._compose_hyperedge[frozen_nodes1]
+    assert frozen_nodes1 in H._node_set_to_hyperedge
+    assert hyperedge_name == H._node_set_to_hyperedge[frozen_nodes1]
 
     # Test that the stars contain the correct info
     for node in frozen_nodes1:
@@ -191,7 +191,7 @@ def test_remove_hyperedge():
     assert 'e1' not in H._star[node_a]
     assert 'e1' not in H._star[node_b]
     assert 'e1' not in H._star[node_c]
-    assert frozen_nodes1 not in H._compose_hyperedge
+    assert frozen_nodes1 not in H._node_set_to_hyperedge
 
     try:
         H.remove_hyperedge('e1')
@@ -231,12 +231,12 @@ def test_remove_hyperedges():
     assert 'e1' not in H._star[node_a]
     assert 'e1' not in H._star[node_b]
     assert 'e1' not in H._star[node_c]
-    assert frozen_nodes1 not in H._compose_hyperedge
+    assert frozen_nodes1 not in H._node_set_to_hyperedge
 
     assert 'e3' not in H._hyperedge_attributes
     assert 'e3' not in H._star[node_d]
     assert 'e3' not in H._star[node_e]
-    assert frozen_nodes3 not in H._compose_hyperedge
+    assert frozen_nodes3 not in H._node_set_to_hyperedge
 
 
 def test_remove_node():
@@ -269,12 +269,12 @@ def test_remove_node():
     assert node_a not in H._star
     assert "e1" not in H._hyperedge_attributes
     assert "e2" not in H._hyperedge_attributes
-    assert frozen_nodes1 not in H._compose_hyperedge
-    assert frozen_nodes2 not in H._compose_hyperedge
+    assert frozen_nodes1 not in H._node_set_to_hyperedge
+    assert frozen_nodes2 not in H._node_set_to_hyperedge
 
     # Test that everything that wasn't supposed to be removed wasn't removed
     assert "e3" in H._hyperedge_attributes
-    assert frozen_nodes3 in H._compose_hyperedge
+    assert frozen_nodes3 in H._node_set_to_hyperedge
 
     try:
         H.remove_node(node_a)
@@ -315,13 +315,13 @@ def test_remove_nodes():
     assert node_a not in H._star
     assert "e1" not in H._hyperedge_attributes
     assert "e2" not in H._hyperedge_attributes
-    assert frozen_nodes1 not in H._compose_hyperedge
-    assert frozen_nodes2 not in H._compose_hyperedge
+    assert frozen_nodes1 not in H._node_set_to_hyperedge
+    assert frozen_nodes2 not in H._node_set_to_hyperedge
 
     assert node_e not in H._node_attributes
     assert node_e not in H._star
     assert "e3" not in H._hyperedge_attributes
-    assert frozen_nodes3 not in H._compose_hyperedge
+    assert frozen_nodes3 not in H._node_set_to_hyperedge
 
 
 def test_get_hyperedge_id():
@@ -575,7 +575,7 @@ def test_copy():
     assert new_H._node_attributes == H._node_attributes
     assert new_H._hyperedge_attributes == H._hyperedge_attributes
     assert new_H._star == H._star
-    assert new_H._compose_hyperedge == H._compose_hyperedge
+    assert new_H._node_set_to_hyperedge == H._node_set_to_hyperedge
 
 
 def test_read_and_write():

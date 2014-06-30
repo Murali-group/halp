@@ -14,8 +14,10 @@ class UndirectedHypergraph(object):
     The UndirectedHypergraph class provides an undirected hypergraph object
     and associated functions for basic properties of undirected hypergraphs.
 
-    An undirected hypergraph contains nodes and hyperedges. Each hyperedge
-    connects a set of nodes together. The set of nodes cannot be empty.
+    An undirected hypergraph contains nodes and undirected hyperedges. Each
+    undirected hyperedge simply connects a set of nodes. An undirected
+    hypergraph is a special case of an undirected graph, where each edge
+    connects exactly 2 nodes. The set of nodes cannot be empty.
 
     A node is simply any hashable type. See "add_node" or "add_nodes" for
     more details.
@@ -45,8 +47,8 @@ class UndirectedHypergraph(object):
 
     >>> H.add_hyperedges(["A", "B"], ("A", "C", "D"))
 
-    Add attributes of nodes and hyperedges by [re]adding the node
-    or hyperedge with the [potentially new] attribute appended.
+    Update attributes of existing nodes and hyperedges by simulating adding the
+    node or hyperedge again, with the [potentially new] attribute appended.
 
     >>> H.add_node("A", label="sink")
     >>> H.add_hyperedge(["A", "C", "D"], weight=5)
@@ -100,14 +102,14 @@ class UndirectedHypergraph(object):
         #
         self._star = {}
 
-        # _compose_hyperedge: a dictionary mapping a set of nodes to the ID
-        # of the hyperedge they belong to/compose. We represent the node set
-        # by a frozenset, so that the structure is hashable.
+        # _node_set_to_hyperedge: a dictionary mapping a set of nodes to the ID
+        # of the hyperedge they compose. We represent the node set by a
+        # frozenset, so that the structure is hashable.
         #
         # Provides O(1) time access to the ID of the hyperedge that
         # a specific frozenset of nodes composes.
         #
-        self._compose_hyperedge = {}
+        self._node_set_to_hyperedge = {}
 
         # _current_hyperedge_id: an int representing the hyperedge ID that
         # was most recently assigned by the class (since users don't
@@ -116,10 +118,10 @@ class UndirectedHypergraph(object):
         #
         # Since the class takes responsibility for giving hyperedges
         # their IDs (i.e. a unique identifier; could be alternatively viewed
-        # as a unique name, label, etc.), the issued IDs need to be kept
-        # track of. A consecutive issuing of integer IDs to the hyperedges is a
-        # simple strategy to ensure their uniqueness and allow for
-        # intuitive readability.
+        # as a unique name, label, etc.), the class keeps track of the issued
+        # IDs. A consecutive issuing of integer IDs to the hyperedges is a
+        # simple strategy to ensure their uniqueness while allowing for
+        # readability.
         #
         # e.g., _current_hyperedge_id = 4  implies that 4 hyperedges have
         # been added to the hypergraph, and that "e4" was the most recently
@@ -132,7 +134,7 @@ class UndirectedHypergraph(object):
         self._current_hyperedge_id = 0
 
     def _combine_attribute_arguments(self, attr_dict, attr):
-        # TODO: Unchanged
+        # Note: Code & comments unchanged from DirectedHypergraph
         """Combines attr_dict and attr dictionaries, by updating attr_dict
             with attr.
 
@@ -159,7 +161,13 @@ class UndirectedHypergraph(object):
         return attr_dict
 
     def has_node(self, node):
-        # TODO: Unchanged
+        # Note: Code & comments unchanged from DirectedHypergraph
+        """Determines if a specific node is present in the hypergraph.
+
+        :param node: reference to the node whose presence is being checked.
+        :returns: bool -- true iff the node exists in the hypergraph.
+
+        """
         return node in self._node_attributes
 
     def add_node(self, node, attr_dict=None, **attr):
@@ -171,6 +179,12 @@ class UndirectedHypergraph(object):
         :param **attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
+        :note: Following the NetworkX model, we allow both a dictionary
+            of attributes to be passed in by the user as well as key-value
+            pairs of attributes to be passed in by the user to provide
+            greater flexibility. This pattern is followed in methods such
+            as add_nodes, add_hyperedge, and add_hyperedges.
+
 
         Examples
         --------
@@ -193,7 +207,7 @@ class UndirectedHypergraph(object):
             self._node_attributes[node].update(attr_dict)
 
     def add_nodes(self, nodes, attr_dict=None, **attr):
-        # TODO: Unchanged
+        # Note: Code & comments unchanged from DirectedHypergraph
         """Adds multiple nodes to the graph, along with any related attributes
             of the nodes.
 
@@ -258,7 +272,7 @@ class UndirectedHypergraph(object):
             frozen_nodes = \
                 self._hyperedge_attributes[hyperedge_id]["__frozen_nodes"]
             # Remove the node set composing the hyperedge
-            del self._compose_hyperedge[frozen_nodes]
+            del self._node_set_to_hyperedge[frozen_nodes]
             # Remove this hyperedge's attributes
             del self._hyperedge_attributes[hyperedge_id]
 
@@ -269,6 +283,7 @@ class UndirectedHypergraph(object):
         del self._node_attributes[node]
 
     def remove_nodes(self, nodes):
+        # Note: Code unchanged from DirectedHypergraph
         """Removes multiple nodes and their attributes from the graph. If
         the nodes are part of any hyperedges, those hyperedges are removed
         as well.
@@ -296,7 +311,7 @@ class UndirectedHypergraph(object):
             self.remove_node(node)
 
     def get_node_set(self):
-        # TODO: Unchanged
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Returns the set of nodes that are currently in the hypergraph.
 
         :returns: set -- all nodes currently in the hypergraph
@@ -305,7 +320,7 @@ class UndirectedHypergraph(object):
         return set(self._node_attributes.keys())
 
     def get_node_attribute(self, node, attribute_name):
-        # TODO: Unchanged
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Given a node and the name of an attribute, get a copy
         of that node's attribute.
 
@@ -326,7 +341,7 @@ class UndirectedHypergraph(object):
                 copy(self._node_attributes[node][attribute_name])
 
     def _assign_next_hyperedge_id(self):
-        # TODO: Unchanged
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Returns the next [consecutive] ID to be assigned
             to a hyperedge.
         :returns: str -- hyperedge ID to be assigned.
@@ -345,7 +360,8 @@ class UndirectedHypergraph(object):
 
         :param nodes: iterable container of references to nodes in the
                     hyperedge to be added.
-        :param attr_dict: dictionary of attributes shared by all
+        :param attr_dict: dictionary of attributes of the hyperedge being
+                        added.
                     the hyperedges.
         :param **attr: keyword arguments of attributes of the hyperedge;
                     attr's values will override attr_dict's values
@@ -383,7 +399,7 @@ class UndirectedHypergraph(object):
                 self._star[node].add(hyperedge_id)
 
             # Add the hyperedge ID as the hyperedge that the node set composes
-            self._compose_hyperedge[frozen_nodes] = hyperedge_id
+            self._node_set_to_hyperedge[frozen_nodes] = hyperedge_id
 
             # Assign some special attributes to this hyperedge. We assign
             # a default weight of 1 to the hyperedge. We also store the
@@ -393,7 +409,7 @@ class UndirectedHypergraph(object):
                 {"nodes": nodes, "__frozen_nodes": frozen_nodes, "weight": 1}
         else:
             # If its not a new hyperedge, just get its ID to update attributes
-            hyperedge_id = self._compose_hyperedge[frozen_nodes]
+            hyperedge_id = self._node_set_to_hyperedge[frozen_nodes]
 
         # Set attributes and return hyperedge ID
         self._hyperedge_attributes[hyperedge_id].update(attr_dict)
@@ -409,7 +425,7 @@ class UndirectedHypergraph(object):
 
         :param hyperedges: iterable container to references of the node sets
         :param attr_dict: dictionary of attributes shared by all
-                    the hyperedges.
+                    the hyperedges being added.
         :param **attr: keyword arguments of attributes of the hyperedges;
                     attr's values will override attr_dict's values
                     if both are provided.
@@ -423,10 +439,10 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+        >>> hyperedge_list = (["A", "B", "C"], \
                                     ("A", "D"), \
                                     set(["B", "D"]))
-        >>> H.add_hyperedges(hyperedge_list)
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -448,11 +464,13 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+        >>> hyperedge_list = (["A", "B", "C"], \
                                     ("A", "D"), \
                                     set(["B", "D"]))
-        >>> H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedge(xyz[0])
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+        >>> H.remove_hyperedge(hyperedge_ids[0])
+        >>> BD_id = H.get_hyperedge_id(set(["B", "D"]))
+        >>> H.remove_hyperedge(BD_id)
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -466,12 +484,13 @@ class UndirectedHypergraph(object):
             self._star[node].remove(hyperedge_id)
 
         # Remove this set as the composer of the hyperedge
-        del self._compose_hyperedge[frozen_nodes]
+        del self._node_set_to_hyperedge[frozen_nodes]
 
         # Remove hyperedge's attributes dictionary
         del self._hyperedge_attributes[hyperedge_id]
 
     def remove_hyperedges(self, hyperedge_ids):
+        # Note: Code unchanged from DirectedHypergraph
         """Removes a set of hyperedges and their attributes from
         the hypergraph.
 
@@ -486,17 +505,18 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+        >>> hyperedge_list = (["A", "B", "C"], \
                                     ("A", "D"), \
                                     set(["B", "D"]))
-        >>> H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedges(xyz)
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+        >>> H.remove_hyperedges(hyperedge_ids)
 
         """
         for hyperedge_id in hyperedge_ids:
             self.remove_hyperedge(hyperedge_id)
 
     def has_hyperedge(self, nodes):
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Given a set of nodes, returns whether there is a hyperedge in the
         hypergraph that is precisely composed of those nodes.
 
@@ -506,9 +526,10 @@ class UndirectedHypergraph(object):
                 specified nodes.
         """
         frozen_nodes = frozenset(nodes)
-        return frozen_nodes in self._compose_hyperedge
+        return frozen_nodes in self._node_set_to_hyperedge
 
     def has_hyperedge_id(self, hyperedge_id):
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Determines if a hyperedge referenced by hyperedge_id
         exists in the hypergraph.
 
@@ -520,6 +541,7 @@ class UndirectedHypergraph(object):
         return hyperedge_id in self._hyperedge_attributes
 
     def get_hyperedge_id_set(self):
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Returns the set of IDs of hyperedges that are currently
         in the hypergraph.
 
@@ -529,6 +551,7 @@ class UndirectedHypergraph(object):
         return set(self._hyperedge_attributes.keys())
 
     def get_hyperedge_id(self, nodes):
+        # Note: Code unchanged from DirectedHypergraph
         """From a set of nodes, returns the ID of the hyperedge that this
         set comprises.
 
@@ -541,10 +564,10 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+        >>> hyperedge_list = (["A", "B", "C"], \
                                     ("A", "D"), \
                                     set(["B", "D"]))
-        >>> H.add_hyperedges(hyperedge_list)
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
         >>> x = H.get_hyperedge_id(["A", "B", "C"])
 
         """
@@ -553,9 +576,10 @@ class UndirectedHypergraph(object):
         if not self.has_hyperedge(frozen_nodes):
             raise ValueError("No such hyperedge exists.")
 
-        return self._compose_hyperedge[frozen_nodes]
+        return self._node_set_to_hyperedge[frozen_nodes]
 
     def get_hyperedge_attribute(self, hyperedge_id, attribute_name):
+        # Note: Code unchanged from DirectedHypergraph
         """Given a hyperedge ID and the name of an attribute, get a copy
         of that hyperedge's attribute.
 
@@ -569,11 +593,11 @@ class UndirectedHypergraph(object):
         Examples
         --------
         >>> H = UndirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B", "C"], \
+        >>> hyperedge_list = (["A", "B", "C"], \
                                     ("A", "D"), \
                                     set(["B", "D"]))
-        >>> H.add_hyperedges(hyperedge_list)
-        >>> attribute = H.get_hyperedge_attribute(xyz[0])
+        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+        >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -595,16 +619,18 @@ class UndirectedHypergraph(object):
         return self.get_hyperedge_attribute(hyperedge_id, "nodes")
 
     def get_hyperedge_weight(self, hyperedge_id):
+        # Note: Code and comments unchanged from DirectedHypergraph
         """Given a hyperedge ID, get that hyperedge's weight.
 
         :param hyperedge: ID of the hyperedge to retrieve the weight from.
-        :returns: a the weight of the hyperedge referenced as hyperedge_id.
+        :returns: int -- the weight of the hyperedge referenced as hyperedge_id.
 
         """
         return self.get_hyperedge_attribute(hyperedge_id, "weight")
 
     def get_star(self, node):
-        """Given a node, get a copy of that node's star.
+        """Given a node, get a copy of that node's star, that is, the set of
+        hyperedges that the node belongs to.
 
         :param node: node to retrieve the star of.
         :returns: set -- set of hyperedge_ids for the hyperedges
@@ -617,6 +643,7 @@ class UndirectedHypergraph(object):
         return self._star[node].copy()
 
     def copy(self):
+        # Note: Code unchanged from DirectedHypergraph
         """Creates a new UndirectedHypergraph object with the same node and
         hyperedge structure.
         Copies of the nodes' and hyperedges' attributes are stored
@@ -671,8 +698,8 @@ class UndirectedHypergraph(object):
             new_H._star[node] = self._star[node].copy()
 
         # Copy the original hypergraph's composed hyperedges
-        for frozen_nodes, hyperedge_id in self._compose_hyperedge.items():
-            new_H._compose_hyperedge[frozen_nodes] = copy.copy(hyperedge_id)
+        for frozen_nodes, hyperedge_id in self._node_set_to_hyperedge.items():
+            new_H._node_set_to_hyperedge[frozen_nodes] = copy.copy(hyperedge_id)
 
         # Start assigning edge labels at the same
         new_H._current_hyperedge_id = self._current_hyperedge_id
@@ -687,7 +714,7 @@ class UndirectedHypergraph(object):
         delimited by "delim".
         The header line is currently ignored, but columns should be of
         the format:
-        node1[delim]..nodeM[sep]node1[delim]..nodeN[sep]weight
+        node1[delim]..nodeM[sep]weight
 
         As a concrete example, an arbitrary line with delim=',' and
         sep='    ' (4 spaces) may look like:
@@ -711,7 +738,8 @@ class UndirectedHypergraph(object):
             words = line.split(sep)
             if not (2 <= len(words) <= 3):
                 raise \
-                    IOError("File format error at line {}".format(line_number))
+                    IOError("Line {} contains {} columns -- \
+                            must contain only 1 or 2.".format(line_number))
 
             nodes = set(words[0].split(delim))
             if len(words) == 2:

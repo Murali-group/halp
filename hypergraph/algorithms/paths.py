@@ -278,7 +278,8 @@ def sum_function(tail_nodes, W):
 
 
 def distance_function(tail_nodes, W):
-    """Additive distance function for nodes in the tail of a hyperedge.
+    """Additive distance (max) function for nodes in the tail of a hyperedge.
+    Also commonly referred to as the 'rank' function.
 
     :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction
                     with the weight of the hyperedge, will additively
@@ -288,6 +289,19 @@ def distance_function(tail_nodes, W):
 
     """
     return max(W[node] for node in tail_nodes)
+
+
+def gap_function(tail_nodes, W):
+    """Additive min function for nodes in the tail of a hyperedge.
+
+    :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction
+                    with the weight of the hyperedge, will additively
+                    constitute the weight of the head node
+    :param W: node weighting function
+    :returns: int -- max of the weights of tail_nodes
+
+    """
+    return min(W[node] for node in tail_nodes)
 
 
 def shortest_b_tree(hypergraph, source_node,
@@ -354,7 +368,7 @@ def shortest_b_tree(hypergraph, source_node,
         del inQ[current_node]
         # If node was at an earlier position in the valid ordering,
         # move it to the end of the ordering
-        if ordering.count(current_node) != 0:
+        if current_node in ordering:
             ordering.remove(current_node)
         ordering.append(current_node)
         for hyperedge_id in forward_star(current_node):

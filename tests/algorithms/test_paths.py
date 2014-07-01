@@ -237,3 +237,48 @@ def test_shortest_distance_b_tree():
     assert W['t'] == 5
     assert W['a'] == float('inf')
     assert W['b'] == float('inf')
+
+
+def test_shortest_gap_b_tree():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    Pv, W = \
+        paths.shortest_b_tree(H, 's', paths.gap_function)
+
+    assert Pv['s'] is None
+    assert Pv['x'] == 'e1'
+    assert Pv['y'] == 'e2'
+    assert Pv['z'] == 'e3'
+    assert Pv['t'] == 'e4'
+    assert Pv['u'] == 'e4'
+    assert (Pv['a'], Pv['b']) == (None, None)
+
+    assert W['s'] == 0
+    assert W['x'] == 1
+    assert W['y'] == 2
+    assert W['z'] == 2
+    assert W['u'] == 4
+    assert W['t'] == 4
+    assert W['a'] == float('inf')
+    assert W['b'] == float('inf')
+
+
+def test_shortest_sum_f_tree():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    Pv, W = \
+        paths.shortest_f_tree(H, 't', paths.sum_function)
+
+    assert Pv['s'] == 'e8'
+    assert Pv['x'] == 'e6'
+    assert (Pv['y'], Pv['z'], Pv['t'], Pv['u'], Pv['a'], Pv['b']) == \
+        (None, None, None, None, None, None)
+
+    assert W['t'] == 0
+    assert W['s'] == 100
+    assert W['x'] == 101
+    assert (W['y'], W['z'], W['u'], W['a'], W['b']) == \
+        (float('inf'), float('inf'), float('inf'),
+         float('inf'), float('inf'))

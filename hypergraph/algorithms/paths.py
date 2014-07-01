@@ -30,6 +30,9 @@ def visit(hypergraph, source_node):
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
+    The Visit algorithm begins from a source node and traverses a hyperedge
+    after any node in the hyperedge's tail has been reached.
+
     :param hypergraph: the hypergraph to perform the 'Visit' algorithm on.
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were visited in this traversal.
@@ -83,8 +86,9 @@ def visit(hypergraph, source_node):
 def is_connected(hypergraph, source_node, target_node):
     """Checks if a target node is connected to a source node. That is,
     this method determines if a target node can be visited from the source
-    node in the sense of the 'Visit' algorithm. Refer to 'Visit's
-    documentation for more details.
+    node in the sense of the 'Visit' algorithm.
+
+    Refer to 'visit's documentation for more details.
 
     :param hypergraph: the hypergraph to check connectedness on.
     :param source_node: the node to check connectedness to.
@@ -102,10 +106,12 @@ def _x_visit(hypergraph, source_node, b_visit):
     time/memory performance than explcitily taking the hypergraph's
     symmetric image and then performing the B-Visit on that).
 
+    Refer to 'b_visit's or 'f_visit's documentation for more details.
+
     :param hypergraph: the hypergraph to perform the 'B-Visit' algorithm on.
     :param source_node: the initial node to begin traversal from.
     :param b_visit: boolean flag representing whether a B-Visit should
-                    be performed.
+                    be performed (vs an F-Visit).
     :returns: set -- nodes that were x-visited in this traversal.
               dict -- mapping from each node visited to the ID of the hyperedge
                     that preceeded it in this traversal.
@@ -191,6 +197,9 @@ def b_visit(hypergraph, source_node):
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
+    The B-Visit algorithm begins from a source node and traverses a hyperedge
+    after all nodes in the hyperedge's tail have been reached.
+
     :param hypergraph: the hypergraph to perform the 'B-Visit' algorithm on.
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were B-visited in this traversal.
@@ -207,13 +216,14 @@ def b_visit(hypergraph, source_node):
 
 def is_b_connected(hypergraph, source_node, target_node):
     """Checks if a target node is B-connected to a source node.
+
     A node t is B-connected to a node s iff:
         - t is s, or
         - there exists an edge in the backward star of t such that all nodes in
         the tail of that edge are B-connected to s
     In other words, this method determines if a target node can be B-visited
     from the source node in the sense of the 'B-Visit' algorithm. Refer to
-    'B-Visit's documentation for more details.
+    'b_visit's documentation for more details.
 
     :param hypergraph: the hypergraph to check B-connectedness on.
     :param source_node: the node to check B-connectedness to.
@@ -233,6 +243,10 @@ def f_visit(hypergraph, source_node):
     http://dx.doi.org/10.1016/0166-218X(93)90045-P.
     (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
 
+    The F-Visit algorithm performs a B-Visit on the hypergraph's symmetric
+    image, beginning at the source node. Refer to 'b_visit's documentation
+    for more details.
+
     :param hypergraph: the hypergraph to perform the 'F-Visit' algorithm on.
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were F-visited in this traversal.
@@ -249,8 +263,9 @@ def f_visit(hypergraph, source_node):
 
 def is_f_connected(hypergraph, source_node, target_node):
     """Checks if a target node is F-connected to a source node.
+
     A node t is F-connected to a node s iff s if B-connected to t.
-    Refer to 'B-connected's documentation for more details.
+    Refer to 'f_visit's or 'is_b_connected's documentation for more details.
 
     :param hypergraph: the hypergraph to check F-connectedness on.
     :param source_node: the node to check F-connectedness to.
@@ -302,18 +317,21 @@ def gap_function(tail_nodes, W):
     return min(W[node] for node in tail_nodes)
 
 
-def shortest_b_tree(hypergraph, source_node,
-                    F=sum_function, valid_ordering=False):
-    """Finds a set of minimum weight B-paths from a source node to all
-    the nodes y which are B-connected to it, as described in the paper:
-    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
-    Directed hypergraphs and applications, Discrete Applied Mathematics,
-    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
-    http://dx.doi.org/10.1016/0166-218X(93)90045-P.
-    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
+def _shortest_x_tree(hypergraph, source_node, b_tree,
+                     F=sum_function, valid_ordering=False):
+    """General form of the Shorest B-Tree algorithm, extended to also
+    perform the implicit Shortest F-Tree procedure if the b_tree flag is
+    not set (providing better time/memory performance than explcitily taking
+    the hypergraph's symmetric image and then performing the SBT procedure
+    on that).
 
-    :param hypergraph: the hypergraph to perform the 'SBT' algorithm on.
+    Refer to 'shorest_b_tree's or 'shorest_f_tree's documentation for
+    more details.
+
+    :param hypergraph: the hypergraph to perform the 'SXT' algorithm on.
     :param source_node: the root of the tree to be found.
+    :param b_tree: boolean flag representing whether the Shortest B-Tree
+                algorithm should be executed (vs the Shortest F-Tree).
     :param F: function pointer to any additive weight function; that is,
             any function that is only a function of the weights of the
             nodes in the tail of a hyperedge.
@@ -326,11 +344,14 @@ def shortest_b_tree(hypergraph, source_node,
                         ordering of the nodes.
 
     """
-    # TODO: implement generalization for Shortest-F-Tree?
-    # Not sure if that's a thing.
-    forward_star = hypergraph.get_forward_star
-    hyperedge_tail = hypergraph.get_hyperedge_tail
-    hyperedge_head = hypergraph.get_hyperedge_head
+    if b_tree:
+        forward_star = hypergraph.get_forward_star
+        hyperedge_tail = hypergraph.get_hyperedge_tail
+        hyperedge_head = hypergraph.get_hyperedge_head
+    else:
+        forward_star = hypergraph.get_backward_star
+        hyperedge_tail = hypergraph.get_hyperedge_head
+        hyperedge_head = hypergraph.get_hyperedge_tail
     hyperedge_weight = hypergraph.get_hyperedge_weight
 
     node_set = hypergraph.get_node_set()
@@ -404,3 +425,57 @@ def shortest_b_tree(hypergraph, source_node,
         return Pv, W, ordering
     else:
         return Pv, W
+
+
+def shortest_b_tree(hypergraph, source_node,
+                    F=sum_function, valid_ordering=False):
+    """Executes the Shortest B-Tree (SBT) algorithm described in the paper:
+    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
+    Directed hypergraphs and applications, Discrete Applied Mathematics,
+    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
+    http://dx.doi.org/10.1016/0166-218X(93)90045-P.
+    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)
+
+    SBT finds a set of minimum weight B-paths from a source node to all
+    the nodes y which are B-connected to it (when additive weight functions
+    are used). Refer to 'is_b_connected's documentation for more details.
+
+    :param hypergraph: the hypergraph to perform the 'SBT' algorithm on.
+    :param source_node: the root of the tree to be found.
+    :param F: function pointer to any additive weight function; that is,
+            any function that is only a function of the weights of the
+            nodes in the tail of a hyperedge.
+    :param valid_ordering: a boolean flag to signal whether or not a valid
+                        ordering of the nodes should be returned.
+    :returns:   dict -- mapping from each node to the ID of the hyperedge that
+                     preceeded it in this traversal.
+                dict -- mapping from each node to the node's weight.
+                list -- [only if valid_ordering argument is passed] a valid
+                        ordering of the nodes.
+
+    """
+    return _shortest_x_tree(hypergraph, source_node, True, F, valid_ordering)
+
+
+def shortest_f_tree(hypergraph, source_node,
+                    F=sum_function, valid_ordering=False):
+    """Executes the Shortest F-Tree algorithm, which is simply an execution
+    of the Shorest B-Tree procedure from the source node on the hypergraph's
+    symmetric image. Refer to 'shortest_b_tree's documentation for more
+    details.
+
+    :param hypergraph: the hypergraph to perform the 'SFT' algorithm on.
+    :param source_node: the root of the tree to be found.
+    :param F: function pointer to any additive weight function; that is,
+            any function that is only a function of the weights of the
+            nodes in the tail of a hyperedge.
+    :param valid_ordering: a boolean flag to signal whether or not a valid
+                        ordering of the nodes should be returned.
+    :returns:   dict -- mapping from each node to the ID of the hyperedge that
+                     preceeded it in this traversal.
+                dict -- mapping from each node to the node's weight.
+                list -- [only if valid_ordering argument is passed] a valid
+                        ordering of the nodes.
+
+    """
+    return _shortest_x_tree(hypergraph, source_node, False, F, valid_ordering)

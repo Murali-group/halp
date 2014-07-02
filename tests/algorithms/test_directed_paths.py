@@ -1,12 +1,12 @@
 from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.algorithms import paths
+from hypergraph.algorithms import directed_paths
 
 
 def test_visit():
     H = DirectedHypergraph()
     H.read("tests/data/basic_directed_hypergraph.txt")
 
-    visited_nodes, Pv, Pe = paths.visit(H, 's')
+    visited_nodes, Pv, Pe = directed_paths.visit(H, 's')
 
     assert visited_nodes == set(['s', 'x', 'y', 'z', 'u', 't', 'a'])
 
@@ -26,7 +26,7 @@ def test_visit():
     assert Pv['b'] is None
 
     try:
-        paths.visit('s', 't')
+        directed_paths.visit('s', 't')
         assert False
     except TypeError:
         pass
@@ -38,13 +38,13 @@ def test_is_connected():
     H = DirectedHypergraph()
     H.read("tests/data/basic_directed_hypergraph.txt")
 
-    assert paths.is_connected(H, 's', 'x')
-    assert paths.is_connected(H, 's', 'y')
-    assert paths.is_connected(H, 's', 'z')
-    assert paths.is_connected(H, 's', 't')
-    assert paths.is_connected(H, 's', 'u')
-    assert paths.is_connected(H, 's', 'a')
-    assert not paths.is_connected(H, 's', 'b')
+    assert directed_paths.is_connected(H, 's', 'x')
+    assert directed_paths.is_connected(H, 's', 'y')
+    assert directed_paths.is_connected(H, 's', 'z')
+    assert directed_paths.is_connected(H, 's', 't')
+    assert directed_paths.is_connected(H, 's', 'u')
+    assert directed_paths.is_connected(H, 's', 'a')
+    assert not directed_paths.is_connected(H, 's', 'b')
 
 
 def test_b_visit():
@@ -52,7 +52,7 @@ def test_b_visit():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     # Let 's' be the source node:
-    b_visited_nodes, Pv, Pe, v = paths.b_visit(H, 's')
+    b_visited_nodes, Pv, Pe, v = directed_paths.b_visit(H, 's')
 
     assert b_visited_nodes == set(['s', 'x', 'y', 'z', 't', 'u'])
 
@@ -76,7 +76,7 @@ def test_b_visit():
     assert Pv['b'] is None
 
     # Let 't' be the source node:
-    b_visited_nodes, Pv, Pe, v = paths.b_visit(H, 't')
+    b_visited_nodes, Pv, Pe, v = directed_paths.b_visit(H, 't')
 
     assert b_visited_nodes == set(['t'])
 
@@ -89,7 +89,7 @@ def test_b_visit():
 
     # Try an invalid B-Visit
     try:
-        paths.b_visit('s', 't')
+        directed_paths.b_visit('s', 't')
         assert False
     except TypeError:
         pass
@@ -101,14 +101,14 @@ def test_is_b_connected():
     H = DirectedHypergraph()
     H.read("tests/data/basic_directed_hypergraph.txt")
 
-    assert paths.is_b_connected(H, 's', 's')
-    assert paths.is_b_connected(H, 's', 'x')
-    assert paths.is_b_connected(H, 's', 'y')
-    assert paths.is_b_connected(H, 's', 'z')
-    assert paths.is_b_connected(H, 's', 't')
-    assert paths.is_b_connected(H, 's', 'u')
-    assert not paths.is_b_connected(H, 's', 'a')
-    assert not paths.is_b_connected(H, 's', 'b')
+    assert directed_paths.is_b_connected(H, 's', 's')
+    assert directed_paths.is_b_connected(H, 's', 'x')
+    assert directed_paths.is_b_connected(H, 's', 'y')
+    assert directed_paths.is_b_connected(H, 's', 'z')
+    assert directed_paths.is_b_connected(H, 's', 't')
+    assert directed_paths.is_b_connected(H, 's', 'u')
+    assert not directed_paths.is_b_connected(H, 's', 'a')
+    assert not directed_paths.is_b_connected(H, 's', 'b')
 
 
 def test_f_visit():
@@ -116,7 +116,7 @@ def test_f_visit():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     # Let 's' be the source node:
-    f_visited_nodes, Pv, Pe, v = paths.f_visit(H, 's')
+    f_visited_nodes, Pv, Pe, v = directed_paths.f_visit(H, 's')
 
     assert f_visited_nodes == set(['s', 'x'])
 
@@ -129,7 +129,7 @@ def test_f_visit():
         (None, None, None, None, None, None)
 
     # Let 't' be the source node:
-    f_visited_nodes, Pv, Pe, v = paths.f_visit(H, 't')
+    f_visited_nodes, Pv, Pe, v = directed_paths.f_visit(H, 't')
 
     assert f_visited_nodes == set(['t', 's', 'x'])
 
@@ -147,7 +147,7 @@ def test_f_visit():
 
     # Try invalid F-visit
     try:
-        paths.f_visit('s', 't')
+        directed_paths.f_visit('s', 't')
         assert False
     except TypeError:
         pass
@@ -159,14 +159,14 @@ def test_is_f_connected():
     H = DirectedHypergraph()
     H.read("tests/data/basic_directed_hypergraph.txt")
 
-    assert paths.is_f_connected(H, 's', 's')
-    assert paths.is_f_connected(H, 's', 'x')
-    assert not paths.is_f_connected(H, 's', 'y')
-    assert not paths.is_f_connected(H, 's', 'z')
-    assert not paths.is_f_connected(H, 's', 't')
-    assert not paths.is_f_connected(H, 's', 'u')
-    assert not paths.is_f_connected(H, 's', 'a')
-    assert not paths.is_f_connected(H, 's', 'b')
+    assert directed_paths.is_f_connected(H, 's', 's')
+    assert directed_paths.is_f_connected(H, 's', 'x')
+    assert not directed_paths.is_f_connected(H, 's', 'y')
+    assert not directed_paths.is_f_connected(H, 's', 'z')
+    assert not directed_paths.is_f_connected(H, 's', 't')
+    assert not directed_paths.is_f_connected(H, 's', 'u')
+    assert not directed_paths.is_f_connected(H, 's', 'a')
+    assert not directed_paths.is_f_connected(H, 's', 'b')
 
 
 def test_shortest_sum_b_tree():
@@ -174,7 +174,7 @@ def test_shortest_sum_b_tree():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     Pv, W, valid_ordering = \
-        paths.shortest_b_tree(H, 's', paths.sum_function, True)
+        directed_paths.shortest_b_tree(H, 's', directed_paths.sum_function, True)
 
     assert valid_ordering.count('s') == 1
     assert valid_ordering.index('s') < valid_ordering.index('x')
@@ -219,7 +219,7 @@ def test_shortest_distance_b_tree():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     Pv, W = \
-        paths.shortest_b_tree(H, 's', paths.distance_function)
+        directed_paths.shortest_b_tree(H, 's', directed_paths.distance_function)
 
     assert Pv['s'] is None
     assert Pv['x'] == 'e1'
@@ -244,7 +244,7 @@ def test_shortest_gap_b_tree():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     Pv, W = \
-        paths.shortest_b_tree(H, 's', paths.gap_function)
+        directed_paths.shortest_b_tree(H, 's', directed_paths.gap_function)
 
     assert Pv['s'] is None
     assert Pv['x'] == 'e1'
@@ -268,8 +268,7 @@ def test_shortest_sum_f_tree():
     H = DirectedHypergraph()
     H.read("tests/data/basic_directed_hypergraph.txt")
 
-    Pv, W = \
-        paths.shortest_f_tree(H, 't', paths.sum_function)
+    Pv, W = directed_paths.shortest_f_tree(H, 't', directed_paths.sum_function)
 
     assert Pv['s'] == 'e8'
     assert Pv['x'] == 'e6'
@@ -282,3 +281,44 @@ def test_shortest_sum_f_tree():
     assert (W['y'], W['z'], W['u'], W['a'], W['b']) == \
         (float('inf'), float('inf'), float('inf'),
          float('inf'), float('inf'))
+
+
+def test_get_hypertree_from_predecessors():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    # Test with a weighting
+    Pv, W, valid_ordering = \
+        directed_paths.shortest_b_tree(H, 's', directed_paths.sum_function, True)
+
+    sub_H = directed_paths.get_hypertree_from_predecessors(H, 's', Pv, W)
+
+    sub_H._check_consistency()
+
+    assert sub_H.get_node_set() == set(['s', 'x', 'y', 'z', 't', 'u'])
+
+    assert sub_H.get_node_attribute('s', 'weight') == 0
+    assert sub_H.get_node_attribute('x', 'weight') == 1
+    assert sub_H.get_node_attribute('y', 'weight') == 2
+    assert sub_H.get_node_attribute('z', 'weight') == 2
+    assert sub_H.get_node_attribute('u', 'weight') == 8
+    assert sub_H.get_node_attribute('t', 'weight') == 8
+
+    assert len(sub_H.get_hyperedge_id_set()) == 4
+    assert sub_H.has_hyperedge(['s'], ['x'])
+    assert sub_H.has_hyperedge(['s'], ['x', 'y'])
+    assert sub_H.has_hyperedge(['s'], ['z'])
+    assert sub_H.has_hyperedge(['x', 'y', 'z'], ['u', 't'])
+
+    # Test without a weighting
+    Pv, W = directed_paths.shortest_f_tree(H, 't', directed_paths.sum_function)
+
+    sub_H = directed_paths.get_hypertree_from_predecessors(H, 't', Pv)
+
+    sub_H._check_consistency()
+
+    assert sub_H.get_node_set() == set(['t', 's', 'x'])
+
+    assert len(sub_H.get_hyperedge_id_set()) == 2
+    assert sub_H.has_hyperedge(['x'], ['s'])
+    assert sub_H.has_hyperedge(['s'], ['t'])

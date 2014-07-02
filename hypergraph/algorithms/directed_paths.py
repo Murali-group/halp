@@ -1,5 +1,5 @@
 """
-.. module:: paths
+.. module:: directed_paths
    :synopsis: Defines several functions for executing various
    path/connectivity queries on a directed hypergraph.
 
@@ -59,7 +59,7 @@ def visit(hypergraph, source_node):
     Pe = {hyperedge_id: None for hyperedge_id in hyperedge_id_set}
 
     # Explicitly tracks the set of visited nodes
-    visited_nodes = set(source_node)
+    visited_nodes = set([source_node])
 
     Q = Queue()
     Q.put(source_node)
@@ -159,7 +159,7 @@ def _x_visit(hypergraph, source_node, b_visit):
     k = {hyperedge_id: 0 for hyperedge_id in hyperedge_id_set}
 
     # Explicitly tracks the set of B-visited nodes
-    x_visited_nodes = set(source_node)
+    x_visited_nodes = set([source_node])
 
     Q = Queue()
     Q.put(source_node)
@@ -479,3 +479,49 @@ def shortest_f_tree(hypergraph, source_node,
 
     """
     return _shortest_x_tree(hypergraph, source_node, False, F, valid_ordering)
+
+
+def get_hypertree_from_predecessors(hypergraph, source_node, Pv,
+                                    node_weights=None, attr_name="weight"):
+    """Gives the induced subhypergraph from a path algorithm beginning at a
+    source node that returns a dictionary mapping each node to the ID of the
+    hyperedge that preceeded it in the path (i.e., a Pv vector). Assigns the
+    node weights (if provided) as attributes of the nodes (e.g., the rank of
+    that node in a specific instance of the SBT algorithm, or the cardinality
+    of that node in a B-Visit traversal, etc.).
+
+    :note: The IDs of the hyperedges in the subhypergraph returned may be
+        different than those in the original hypergraph (even though the
+        tail and head sets are identical).
+
+    :param hypergraph: the hypergraph which the path algorithm was executed on.
+    :param source_node: the root of the executed path algorithm.
+    :param Pv: dictionary mapping each node to the ID of the hyperedge that
+            preceeded it in the path.
+    :param node_weights: [optional] dictionary mapping each node to some weight
+                        measure.
+    :param attr_name: key into the nodes' attribute dictionaries for their
+                    weight values (if node_weights is provided).
+    :returns: DirectedHypergraph -- subhypergraph induced by the path
+            algorithm specified by the predecessor vector (Pv) from a
+            source node.
+
+    """
+    sub_H = DirectedHypergraph()
+
+    if node_weights is None:
+        nodes = [node for node in Pv.keys() if Pv[node] is not None]
+        nodes.append(source_node)
+    else:
+        nodes = [(node, {attr_name: node_weights[node]})
+                 for node in Pv.keys() if Pv[node] is not None]
+        nodes.append((source_node, {attr_name: node_weights[source_node]}))
+    sub_H.add_nodes(nodes)
+
+    hyperedges = [(hypergraph.get_hyperedge_tail(hyperedge_id),
+                   hypergraph.get_hyperedge_head(hyperedge_id),
+                   hypergraph.get_hyperedge_attributes(hyperedge_id))
+                  for hyperedge_id in Pv.values() if hyperedge_id is not None]
+    hyperedge_ids = sub_H.add_hyperedges(hyperedges)
+
+    return sub_H

@@ -401,6 +401,22 @@ class DirectedHypergraph(object):
             return copy.\
                 copy(self._node_attributes[node][attribute_name])
 
+    def get_node_attributes(self, node):
+        """Given a node, get a dictionary with copies of that node's
+        attributes.
+
+        :param node: reference to the node to retrieve the attributes of.
+        :returns: dict -- copy of each attribute of the specified node.
+        :raises: ValueError -- No such node exists.
+
+        """
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+        attributes = {}
+        for attr_name, attr_value in self._node_attributes[node].items():
+            attributes[attr_name] = copy.copy(attr_value)
+        return attributes
+
     def _assign_next_hyperedge_id(self):
         """Returns the next [consecutive] ID to be assigned
             to a hyperedge.
@@ -710,6 +726,25 @@ class DirectedHypergraph(object):
             return copy.\
                 copy(self._hyperedge_attributes[hyperedge_id][attribute_name])
 
+    def get_hyperedge_attributes(self, hyperedge_id):
+        """Given a hyperedge ID, get a dictionary of copies of that hyperedge's
+        attributes.
+
+        :param hyperedge_id: ID of the hyperedge to retrieve the attributes of.
+        :returns: dict -- copy of each attribute of the specified hyperedge_id
+                (except the private __frozen_tail and __frozen_head entries).
+        :raises: ValueError -- No such hyperedge exists.
+
+        """
+        if not self.has_hyperedge_id(hyperedge_id):
+            raise ValueError("No such hyperedge exists.")
+        dict_to_copy = self._hyperedge_attributes[hyperedge_id].items()
+        attributes = {}
+        for attr_name, attr_value in dict_to_copy:
+            if attr_name not in ("__frozen_tail", "__frozen_head"):
+                attributes[attr_name] = copy.copy(attr_value)
+        return attributes
+
     def get_hyperedge_tail(self, hyperedge_id):
         """Given a hyperedge ID, get a copy of that hyperedge's tail.
 
@@ -869,7 +904,6 @@ class DirectedHypergraph(object):
 
         return new_H
 
-    # TODO: decide good way to get/use/process the hypergraph's symmetric image
     def get_symmetric_image(self):
         """Creates a new DirectedHypergraph object that is the symmetric
         image of this hypergraph (i.e., identical hypergraph with all
@@ -903,6 +937,23 @@ class DirectedHypergraph(object):
             new_H._predecessors, new_H._successors
 
         return new_H
+
+    def get_induced_subhypergraph(self, nodes):
+        """Gives a new hypergraph that is the subhypergraph of the current
+        hypergraph induced by the provided set of nodes. That is, the induced
+        subhypergraph's node set corresponds precisely to the nodes provided,
+        and the coressponding hyperedges in the subhypergraph are only those
+        from the original graph consist of tail and head sets that are subsets
+        of the provided nodes.
+
+        :param nodes: the set of nodes to find the induced subhypergraph of.
+        :returns: DirectedHypergraph -- the subhypergraph induced on the
+                provided nodes.
+
+        """
+        sub_H = self.copy()
+        sub_H.remove_nodes(sub_H.get_node_set() - set(nodes))
+        return sub_H
 
     # TODO: make reading more extensible (attributes, variable ordering, etc.)
     def read(self, file_name, delim=',', sep='\t'):

@@ -133,6 +133,36 @@ def test_add_hyperedge():
         assert False, e
 
 
+def test_get_hyperedge_attributes():
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    node_d = 'D'
+
+    tail = set([node_a, node_b])
+    head = set([node_c, node_d])
+    frozen_tail = frozenset(tail)
+    frozen_head = frozenset(head)
+
+    attrib = {'weight': 6, 'color': 'black'}
+
+    H = DirectedHypergraph()
+    H.add_node(node_a, label=1337)
+    hyperedge_name = H.add_hyperedge(tail, head, attrib, weight=5)
+
+    assert H.get_hyperedge_attributes(hyperedge_name) == \
+        {'tail': tail, 'head': head, 'weight': 5, 'color': 'black'}
+
+    # Test getting non-existent hyperedge's attributes
+    try:
+        H.get_hyperedge_attributes("e10")
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
 def test_add_hyperedges():
     node_a = 'A'
     node_b = 'B'
@@ -596,6 +626,34 @@ def test_get_node_attribute():
     # Try requesting an invalid attribute
     try:
         H.get_node_attribute(node_a, 'alt_name')
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
+def test_get_node_attributes():
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    node_d = 'D'
+    attrib_d = {'label': 'black', 'sink': True}
+
+    # Test adding unadded nodes with various attribute settings
+    H = DirectedHypergraph()
+    H.add_node(node_a)
+    H.add_node(node_b, source=True)
+    H.add_node(node_c, attrib_c)
+    H.add_node(node_d, attrib_d, sink=False)
+
+    assert H.get_node_attributes(node_a) == {}
+    assert H.get_node_attributes(node_d) == {'label': 'black', 'sink': False}
+
+    # Test getting non-existent node's attributes
+    try:
+        H.get_node_attributes("X")
         assert False
     except ValueError:
         pass
@@ -1400,3 +1458,23 @@ def test_get_symmetric_image():
     assert sym_H._backward_star[node_c] == set(["e2"])
     assert sym_H._backward_star[node_d] == set(["e3"])
     assert sym_H._backward_star[node_e] == set()
+
+
+def test_get_induced_subhypergraph():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    induce_on_nodes = H.get_node_set() - {'t'}
+    induced_H = H.get_induced_subhypergraph(induce_on_nodes)
+
+    induced_nodes = induced_H.get_node_set()
+    assert induced_nodes == H.get_node_set() - {'t'}
+
+    hyperedges = [(induced_H.get_hyperedge_tail(hyperedge_id),
+                   induced_H.get_hyperedge_head(hyperedge_id))
+                  for hyperedge_id in induced_H.get_hyperedge_id_set()]
+    for hyperedge in hyperedges:
+        tail, head = hyperedge
+        assert set(tail) - induce_on_nodes == set()
+        assert set(head) - induce_on_nodes == set()
+        assert H.has_hyperedge(tail, head)

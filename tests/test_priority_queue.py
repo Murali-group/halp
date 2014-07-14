@@ -1,4 +1,4 @@
-from hypergraph.algorithms.priority_queue import PriorityQueue
+from hypergraph.priority_queue import PriorityQueue
 
 
 def test_priority_queue():

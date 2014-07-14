@@ -9,7 +9,7 @@ try:
 except ImportError:
     from Queue import Queue
 
-from hypergraph.algorithms.priority_queue import PriorityQueue
+from hypergraph.priority_queue import PriorityQueue
 from hypergraph.directed_hypergraph import DirectedHypergraph
 
 # TODO-A: consider including target_node (with default value as None) in visit

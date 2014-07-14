@@ -550,6 +550,10 @@ class UndirectedHypergraph(object):
         """
         return set(self._hyperedge_attributes.keys())
 
+    def hyperedge_iterator(self):
+        for key,value in self._hyperedge_attributes.iteritems():
+            yield (key,value)
+
     def get_hyperedge_id(self, nodes):
         # Note: Code unchanged from DirectedHypergraph
         """From a set of nodes, returns the ID of the hyperedge that this
@@ -738,7 +742,7 @@ class UndirectedHypergraph(object):
                 continue
 
             words = line.split(sep)
-            if not (2 <= len(words) <= 3):
+            if not (1 <= len(words) <= 2):
                 raise \
                     IOError("Line {} ".format(line_number) +
                             "contains {} ".format(len(words)) +

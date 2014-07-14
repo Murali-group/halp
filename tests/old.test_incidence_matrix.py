@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from hypergraph.undirectedHyperGraph import UndirectedHyperGraph
 import numpy as np
 
-
 def test_incidence_matrix():
     '''
         Test reading undirected hypergraphs from files,

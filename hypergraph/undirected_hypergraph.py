@@ -738,7 +738,7 @@ class UndirectedHypergraph(object):
                 continue
 
             words = line.split(sep)
-            if not (2 <= len(words) <= 3):
+            if not (1 <= len(words) <= 2):
                 raise \
                     IOError("Line {} ".format(line_number) +
                             "contains {} ".format(len(words)) +

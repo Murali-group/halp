@@ -1474,21 +1474,21 @@ def test_get_symmetric_image():
     assert sym_H._backward_star[node_e] == set()
 
 
-# def test_get_induced_subhypergraph():
-#     H = DirectedHypergraph()
-#     H.read("tests/data/basic_directed_hypergraph.txt")
+def test_get_induced_subhypergraph():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
 
-#     induce_on_nodes = H.get_node_set() - {'t'}
-#     induced_H = H.get_induced_subhypergraph(induce_on_nodes)
+    induce_on_nodes = H.get_node_set() - {'t'}
+    induced_H = H.get_induced_subhypergraph(induce_on_nodes)
 
-#     induced_nodes = induced_H.get_node_set()
-#     assert induced_nodes == H.get_node_set() - {'t'}
+    induced_nodes = induced_H.get_node_set()
+    assert induced_nodes == H.get_node_set() - {'t'}
 
-#     hyperedges = [(induced_H.get_hyperedge_tail(hyperedge_id),
-#                    induced_H.get_hyperedge_head(hyperedge_id))
-#                   for hyperedge_id in induced_H.get_hyperedge_id_set()]
-#     for hyperedge in hyperedges:
-#         tail, head = hyperedge
-#         assert set(tail) - induce_on_nodes == set()
-#         assert set(head) - induce_on_nodes == set()
-#         assert H.has_hyperedge(tail, head)
+    hyperedges = [(induced_H.get_hyperedge_tail(hyperedge_id),
+                   induced_H.get_hyperedge_head(hyperedge_id))
+                  for hyperedge_id in induced_H.get_hyperedge_id_set()]
+    for hyperedge in hyperedges:
+        tail, head = hyperedge
+        assert set(tail) - induce_on_nodes == set()
+        assert set(head) - induce_on_nodes == set()
+        assert H.has_hyperedge(tail, head)

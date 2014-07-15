@@ -205,7 +205,7 @@ def test_add_hyperedges():
 
     assert set(hyperedge_names) == H.get_hyperedge_id_set()
 
-
+  
 def test_remove_node():
     node_a = 'A'
     node_b = 'B'
@@ -245,14 +245,23 @@ def test_remove_node():
     assert "e1" not in H._hyperedge_attributes
     assert "e2" not in H._hyperedge_attributes
     assert frozen_tail1 not in H._successors
-    assert frozen_tail1 not in H._predecessors[frozen_head1]
+    assert frozen_head1 not in H._predecessors
     assert frozen_head2 not in H._predecessors
-    assert frozen_head2 not in H._successors[frozen_tail2]
+    assert frozen_tail2 not in H._successors
 
     # Test that everything that wasn't supposed to be removed wasn't removed
     assert "e3" in H._hyperedge_attributes
     assert frozen_tail3 in H._successors
     assert frozen_head3 in H._predecessors
+
+    # Remove another node
+    H.remove_node(node_e)
+    assert node_e not in H._node_attributes
+    assert node_e not in H._forward_star
+    assert node_e not in H._backward_star
+    assert "e3" not in H._hyperedge_attributes
+    assert frozen_head3 not in H._predecessors
+    assert frozen_tail3 not in H._successors
 
     try:
         H.remove_node(node_a)
@@ -285,15 +294,20 @@ def test_remove_nodes():
     frozen_tail3 = frozenset(tail3)
     frozen_head3 = frozenset(head3)
 
+    tail4 = set([node_c])
+    head4 = set([node_e])
+    frozen_tail4 = frozenset(tail4)
+    frozen_head4 = frozenset(head4)
+
     attrib = {'weight': 6, 'color': 'black'}
     common_attrib = {'sink': False}
 
-    hyperedges = [(tail1, head1, attrib), (tail2, head2), (tail3, head3)]
+    hyperedges = [(tail1, head1, attrib), (tail2, head2), (tail3, head3), (tail4, head4)]
 
     H = DirectedHypergraph()
     hyperedge_names = \
         H.add_hyperedges(hyperedges, common_attrib, color='white')
-    H.remove_nodes([node_a, node_e])
+    H.remove_nodes([node_a, node_d])
 
     # Test that everything that needed to be removed was removed
     assert node_a not in H._node_attributes
@@ -302,16 +316,16 @@ def test_remove_nodes():
     assert "e1" not in H._hyperedge_attributes
     assert "e2" not in H._hyperedge_attributes
     assert frozen_tail1 not in H._successors
-    assert frozen_tail1 not in H._predecessors[frozen_head1]
+    assert frozen_head1 not in H._predecessors
     assert frozen_head2 not in H._predecessors
-    assert frozen_head2 not in H._successors[frozen_tail2]
+    assert frozen_tail2 not in H._successors
 
-    assert node_e not in H._node_attributes
-    assert node_e not in H._forward_star
-    assert node_e not in H._backward_star
+    assert node_d not in H._node_attributes
+    assert node_d not in H._forward_star
+    assert node_d not in H._backward_star
     assert "e3" not in H._hyperedge_attributes
-    assert frozen_head3 not in H._predecessors
-    assert frozen_head3 not in H._successors[frozen_tail3]
+    assert "e3" not in H._predecessors[frozen_head3]
+    assert frozen_tail3 not in H._predecessors[frozen_head3]
 
 
 def test_remove_hyperedge():
@@ -347,8 +361,8 @@ def test_remove_hyperedge():
     H.remove_hyperedge('e1')
 
     assert 'e1' not in H._hyperedge_attributes
-    assert 'e1' not in H._successors[frozen_tail1]
-    assert 'e1' not in H._predecessors[frozen_head1]
+    assert frozen_tail1 not in H._successors
+    assert frozen_head1 not in H._predecessors
     assert 'e1' not in H._forward_star[node_a]
     assert 'e1' not in H._forward_star[node_b]
     assert 'e1' not in H._backward_star[node_c]
@@ -396,16 +410,16 @@ def test_remove_hyperedges():
     H.remove_hyperedges(['e1', 'e3'])
 
     assert 'e1' not in H._hyperedge_attributes
-    assert 'e1' not in H._successors[frozen_tail1]
-    assert 'e1' not in H._predecessors[frozen_head1]
+    assert frozen_tail1 not in H._successors
+    assert frozen_head1 not in H._predecessors
     assert 'e1' not in H._forward_star[node_a]
     assert 'e1' not in H._forward_star[node_b]
     assert 'e1' not in H._backward_star[node_c]
     assert 'e1' not in H._backward_star[node_d]
 
     assert 'e3' not in H._hyperedge_attributes
-    assert 'e3' not in H._successors[frozen_tail3]
-    assert 'e3' not in H._predecessors[frozen_head3]
+    assert frozen_tail3 not in H._successors
+    assert frozen_head3 not in H._predecessors
     assert 'e3' not in H._forward_star[node_d]
     assert 'e3' not in H._backward_star[node_e]
 

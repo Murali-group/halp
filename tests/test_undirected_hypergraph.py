@@ -488,7 +488,7 @@ def test_get_node_attribute():
 
     # Try requesting an invalid node
     try:
-        H.get_node_attribute("D", 'common')
+        H.get_node_attribute("E", 'common')
         assert False
     except ValueError:
         pass
@@ -566,6 +566,7 @@ def test_copy():
     hyperedges = hyperedges = [nodes1, nodes2, nodes3]
 
     H = UndirectedHypergraph()
+    H.add_node("A", root=True)
     hyperedge_names = \
         H.add_hyperedges(hyperedges, common_attrib, color='white')
 

@@ -4,14 +4,12 @@
    path/connectivity queries on a directed hypergraph.
 
 """
-
 try:
     from queue import Queue
-    from queue import PriorityQueue
 except ImportError:
     from Queue import Queue
-    from Queue import PriorityQueue
 
+from hypergraph.priority_queue import PriorityQueue
 from hypergraph.directed_hypergraph import DirectedHypergraph
 
 # TODO-A: consider including target_node (with default value as None) in visit
@@ -324,6 +322,7 @@ def _shortest_x_tree(hypergraph, source_node, b_tree,
     not set (providing better time/memory performance than explcitily taking
     the hypergraph's symmetric image and then performing the SBT procedure
     on that).
+    Uses priority queue to achieve O(size(H)*lg(n)) runtime.
 
     Refer to 'shorest_b_tree's or 'shorest_f_tree's documentation for
     more details.
@@ -375,20 +374,11 @@ def _shortest_x_tree(hypergraph, source_node, b_tree,
     ordering = []
 
     Q = PriorityQueue()
-    Q.put((W[source_node], source_node))
-    # Since PriorityQueue doesn't support "contains" operations we,
-    # need another structure to keep track of what is currently in
-    # the priority queue Q
-    inQ = {source_node: W[source_node]}
+    Q.add_element(W[source_node], source_node)
 
-    while not Q.empty():
+    while not Q.is_empty():
         # At current_node, we can traverse each hyperedge in its forward star
-        current_node_weight, current_node = Q.get()
-        del inQ[current_node]
-        # If node was at an earlier position in the valid ordering,
-        # move it to the end of the ordering
-        if current_node in ordering:
-            ordering.remove(current_node)
+        current_node = Q.get_top_priority()
         ordering.append(current_node)
         for hyperedge_id in forward_star(current_node):
             # Since we're arrived at a new node, we increment
@@ -405,21 +395,16 @@ def _shortest_x_tree(hypergraph, source_node, b_tree,
                 for head_node in \
                     [node for node in hyperedge_head(hyperedge_id) if
                      W[node] > hyperedge_weight(hyperedge_id) + f]:
-                    # If it's not already in the priority queue...
-                    if head_node not in inQ:
-                        # Add it to the priority queue
-                        Q.put((W[head_node], head_node))
-                        inQ[head_node] = W[head_node]
-                        # If it has been visited before...
-                        if W[head_node] < float("inf"):
-                            # "Unmark" that node from the outgoing
-                            # hyperedges of that node (signal that
-                            # are not yet traversable)
-                            for head_hyperedge_id in forward_star(head_node):
-                                k[head_hyperedge_id] -= 1
                     # Update its weight to the new, smaller weight
                     W[head_node] = hyperedge_weight(hyperedge_id) + f
                     Pv[head_node] = hyperedge_id
+                    # If it's not already in the priority queue...
+                    if not Q.contains_element(head_node):
+                        # Add it to the priority queue
+                        Q.add_element(W[head_node], head_node)
+                    else:
+                        # Otherwise, decrease it's key in the priority queue
+                        Q.reprioritize(W[head_node], head_node)
 
     if valid_ordering:
         return Pv, W, ordering

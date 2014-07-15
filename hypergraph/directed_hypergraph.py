@@ -55,8 +55,7 @@ class DirectedHypergraph(object):
     """
 
     def __init__(self):
-        """
-        Constructor for the DirectedHypergraph class.
+        """Constructor for the DirectedHypergraph class.
         Initializes all internal data structures used for the rapid
         execution of most of the fundamental hypergraph queries.
 
@@ -291,55 +290,19 @@ class DirectedHypergraph(object):
         if not self.has_node(node):
             raise ValueError("No such node exists.")
 
-        # Loop over every hyperedge in the forward star of the node;
-        # i.e., over every hyperedge that contains the node in the tail
-        frozen_tails = set()
-        for hyperedge_id in self._forward_star[node]:
-            frozen_tail = \
-                self._hyperedge_attributes[hyperedge_id]["__frozen_tail"]
-            frozen_head = \
-                self._hyperedge_attributes[hyperedge_id]["__frozen_head"]
-            frozen_tails.add(frozen_tail)
-            # Remove this hyperedge from the _successors dict. Note that
-            # after completion of this loop, _successors[frozen_tail]
-            # will be empty
-            del self._successors[frozen_tail][frozen_head]
-            # Remove this hyperedge from the _predecessors dict
-            del self._predecessors[frozen_head][frozen_tail]
-            # Remove this hyperedge's attributes
-            del self._hyperedge_attributes[hyperedge_id]
-        # Remove _successors[frozen_tail] dicts for all tails that
-        # contain the node
-        for frozen_tail in frozen_tails:
-            del self._successors[frozen_tail]
+        # Remove every hyperedge which is in the forward star of the node
+        forward_star = self.get_forward_star(node)
+        for hyperedge_id in forward_star:
+            self.remove_hyperedge(hyperedge_id)
 
-        # Loop over every hyperedge in the back star of the node that is
-        # not also in the forward star of the node (to handle overlapping
-        # hyperedges); i.e., over every hyperedge that contains the node
-        # in the tail
-        frozen_heads = set()
-        for hyperedge_id in \
-                self._backward_star[node].difference(self._forward_star[node]):
-            # Compute the frozenset for the tail and head of hyperedge_id
-            frozen_head = \
-                self._hyperedge_attributes[hyperedge_id]["__frozen_head"]
-            frozen_tail = \
-                self._hyperedge_attributes[hyperedge_id]["__frozen_tail"]
-            frozen_heads.add(frozen_head)
-            # Remove this hyperedge from the _predecessors dict. Note that
-            # after completion of this loop, _predecessors[frozen_tail]
-            # will be empty
-            del self._predecessors[frozen_head][frozen_tail]
-            # Remove this hyperedge from the _successors dict
-            del self._successors[frozen_tail][frozen_head]
-            # Remove this hyperedge's attributes
-            del self._hyperedge_attributes[hyperedge_id]
-        # Remove _predecessors[frozen_head] dicts for all heads that
-        # contain the node
-        for frozen_head in frozen_heads:
-            del self._predecessors[frozen_head]
+        # Remove every hyperedge which is in the backward star of the node
+        # but that is not also in the forward start of the node (to handle
+        # overlapping hyperedges)
+        backward_star = self.get_backward_star(node)
+        for hyperedge_id in backward_star - forward_star:
+            self.remove_hyperedge(hyperedge_id)
 
-        # Remove node's forward- and backward-star
+        # Remove node's forward and backward star
         del self._forward_star[node]
         del self._backward_star[node]
 
@@ -599,8 +562,16 @@ class DirectedHypergraph(object):
 
         # Remove frozen_head as a successor of frozen_tail
         del self._successors[frozen_tail][frozen_head]
+        # If that tail is no longer the tail of any hyperedge, remove it
+        # from the successors dictionary
+        if self._successors[frozen_tail] == {}:
+            del self._successors[frozen_tail]
         # Remove frozen_tail as a predecessor of frozen_head
         del self._predecessors[frozen_head][frozen_tail]
+        # If that head is no longer the head of any hyperedge, remove it
+        # from the predecessors dictionary
+        if self._predecessors[frozen_head] == {}:
+            del self._predecessors[frozen_head]
 
         # Remove hyperedge's attributes dictionary
         del self._hyperedge_attributes[hyperedge_id]
@@ -1098,7 +1069,7 @@ class DirectedHypergraph(object):
             headset = hyperedge_attr_dict['__frozen_head']
 
             # Check 1.4: make sure successors dictionary contains the
-            # hyperedge id.  Need to also check that tailset and
+            # hyperedge id. Need to also check that tailset and
             # headset are entries into the dict.
             if tailset not in self._successors or \
                headset not in self._successors[tailset] or \
@@ -1108,7 +1079,7 @@ class DirectedHypergraph(object):
                     'id %s not in self._successors.' % (hyperedge_id))
 
             # Check 1.5: make sure predecessors dictionary contains
-            # the hyperedge id.  Need to also check that headset and
+            # the hyperedge id. Need to also check that headset and
             # tailset are entries into the dict.
             if headset not in self._predecessors or \
                tailset not in self._predecessors[headset] or \
@@ -1205,7 +1176,7 @@ class DirectedHypergraph(object):
         if predecessor_heads != successor_heads:
             raise ValueError(
                 'Consistency Check 3.1 Failed: successors and predecessors ' +
-                'do  not contain the same head sets \n' +
+                'do not contain the same head sets \n' +
                 'predecessor heads: %s \n' % (predecessor_heads) +
                 'successor heads: %s' % (successor_heads))
 
@@ -1218,7 +1189,7 @@ class DirectedHypergraph(object):
         if successor_tails != predecessor_tails:
             raise ValueError(
                 'Consistency Check 3.2 Failed: successors and predecessors ' +
-                'do  not contain the same tail sets \n' +
+                'do not contain the same tail sets \n' +
                 'predecessor tails: %s \n' % (predecessor_tails) +
                 'successor tails: %s' % (successor_tails))
 
@@ -1402,7 +1373,7 @@ class DirectedHypergraph(object):
         """Compares the contents of the six dictionaries and ensures
         that they are consistent with each other, raising a ValueError
         if there is any inconsistency among the dictionaries. This
-        function is used in testing when modifying hypergraphs.  The
+        function is used in testing when modifying hypergraphs. The
         consistency checks are divided into the following groups:
 
         1. hyperedge_id consistency (using hyperedge_attribute keys)
@@ -1417,7 +1388,7 @@ class DirectedHypergraph(object):
 
         # TODO: many of these for loops can be replaced by list
         # comprehension; however the errors currently report the exact
-        # condition that fails.  Using list comprehension would allow
+        # condition that fails. Using list comprehension would allow
         # us to report which check fails, but not which node/hyperedge
         # id/etc.x
 

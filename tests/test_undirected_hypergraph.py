@@ -76,7 +76,8 @@ def test_add_nodes():
     node_set = H.get_node_set()
     assert node_set == set(['A', 'B', 'C', 'D'])
     assert len(node_set) == len(node_list)
-
+    for node in H.node_iterator():
+        assert node in node_set
 
 def test_add_hyperedge():
     node_a = 'A'
@@ -159,7 +160,9 @@ def test_add_hyperedges():
     assert H._hyperedge_attributes['e2']['sink'] is False
 
     assert set(hyperedge_names) == H.get_hyperedge_id_set()
-
+    assert set(hyperedge_names) == H.get_hyperedge_id_set()
+    for hyperedge_id in H.hyperedge_id_iterator():
+        assert hyperedge_id in hyperedge_names
 
 def test_remove_hyperedge():
     node_a = 'A'

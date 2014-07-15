@@ -319,6 +319,14 @@ class UndirectedHypergraph(object):
         """
         return set(self._node_attributes.keys())
 
+    def node_iterator(self):
+        # Note: Code and comments unchanged from DirectedHypergraph
+        """Provides an iterator over the nodes.
+
+        """
+        for node in self._hyperedge_attributes.keys():
+            yield node
+
     def get_node_attribute(self, node, attribute_name):
         # Note: Code and comments unchanged from DirectedHypergraph
         """Given a node and the name of an attribute, get a copy
@@ -550,9 +558,13 @@ class UndirectedHypergraph(object):
         """
         return set(self._hyperedge_attributes.keys())
 
-    def hyperedge_iterator(self):
-        for key,value in self._hyperedge_attributes.iteritems():
-            yield (key,value)
+    def hyperedge_id_iterator(self):
+        # Note: Code and comments unchanged from DirectedHypergraph
+        """Provides an iterator over the list of hyperedge IDs.
+
+        """
+        for hyperedge_id in self._hyperedge_attributes.keys():
+            yield hyperedge_id
 
     def get_hyperedge_id(self, nodes):
         # Note: Code unchanged from DirectedHypergraph

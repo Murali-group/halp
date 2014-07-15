@@ -1,42 +1,46 @@
+import random
 import numpy as np
 from scipy import sparse
 from scipy.sparse import linalg
-import random
+
 
 class UndirectedHypergraphAlgorithm(object):
-    def __init__(self, UndirectedHypergraph = None):
+
+    def __init__(self, UndirectedHypergraph=None):
         self._H = UndirectedHypergraph
-        self._nodeidList2nodeset, self._nodeset2nodeid = self._get_nodeset2nodeid()
+        self._nodeidList2nodeset, self._nodeset2nodeid = \
+            self._get_nodeset2nodeid()
         self._hyperedgeWeight = {}
         self._incidenceMatrix = self._getIncidenceMatrix()
-        self._W   = self._getDiagonalWeightMatrix()
+        self._W = self._getDiagonalWeightMatrix()
         self._D_v = self._getDiagonalNodeMatrix()
         self._D_e = self._getDiagonalEdgeMatrix()
-        print("Hypergraph with {0} number of nodes and {1} number of edges".format( \
-        len(self._H.get_node_set()),len(self._H.get_hyperedge_id_set())))
+        print("Hypergraph with {0} number of nodes and {1} number of edges"
+              .format(len(self._H.get_node_set()),
+                      len(self._H.get_hyperedge_id_set())))
 
     def getNodeNumber(self):
         return len(self._H.get_node_set())
-        
+
     def getHyperedgeNumber(self):
         return len(self._H.get_hyperedge_id_set())
-        
+
     def get_nodeid2nodeset(self):
         return self._nodeidList2nodeset
 
     def get_nodeset2nodeid(self):
-        return self._nodeset2nodeidList 
-    
+        return self._nodeset2nodeidList
+
     def _get_nodeset2nodeid(self):
         nodeSet = self._H.get_node_set()
         nodeset2nodeidList = {}
         nodeidList2nodeset = {}
         node_id = 0
         for node in nodeSet:
-            nodeset2nodeidList.update({node:node_id})
-            nodeidList2nodeset.update({node_id:node})
+            nodeset2nodeidList.update({node: node_id})
+            nodeidList2nodeset.update({node_id: node})
             node_id += 1
-        return nodeidList2nodeset,nodeset2nodeidList
+        return nodeidList2nodeset, nodeset2nodeidList
 
     def _getIncidenceMatrix(self):
         nodeNumber = len(self._H.get_node_set())
@@ -44,13 +48,19 @@ class UndirectedHypergraphAlgorithm(object):
         rows = []
         cols = []
 
-        for (hyperedge_id,attr) in self._H.hyperedge_iterator():
+        for hyperedge_id in self._H.hyperedge_id_iterator():
             for node in self._H.get_hyperedge_nodes(hyperedge_id):
-                rows.append(self._nodeset2nodeid.get(node)) # get the mapping btw node and its id
-                cols.append(int(hyperedge_id[1:])-1) # since it starts with e, like e31
-            self._hyperedgeWeight.update({str(int(hyperedge_id[1:])-1):attr['weight']})
-        values = np.ones(len(rows),dtype=int)
-        return sparse.csc_matrix((values,(rows,cols)),shape=(len(set(rows)),len(set(cols))))
+                # get the mapping btw node and its id
+                rows.append(self._nodeset2nodeid.get(node))
+                # since it starts with e, like e31
+                cols.append(int(hyperedge_id[1:])-1)
+            self._hyperedgeWeight.update(
+                {str(int(hyperedge_id[1:])-1):
+                 self._H.get_hyperedge_weight(hyperedge_id)})
+        values = np.ones(len(rows), dtype=int)
+        return sparse.csc_matrix((values, (rows, cols)),
+                                 shape=(len(set(rows)),
+                                 len(set(cols))))
 
     '''
         Returns a diagonal matrix containing the hyperedge weights
@@ -58,9 +68,9 @@ class UndirectedHypergraphAlgorithm(object):
     def _getDiagonalWeightMatrix(self):
         edgeNumber = len(self._H.get_hyperedge_id_set())
         edgeWeightVector = []
-        for i in xrange(edgeNumber):
+        for i in range(edgeNumber):
             edgeWeightVector.append(self._hyperedgeWeight.get(str(i)))
-        return sparse.diags([edgeWeightVector],[0])
+        return sparse.diags([edgeWeightVector], [0])
 
     '''
         Returns a diagonal matrix containing the node degrees
@@ -68,7 +78,7 @@ class UndirectedHypergraphAlgorithm(object):
         node's incident edges
     '''
     def _getDiagonalNodeMatrix(self):
-        return sparse.diags([self._incidenceMatrix * self._W.diagonal()],[0])
+        return sparse.diags([self._incidenceMatrix * self._W.diagonal()], [0])
 
     '''
         Returns a diagonal matrix containing the hyperedge degrees
@@ -80,20 +90,20 @@ class UndirectedHypergraphAlgorithm(object):
         degrees = degrees.transpose()
         for degree in degrees:
             new_degree.append(int(degree[0:]))
-        
-        return sparse.diags([new_degree],[0])
-    
+
+        return sparse.diags([new_degree], [0])
+
     '''
         this inverse only works for diagonal matrix and its much faster
-        than the linalg.inv() function        
+        than the linalg.inv() function
     '''
-    def _fastInverse(self,M):
+    def _fastInverse(self, M):
         diags = M.diagonal()
         new_diag = []
         for value in diags:
             new_diag.append(1.0/value)
-        return sparse.diags([new_diag],[0])
-    
+        return sparse.diags([new_diag], [0])
+
     '''
         Creates the transition matrix for the random walk
     '''
@@ -126,7 +136,7 @@ class UndirectedHypergraphAlgorithm(object):
     '''
     def _converged(self, pi_star, pi):
         nodeNumber = pi.shape[0]
-        for i in xrange(nodeNumber):
+        for i in range(nodeNumber):
             if pi[i]-pi_star[i] > 10e-6:
                 return False
         return True
@@ -169,32 +179,30 @@ class UndirectedHypergraphAlgorithm(object):
         The return value is a two dimensional array containing
         the node names for the first and second partition
     '''
-    def minCut(self, threshold=0,numberOfEigenValues=None):
+    def minCut(self, threshold=0, numberOfEigenValues=None):
         '''
         TODO: make sure that the hypergraph is connected
         '''
         Delta = self.normalizedLaplacian()
-        eigenValues,eigenVectors = np.linalg.eig(Delta.todense())
+        eigenValues, eigenVectors = np.linalg.eig(Delta.todense())
         '''
             since the eigs method in sparse.linalg library doesn't find
             all the eigenvalues and eigenvectors, it doesn't give us an
-            exact and correct solution. Therefore, we should use the 
+            exact and correct solution. Therefore, we should use the
             numpy library which works on dense graphs. This might be
             problematic for large graphs.
         '''
-        #eigenValues,eigenVectors = linalg.eigs(Delta,k=numberOfEigenValues)
+        # eigenValues,eigenVectors = linalg.eigs(Delta,k=numberOfEigenValues)
         second_min_index = np.argsort(eigenValues)[1]
         secondEigenVector = eigenVectors[:, second_min_index]
-        
+
         partitionIndex = [
             i for i in range(
                 len(secondEigenVector)) if secondEigenVector[i] >= threshold]
         Partition = [list() for x in range(2)]
-        for (key, value) in list(self._nodeset2nodeid.iteritems()):
+        for (key, value) in list(self._nodeset2nodeid.items()):
             if value in partitionIndex:
                 Partition[0].append(key)
             else:
                 Partition[1].append(key)
         return Partition
-
-

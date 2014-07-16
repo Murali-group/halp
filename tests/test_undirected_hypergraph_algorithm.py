@@ -3,7 +3,7 @@ import numpy as np
 from scipy import sparse
 
 from hypergraph.undirected_hypergraph import UndirectedHypergraph
-from hypergraph.undirected_hypergraph_algorithm import UndirectedHypergraphAlgorithm
+from hypergraph.algorithms.undirected_hypergraph_algorithm import UndirectedHypergraphAlgorithm
 
 def test_init():
     H = UndirectedHypergraph()

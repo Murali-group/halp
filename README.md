@@ -3,7 +3,7 @@ Status](https://travis-ci.org/tmmurali/hypergraph.svg?branch=master)](https://tr
 [![Coverage
 Status](https://coveralls.io/repos/tmmurali/hypergraph/badge.png?branch=master)](https://coveralls.io/r/tmmurali/hypergraph?branch=master)
 
-hypergraph  [Under Construction]
+halp: Hypergraph Algorithms Library in Python<br>[Under Construction]
 ==========
 
 This library provides a general hypergraph implementation, as well as several important and canonical algorithms that operate on hypergraphs.

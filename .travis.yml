@@ -7,14 +7,13 @@ python:
 virtualenv:
     system_site_packages: true
 
-before-install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python-numpy python-scipy
-  - sudo apt-get install -qq python3-numpy python3-scipy
-
 install:
   - pip install coveralls
   - pip install pep8
+  # need the following installed from their respective github repos
+  # to ensure that the latest version of numpy and scipy are installed;
+  # causes errors in the TravisCI framework otherwise
+  # downside: TravisCI now takes ~20-25 minutes to finish its run
   - sudo apt-get install libatlas-base-dev gfortran
   - pip install git+http://github.com/cython/cython/
   - pip install git+http://github.com/numpy/numpy/

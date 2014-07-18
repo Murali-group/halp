@@ -51,7 +51,7 @@ def _F_outdegree(hypergraph, F):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
     return F([len(hypergraph.get_forward_star(node))
-               for node in hypergraph.get_node_set()])
+             for node in hypergraph.get_node_set()])
 
 
 def max_outdegree(hypergraph):
@@ -102,7 +102,7 @@ def _F_indegree(hypergraph, F):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
     return F([len(hypergraph.get_backward_star(node))
-               for node in hypergraph.get_node_set()])
+             for node in hypergraph.get_node_set()])
 
 
 def max_indegree(hypergraph):
@@ -155,7 +155,7 @@ def _F_tail_cardinality(hypergraph, F):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
     return F([len(hypergraph.get_hyperedge_tail(hyperedge_id))
-           for hyperedge_id in hypergraph.get_hyperedge_id_set()])
+             for hyperedge_id in hypergraph.get_hyperedge_id_set()])
 
 
 def max_tail_cardinalitiy(hypergraph):
@@ -210,7 +210,7 @@ def _F_head_cardinality(hypergraph, F):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
     return F([len(hypergraph.get_hyperedge_head(hyperedge_id))
-           for hyperedge_id in hypergraph.get_hyperedge_id_set()])
+             for hyperedge_id in hypergraph.get_hyperedge_id_set()])
 
 
 def max_head_cardinalitiy(hypergraph):

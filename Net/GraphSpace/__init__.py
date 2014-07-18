@@ -5,7 +5,10 @@ See http://graphspace.org for more information."""
 from Net.GraphSpace.Node import Node
 from Net.GraphSpace.Edge import Edge
 from Net.GraphSpace.Graph import Graph, new_graph_from_serial
-import urllib2
+try:
+    import urllib.request as urllib2
+except:
+    import urllib2
 import json
 import re
 

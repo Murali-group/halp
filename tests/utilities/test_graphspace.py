@@ -16,3 +16,22 @@ def test_graphspace():
                                   'basic_directed_hypergraph',
                                   'annaritz@vt.edu',
                                   'platypus')
+
+    # Post to group
+    graphspace.post_to_graphspace(H,
+                                  'basic_directed_hypergraph',
+                                  'annaritz@vt.edu',
+                                  'platypus',
+                                  'hypergraph_test_group')
+
+    # Try posting invalid directed hypergraph
+    try:
+        graphspace.post_to_graphspace("invalid_graph",
+                                      'basic_directed_hypergraph',
+                              		  'annaritz@vt.edu',
+                              		  'platypus')
+        assert False
+    except TypeError:
+        pass
+    except BaseException as e:
+        assert False, e

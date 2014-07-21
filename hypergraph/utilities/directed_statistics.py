@@ -81,7 +81,7 @@ def average_outdegree(hypergraph):
 
     :param hypergraph: the hypergraph whose average outdegree is to be
                     determined.
-    :returns: int -- the average outdegree in the hypergraph.
+    :returns: float -- the average outdegree in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -132,7 +132,7 @@ def average_indegree(hypergraph):
 
     :param hypergraph: the hypergraph whose average indegree is to be
                     determined.
-    :returns: int -- the average indegree in the hypergraph.
+    :returns: float -- the average indegree in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -158,36 +158,36 @@ def _F_tail_cardinality(hypergraph, F):
              for hyperedge_id in hypergraph.get_hyperedge_id_set()])
 
 
-def max_tail_cardinalitiy(hypergraph):
+def max_tail_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge tail cardinality.
 
     :param hypergraph: the hypergraph whose max hyperedge tail cardinality
                 is to be determined.
-    :returns: the max hyperedge tail cardinality in the graph.
+    :returns: int -- the max hyperedge tail cardinality in the graph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
     return _F_tail_cardinality(hypergraph, max)
 
 
-def min_tail_cardinalitiy(hypergraph):
+def min_tail_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge tail cardinality.
 
     :param hypergraph: the hypergraph whose min hyperedge tail cardinality
                 is to be determined.
-    :returns: the min hyperedge tail cardinality in the graph.
+    :returns: int -- the min hyperedge tail cardinality in the graph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
     return _F_tail_cardinality(hypergraph, min)
 
 
-def average_tail_cardinalitiy(hypergraph):
+def average_tail_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge tail cardinality.
 
     :param hypergraph: the hypergraph whose np.mean hyperedge tail cardinality
                 is to be determined.
-    :returns: the np.mean hyperedge tail cardinality in the graph.
+    :returns: float -- the np.mean hyperedge tail cardinality in the graph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -213,36 +213,36 @@ def _F_head_cardinality(hypergraph, F):
              for hyperedge_id in hypergraph.get_hyperedge_id_set()])
 
 
-def max_head_cardinalitiy(hypergraph):
+def max_head_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge head cardinality.
 
     :param hypergraph: the hypergraph whose max hyperedge head cardinality
                 is to be determined.
-    :returns: the max hyperedge head cardinality in the graph.
+    :returns: int -- the max hyperedge head cardinality in the graph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
     return _F_head_cardinality(hypergraph, max)
 
 
-def min_head_cardinalitiy(hypergraph):
+def min_head_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge head cardinality.
 
     :param hypergraph: the hypergraph whose min hyperedge head cardinality
                 is to be determined.
-    :returns: the min hyperedge head cardinality in the graph.
+    :returns: int -- the min hyperedge head cardinality in the graph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
     return _F_head_cardinality(hypergraph, min)
 
 
-def average_head_cardinalitiy(hypergraph):
+def average_head_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge head cardinality.
 
     :param hypergraph: the hypergraph whose np.mean hyperedge head cardinality
                 is to be determined.
-    :returns: the np.mean hyperedge head cardinality in the graph.
+    :returns: float -- the np.mean hyperedge head cardinality in the graph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """

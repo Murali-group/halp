@@ -324,7 +324,7 @@ class UndirectedHypergraph(object):
         """Provides an iterator over the nodes.
 
         """
-        for node in self._hyperedge_attributes.keys():
+        for node in self._node_attributes.keys():
             yield node
 
     def get_node_attribute(self, node, attribute_name):

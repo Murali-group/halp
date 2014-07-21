@@ -23,12 +23,12 @@ def post_to_graphspace(hypergraph, graphid, username, password, group=None):
     :param hypergraph: the hypergraph to post to GraphSpace.
     :param graphid: the name of the hypergraph in GraphSpace.
     :param username: the name of the user posting to GraphSpace
-    (an email address)
+                    (an email address)
     :param password: password of the user posting to GraphSpace
     :param group: (Optional) the name of the group the graph will
-    be shared with.
+                be shared with.
     :raises: TypeError -- only directed hypergraphs can be posted
-    to GraphSpace.
+            to GraphSpace.
 
     """
     # TODO: how to deal with python module??  For now

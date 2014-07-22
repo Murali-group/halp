@@ -974,7 +974,7 @@ class DirectedHypergraph(object):
                 raise \
                     IOError("Line {} ".format(line_number) +
                             "contains {} ".format(len(words)) +
-                            "columns -- must contain only 1 or 2.")
+                            "columns -- must contain only 2 or 3.")
 
             tail = set(words[0].split(delim))
             head = set(words[1].split(delim))

@@ -54,15 +54,18 @@ def _F_outdegree(hypergraph, F):
              for node in hypergraph.get_node_set()])
 
 
-def max_outdegree(hypergraph):
-    """Returns the hypergraph's largest outdegree.
+def outdegree_list(hypergraph):
+    """Returns a list of the hypergraph's nodes' outdegrees.
+    Use this to manually perform statistics on the hypergraph's nodes'
+    outdegrees or to avoid the performance cost of calling several
+    built-in statistics functions.
 
-    :param hypergraph: the hypergraph whose max outdegree is to be determined.
-    :returns: int -- the max outdegree in the hypergraph.
+    :param hypergraph: the hypergraph whose outdegrees are to be returned.
+    :returns: list -- outdegrees for each node in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_outdegree(hypergraph, max)
+    return _F_outdegree(hypergraph, list)
 
 
 def min_outdegree(hypergraph):
@@ -76,12 +79,23 @@ def min_outdegree(hypergraph):
     return _F_outdegree(hypergraph, min)
 
 
-def average_outdegree(hypergraph):
-    """Returns the hypergraph's average outdegree.
+def max_outdegree(hypergraph):
+    """Returns the hypergraph's largest outdegree.
 
-    :param hypergraph: the hypergraph whose average outdegree is to be
+    :param hypergraph: the hypergraph whose max outdegree is to be determined.
+    :returns: int -- the max outdegree in the hypergraph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_outdegree(hypergraph, max)
+
+
+def mean_outdegree(hypergraph):
+    """Returns the hypergraph's mean outdegree.
+
+    :param hypergraph: the hypergraph whose mean outdegree is to be
                     determined.
-    :returns: float -- the average outdegree in the hypergraph.
+    :returns: float -- the mean outdegree in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -105,15 +119,18 @@ def _F_indegree(hypergraph, F):
              for node in hypergraph.get_node_set()])
 
 
-def max_indegree(hypergraph):
-    """Returns the hypergraph's largest indegree.
+def indegree_list(hypergraph):
+    """Returns a list of the hypergraph's nodes' indegrees.
+    Use this to manually perform statistics on the hypergraph's nodes'
+    indegrees or to avoid the performance cost of calling several
+    built-in statistics functions.
 
-    :param hypergraph: the hypergraph whose max indegree is to be determined.
-    :returns: int -- the max indegree in the hypergraph.
+    :param hypergraph: the hypergraph whose indegrees are to be returned.
+    :returns: list -- indegrees for each node in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_indegree(hypergraph, max)
+    return _F_indegree(hypergraph, list)
 
 
 def min_indegree(hypergraph):
@@ -127,19 +144,30 @@ def min_indegree(hypergraph):
     return _F_indegree(hypergraph, min)
 
 
-def average_indegree(hypergraph):
-    """Returns the hypergraph's average indegree.
+def max_indegree(hypergraph):
+    """Returns the hypergraph's largest indegree.
 
-    :param hypergraph: the hypergraph whose average indegree is to be
+    :param hypergraph: the hypergraph whose max indegree is to be determined.
+    :returns: int -- the max indegree in the hypergraph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_indegree(hypergraph, max)
+
+
+def mean_indegree(hypergraph):
+    """Returns the hypergraph's mean indegree.
+
+    :param hypergraph: the hypergraph whose mean indegree is to be
                     determined.
-    :returns: float -- the average indegree in the hypergraph.
+    :returns: float -- the mean indegree in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
     return _F_indegree(hypergraph, np.mean)
 
 
-def _F_tail_cardinality(hypergraph, F):
+def _F_hyperedge_tail_cardinality(hypergraph, F):
     """Returns the result of a function F applied to the set of cardinalities
     of hyperedge tails in the hypergraph.
 
@@ -158,7 +186,34 @@ def _F_tail_cardinality(hypergraph, F):
              for hyperedge_id in hypergraph.get_hyperedge_id_set()])
 
 
-def max_tail_cardinality(hypergraph):
+def hyperedge_tail_cardinality_list(hypergraph):
+    """Returns a list of the hypergraph's hyperedges' tail cardinalities.
+    Use this to manually perform statistics on the hypergraph's
+    hyperedges' tail cardinalities or to avoid the performance cost of calling
+    several built-in statistics functions.
+
+    :param hypergraph: the hypergraph whose tail cardinalities are to
+                    be returned.
+    :returns: list -- tail cardinalities for each hyperedge in the hypergraph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_tail_cardinality(hypergraph, list)
+
+
+def min_hyperedge_tail_cardinality(hypergraph):
+    """Returns the hypergraph's smallest hyperedge tail cardinality.
+
+    :param hypergraph: the hypergraph whose min hyperedge tail cardinality
+                is to be determined.
+    :returns: int -- the min hyperedge tail cardinality in the graph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_tail_cardinality(hypergraph, min)
+
+
+def max_hyperedge_tail_cardinality(hypergraph):
     """Returns the hypergraph's largest hyperedge tail cardinality.
 
     :param hypergraph: the hypergraph whose max hyperedge tail cardinality
@@ -167,23 +222,11 @@ def max_tail_cardinality(hypergraph):
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_tail_cardinality(hypergraph, max)
+    return _F_hyperedge_tail_cardinality(hypergraph, max)
 
 
-def min_tail_cardinality(hypergraph):
-    """Returns the hypergraph's largest hyperedge tail cardinality.
-
-    :param hypergraph: the hypergraph whose min hyperedge tail cardinality
-                is to be determined.
-    :returns: int -- the min hyperedge tail cardinality in the graph.
-    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
-
-    """
-    return _F_tail_cardinality(hypergraph, min)
-
-
-def average_tail_cardinality(hypergraph):
-    """Returns the hypergraph's largest hyperedge tail cardinality.
+def mean_hyperedge_tail_cardinality(hypergraph):
+    """Returns the hypergraph's mean hyperedge tail cardinality.
 
     :param hypergraph: the hypergraph whose np.mean hyperedge tail cardinality
                 is to be determined.
@@ -191,10 +234,10 @@ def average_tail_cardinality(hypergraph):
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_tail_cardinality(hypergraph, np.mean)
+    return _F_hyperedge_tail_cardinality(hypergraph, np.mean)
 
 
-def _F_head_cardinality(hypergraph, F):
+def _F_hyperedge_head_cardinality(hypergraph, F):
     """Returns the result of a function F applied to the set of cardinalities
     of hyperedge heads in the hypergraph.
 
@@ -213,7 +256,23 @@ def _F_head_cardinality(hypergraph, F):
              for hyperedge_id in hypergraph.get_hyperedge_id_set()])
 
 
-def max_head_cardinality(hypergraph):
+def hyperedge_head_cardinality_list(hypergraph):
+    """Returns a list of the hypergraph's hyperedges' head cardinalities.
+    Use this to manually perform statistics on the hypergraph's
+    hyperedges' head cardinalities or to avoid the performance cost of calling
+    several built-in statistics functions.
+
+    :param hypergraph: the hypergraph whose head cardinalities are to
+                    be returned.
+    :returns: list -- head cardinalities for each hyperedge in the hypergraph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_head_cardinality(hypergraph, list)
+
+
+def max_hyperedge_head_cardinality(hypergraph):
+
     """Returns the hypergraph's largest hyperedge head cardinality.
 
     :param hypergraph: the hypergraph whose max hyperedge head cardinality
@@ -222,11 +281,11 @@ def max_head_cardinality(hypergraph):
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_head_cardinality(hypergraph, max)
+    return _F_hyperedge_head_cardinality(hypergraph, max)
 
 
-def min_head_cardinality(hypergraph):
-    """Returns the hypergraph's largest hyperedge head cardinality.
+def min_hyperedge_head_cardinality(hypergraph):
+    """Returns the hypergraph's smallest hyperedge head cardinality.
 
     :param hypergraph: the hypergraph whose min hyperedge head cardinality
                 is to be determined.
@@ -234,11 +293,11 @@ def min_head_cardinality(hypergraph):
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_head_cardinality(hypergraph, min)
+    return _F_hyperedge_head_cardinality(hypergraph, min)
 
 
-def average_head_cardinality(hypergraph):
-    """Returns the hypergraph's largest hyperedge head cardinality.
+def mean_hyperedge_head_cardinality(hypergraph):
+    """Returns the hypergraph's mean hyperedge head cardinality.
 
     :param hypergraph: the hypergraph whose np.mean hyperedge head cardinality
                 is to be determined.
@@ -246,4 +305,79 @@ def average_head_cardinality(hypergraph):
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
-    return _F_head_cardinality(hypergraph, np.mean)
+    return _F_hyperedge_head_cardinality(hypergraph, np.mean)
+
+
+def _F_hyperedge_cardinality_ratio(hypergraph, F):
+    """Returns the result of a function F applied to the set of cardinality
+    ratios between the tail and the head sets (specifically, |tail|/|head|) of
+    hyperedges in the hypergraph.
+
+    :param hypergraph: the hypergraph whose cardinality ratios will be
+                    operated on.
+    :param F: function to execute on the set of cardinality ratios in the
+            hypergraph.
+    :returns: result of the given function F.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    if not isinstance(hypergraph, DirectedHypergraph):
+        raise TypeError("Algorithm only applicable to directed hypergraphs")
+
+    # Since |head| can potentially be 0 (causing a division by 0 exception),
+    # we use numpy's float64 to have division by 0 result in inf, which is
+    # then cast back to a float for our final result
+    return F([float(len(hypergraph.get_hyperedge_tail(hyperedge_id)) /
+              np.float64(len(hypergraph.get_hyperedge_head(hyperedge_id))))
+             for hyperedge_id in hypergraph.get_hyperedge_id_set()])
+
+
+def hyperedge_cardinality_ratio_list(hypergraph):
+    """Returns a list of the hypergraph's hyperedges' cardinality ratios.
+    Use this to manually perform statistics on the hypergraph's
+    hyperedges' cardinality ratios or to avoid the performance cost of calling
+    several built-in statistics functions.
+
+    :param hypergraph: the hypergraph whose cardinality ratios are to
+                    be returned.
+    :returns: list -- cardinality ratios for each hyperedge in the hypergraph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_cardinality_ratio(hypergraph, list)
+
+
+def min_hyperedge_cardinality_ratio(hypergraph):
+    """Returns the hypergraph's smallest hyperedge cardinality ratio.
+
+    :param hypergraph: the hypergraph whose min hyperedge cardinality ratio
+                is to be determined.
+    :returns: int -- the min hyperedge cardinality ratio in the graph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_cardinality_ratio(hypergraph, min)
+
+
+def max_hyperedge_cardinality_ratio(hypergraph):
+    """Returns the hypergraph's largest hyperedge cardinality ratio.
+
+    :param hypergraph: the hypergraph whose max hyperedge cardinality ratio
+                is to be determined.
+    :returns: int -- the max hyperedge cardinality ratio in the graph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_cardinality_ratio(hypergraph, max)
+
+
+def mean_hyperedge_cardinality_ratio(hypergraph):
+    """Returns the hypergraph's mean hyperedge cardinality ratio.
+
+    :param hypergraph: the hypergraph whose mean hyperedge cardinality ratio
+                is to be determined.
+    :returns: int -- the mean hyperedge cardinality ratio in the graph.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+
+    """
+    return _F_hyperedge_cardinality_ratio(hypergraph, np.mean)

@@ -567,7 +567,6 @@ class UndirectedHypergraph(object):
             yield hyperedge_id
 
     def get_hyperedge_id(self, nodes):
-        # Note: Code unchanged from DirectedHypergraph
         """From a set of nodes, returns the ID of the hyperedge that this
         set comprises.
 

@@ -1,5 +1,6 @@
 from hypergraph.directed_hypergraph import DirectedHypergraph
 from hypergraph.algorithms import directed_paths
+import unittest
 
 
 def test_visit():
@@ -174,7 +175,8 @@ def test_shortest_sum_b_tree():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     Pv, W, valid_ordering = \
-        directed_paths.shortest_b_tree(H, 's', directed_paths.sum_function, True)
+        directed_paths.shortest_b_tree(
+            H, 's', directed_paths.sum_function, True)
 
     assert valid_ordering.count('s') == 1
     assert valid_ordering.index('s') < valid_ordering.index('x')
@@ -219,7 +221,8 @@ def test_shortest_distance_b_tree():
     H.read("tests/data/basic_directed_hypergraph.txt")
 
     Pv, W = \
-        directed_paths.shortest_b_tree(H, 's', directed_paths.distance_function)
+        directed_paths.shortest_b_tree(
+            H, 's', directed_paths.distance_function)
 
     assert Pv['s'] is None
     assert Pv['x'] == 'e1'
@@ -289,7 +292,8 @@ def test_get_hypertree_from_predecessors():
 
     # Test with a weighting
     Pv, W, valid_ordering = \
-        directed_paths.shortest_b_tree(H, 's', directed_paths.sum_function, True)
+        directed_paths.shortest_b_tree(
+            H, 's', directed_paths.sum_function, True)
 
     sub_H = directed_paths.get_hypertree_from_predecessors(H, 's', Pv, W)
 
@@ -322,3 +326,126 @@ def test_get_hypertree_from_predecessors():
     assert len(sub_H.get_hyperedge_id_set()) == 2
     assert sub_H.has_hyperedge(['x'], ['s'])
     assert sub_H.has_hyperedge(['s'], ['t'])
+
+
+class TestGetHyperpathFromPredecessors(unittest.TestCase):
+    # valid input tests
+
+    def test_raises_exception_if_keys_of_function_are_not_nodes_in_hypergraph(
+            self):
+        s1, s2, s3 = 1, 2, 3
+        H = DirectedHypergraph()
+        H.add_nodes([s1, s2])
+        e1 = H.add_hyperedge([s1], [s2])
+        T = {s1: None, s3: e1}
+        self.assertRaises(TypeError,
+                          directed_paths.get_hyperpath_from_predecessors,
+                          H, T, s1, s2)
+
+    def test_raises_exception_if_values_of_function_are_not__in_hypergraph(
+            self):
+        s1, s2, s3 = 1, 2, 3
+        H = DirectedHypergraph()
+        H.add_nodes([s1, s2])
+        e1 = H.add_hyperedge([s1], [s2])
+        T = {s1: None, s2: 'e2'}
+        self.assertRaises(TypeError,
+                          directed_paths.get_hyperpath_from_predecessors,
+                          H, T, s1, s2)
+
+    def test_raises_exception_if_more_than_one_node_does_not_have_predecessor(
+            self):
+        s1, s2, s3 = 1, 2, 3
+        H = DirectedHypergraph()
+        H.add_nodes([s1, s2, s3])
+        e1 = H.add_hyperedge([s1], [s2])
+        T = {s1: None, s2: e1, s3: None}
+        self.assertRaises(ValueError,
+                          directed_paths.get_hyperpath_from_predecessors,
+                          H, T, s1, s2)
+
+    def test_raises_exception_if_all_nodes_have_predecessors(self):
+        s1, s2, s3 = 1, 2, 3
+        H = DirectedHypergraph()
+        H.add_nodes([s1, s2, s3])
+        e1 = H.add_hyperedge([s1], [s2])
+        T = {s1: e1, s2: e1, s3: e1}
+        self.assertRaises(ValueError,
+                          directed_paths.get_hyperpath_from_predecessors,
+                          H, T, s1, s2)
+
+    # various cases
+    def test_returns_hyperpath_with_single_node_if_source_equals_destination(
+            self):
+        s = '1'
+        T = {s: None}
+        H = DirectedHypergraph()
+        H.add_node(s)
+        path = directed_paths.get_hyperpath_from_predecessors(H, T, s, s)
+        self.assertEqual(len(path.get_node_set()), 1)
+        self.assertEqual(len(path.get_hyperedge_id_set()), 0)
+
+    def test_returns_hyperpath_containing_source_if_source_equals_destination(
+            self):
+        s = '1'
+        T = {s: None}
+        H = DirectedHypergraph()
+        H.add_node(s)
+        path = directed_paths.get_hyperpath_from_predecessors(H, T, s, s)
+        self.assertTrue(path.has_node(s))
+
+    def test_returns_hyperpath_for_simple_tree(self):
+        s1, s2, s3, s4 = 1, 2, 3, 4
+        H = DirectedHypergraph()
+        H.add_nodes([s1, s2, s3, s4])
+        e1 = H.add_hyperedge([s1], [s2])
+        e2 = H.add_hyperedge([s1], [s3])
+        e3 = H.add_hyperedge([s3], [s4])
+        T = {s4: e3, s3: e2, s2: e1, s1: None}
+        path = directed_paths.get_hyperpath_from_predecessors(H, T, s1, s4)
+        # validate nodes
+        self.assertEqual(path.get_node_set(), {s1, s3, s4})
+        # validate hyperedges
+        self.assertEqual(len(path.get_hyperedge_id_set()), 2)
+        self.assertTrue(path.get_hyperedge_id([1], [3]))
+        self.assertTrue(path.get_hyperedge_id([3], [4]))
+
+    def test_returns_hyperpath_for_tree_with_multiple_nodes_in_tail(self):
+        s1, s2, s3 = 1, 2, 3
+        s4, s5, s6 = 4, 5, 6
+        H = DirectedHypergraph()
+        H.add_nodes([s1, s2, s3, s4, s5, s6])
+        e1 = H.add_hyperedge([s1], [s2])
+        e2 = H.add_hyperedge([s1], [s3])
+        e3 = H.add_hyperedge([s1], [s4])
+        e4 = H.add_hyperedge([s2, s3], [s5])
+        e5 = H.add_hyperedge([s5], [s6])
+
+        T = {s6: e5, s5: e4, s4: e3, s3: e2, s2: e1, s1: None}
+        path = directed_paths.get_hyperpath_from_predecessors(H, T, s1, s6)
+        # validate nodes
+        self.assertEqual(path.get_node_set(), {s1, s2, s3, s5, s6})
+        # validate hyperedges
+        self.assertEqual(len(path.get_hyperedge_id_set()), 4)
+        self.assertTrue(path.get_hyperedge_id([5], [6]))
+        self.assertTrue(path.get_hyperedge_id([2, 3], [5]))
+        self.assertTrue(path.get_hyperedge_id([1], [3]))
+        self.assertTrue(path.get_hyperedge_id([1], [2]))
+
+    def test_returns_hyperpath_when_node_is_in_tail_of_two_edges(self):
+        s1, s2, s3 = 1, 2, 3
+        s4 = 4
+        H = DirectedHypergraph()
+        e1 = H.add_hyperedge([s1], [s2])
+        e2 = H.add_hyperedge([s2], [s3])
+        e3 = H.add_hyperedge([s2, s3], [s4])
+
+        T = {s4: e3, s3: e2, s2: e1, s1: None}
+        path = directed_paths.get_hyperpath_from_predecessors(H, T, s1, s4)
+        # validate nodes
+        self.assertEqual(path.get_node_set(), {s1, s2, s3, s4})
+        # validate hyperedges
+        self.assertEqual(len(path.get_hyperedge_id_set()), 3)
+        self.assertTrue(path.get_hyperedge_id([2, 3], [4]))
+        self.assertTrue(path.get_hyperedge_id([2], [3]))
+        self.assertTrue(path.get_hyperedge_id([1], [2]))

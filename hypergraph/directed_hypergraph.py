@@ -10,6 +10,7 @@ import copy
 
 
 class DirectedHypergraph(object):
+
     """
     The DirectedHypergraph class provides a directed hypergraph object
     and associated functions for basic properties of directed hypergraphs.
@@ -348,8 +349,7 @@ class DirectedHypergraph(object):
         """Provides an iterator over the nodes.
 
         """
-        for node in self._node_attributes.keys():
-            yield node
+        return iter(self._node_attributes)
 
     def get_node_attribute(self, node, attribute_name):
         """Given a node and the name of an attribute, get a copy
@@ -649,8 +649,7 @@ class DirectedHypergraph(object):
         """Provides an iterator over the list of hyperedge IDs.
 
         """
-        for hyperedge_id in self._hyperedge_attributes.keys():
-            yield hyperedge_id
+        return iter(self._hyperedge_attributes)
 
     def get_hyperedge_id(self, tail, head):
         """From a tail and head set of nodes, returns the ID of the hyperedge
@@ -819,6 +818,20 @@ class DirectedHypergraph(object):
             return set()
 
         return set(self._predecessors[frozen_head].values())
+
+    def is_B_hypergraph(self):
+        """
+            Indicates whether the hypergraph is a B-hypergraph.
+            In a B-hypergraph, all hyperedges have exactly one
+            node in the head
+
+            :returns: True if the graph is a B-hypergraph, false otherwise
+        """
+        for hyperedge_id in self._hyperedge_attributes:
+            head = self.get_hyperedge_head(hyperedge_id)
+            if len(head) > 1:
+                return False
+        return True
 
     def copy(self):
         """Creates a new DirectedHypergraph object with the same node and

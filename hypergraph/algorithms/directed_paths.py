@@ -510,3 +510,63 @@ def get_hypertree_from_predecessors(hypergraph, source_node, Pv,
     hyperedge_ids = sub_H.add_hyperedges(hyperedges)
 
     return sub_H
+
+
+def get_hyperpath_from_predecessors(hypergraph, Pv, source, destination):
+    """Given a predecessor function and source and destination nodes,
+       this function returns a hyperpath (DirectedHypergraph) representing
+       the shortest B-hyperpath from source to destination.
+
+    :note: The IDs of the hyperedges in the subhypergraph returned may be
+        different than those in the original hypergraph (even though the
+        tail and head sets are identical).
+
+    :param hypergraph: the hypergraph which the path algorithm was executed on.
+    :param Pv: dictionary mapping each node to the ID of the hyperedge that
+            preceeded it in the path.
+    :param source: the source node of the path.
+    :param destination: the destination node of the path.
+    :returns: DirectedHypergraph -- shortest B-hyperpath from source to
+              destination
+    """
+    # check that pred_func is a valid predecessor function:
+    # keys must be nodes in H mapping to hyperedges in H
+    # exactly one Node must map to None (i.e. only one node without
+    # predecessor)
+    nodes_without_predecessor = 0
+    for node, hyperedge_id in Pv.items():
+        if not hypergraph.has_node(node):
+            raise TypeError(
+                "key %s in predecessor is not a node in hypergraph" % node)
+        if hyperedge_id is None:
+            nodes_without_predecessor += 1
+        elif not hypergraph.has_hyperedge_id(hyperedge_id):
+            raise TypeError(
+                "edge %s in predecessor is not in hypergraph" % hyperedge_id)
+    if nodes_without_predecessor > 1:
+        raise ValueError(
+            "Multiple nodes without predecessor. %s received" % Pv)
+    elif nodes_without_predecessor == 0:
+        raise ValueError("Hypertree does not have root node. %s received" % Pv)
+
+    path = DirectedHypergraph()
+
+    # keep track of which nodes are or have been processed
+    processedOrInQueue = {n: False for n in Pv}
+    nodesToProcess = [destination]
+    processedOrInQueue[destination] = True
+    while nodesToProcess:
+        node = nodesToProcess.pop(0)
+        hyperedge_id = Pv[node]
+        if hyperedge_id:
+            for n in hypergraph.get_hyperedge_tail(hyperedge_id):
+                if not processedOrInQueue[n]:
+                    nodesToProcess.append(n)
+                    processedOrInQueue[n] = True
+            path.add_hyperedge(hypergraph.get_hyperedge_tail(hyperedge_id),
+                               hypergraph.get_hyperedge_head(hyperedge_id),
+                               weight=hypergraph.get_hyperedge_weight(
+                               hyperedge_id))
+        elif not path.has_node(node):
+            path.add_node(node)
+    return path

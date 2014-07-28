@@ -10,6 +10,7 @@ import copy
 
 
 class DirectedHypergraph(object):
+
     """
     The DirectedHypergraph class provides a directed hypergraph object
     and associated functions for basic properties of directed hypergraphs.
@@ -348,8 +349,7 @@ class DirectedHypergraph(object):
         """Provides an iterator over the nodes.
 
         """
-        for node in self._node_attributes.keys():
-            yield node
+        return iter(self._node_attributes)
 
     def get_node_attribute(self, node, attribute_name):
         """Given a node and the name of an attribute, get a copy
@@ -649,8 +649,7 @@ class DirectedHypergraph(object):
         """Provides an iterator over the list of hyperedge IDs.
 
         """
-        for hyperedge_id in self._hyperedge_attributes.keys():
-            yield hyperedge_id
+        return iter(self._hyperedge_attributes)
 
     def get_hyperedge_id(self, tail, head):
         """From a tail and head set of nodes, returns the ID of the hyperedge
@@ -820,6 +819,55 @@ class DirectedHypergraph(object):
 
         return set(self._predecessors[frozen_head].values())
 
+    # TODO: Make this a property of the hypergraph that stays updated with
+    # the hypergraph, for constant-time calls.
+    def is_B_hypergraph(self):
+        """Indicates whether the hypergraph is a B-hypergraph.
+        In a B-hypergraph, all hyperedges are B-hyperedges -- that is, every
+        hyperedge has exactly one node in the head.
+
+        :returns: bool -- True iff the hypergraph is a B-hypergraph.
+
+        """
+        for hyperedge_id in self._hyperedge_attributes:
+            head = self.get_hyperedge_head(hyperedge_id)
+            if len(head) > 1:
+                return False
+        return True
+
+    # TODO: Make this a property of the hypergraph that stays updated with
+    # the hypergraph, for constant-time calls.
+    def is_F_hypergraph(self):
+        """Indicates whether the hypergraph is an F-hypergraph.
+        In an F-hypergraph, all hyperedges are F-hyperedges -- that is, every
+        hyperedge has exactly one node in the tail.
+
+        :returns: bool -- True iff the hypergraph is an F-hypergraph.
+
+        """
+        for hyperedge_id in self._hyperedge_attributes:
+            tail = self.get_hyperedge_tail(hyperedge_id)
+            if len(tail) > 1:
+                return False
+        return True
+
+    # TODO: Make this a property of the hypergraph that stays updated with
+    # the hypergraph, for constant-time calls.
+    def is_BF_hypergraph(self):
+        """Indicates whether the hypergraph is a BF-hypergraph.
+        A BF-hypergraph consists of only B-hyperedges and F-hyperedges.
+        See "is_B_hypergraph" or "is_F_hypergraph" for more details.
+
+        :returns: bool -- True iff the hypergraph is an F-hypergraph.
+
+        """
+        for hyperedge_id in self._hyperedge_attributes:
+            tail = self.get_hyperedge_tail(hyperedge_id)
+            head = self.get_hyperedge_head(hyperedge_id)
+            if len(tail) > 1 and len(head) > 1:
+                return False
+        return True
+
     def copy(self):
         """Creates a new DirectedHypergraph object with the same node and
         hyperedge structure.
@@ -974,7 +1022,7 @@ class DirectedHypergraph(object):
                 raise \
                     IOError("Line {} ".format(line_number) +
                             "contains {} ".format(len(words)) +
-                            "columns -- must contain only 1 or 2.")
+                            "columns -- must contain only 2 or 3.")
 
             tail = set(words[0].split(delim))
             head = set(words[1].split(delim))

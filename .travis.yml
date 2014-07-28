@@ -10,6 +10,7 @@ virtualenv:
 install:
   - pip install coveralls
   - pip install pep8
+  - pip install networkx
   # need the following installed from their respective github repos
   # to ensure that the latest version of numpy and scipy are installed;
   # causes errors in the TravisCI framework otherwise

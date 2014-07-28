@@ -170,6 +170,12 @@ class TestKShortestHyperpaths(unittest.TestCase):
         self.assertRaises(TypeError,
                           ksh.k_shortest_hyperpaths, H, source, destination, 1)
 
+    def test_raises_exception_if_H_not_hypegraph(self):
+        H = "DirectedHypergraph"
+        source, destination = 1, 2
+        self.assertRaises(TypeError,
+                          ksh.k_shortest_hyperpaths, H, source, destination, 1)
+
     def test_raises_exception_if_source_not_in_graph(self):
         H = DirectedHypergraph()
         source, destination = 1, 2

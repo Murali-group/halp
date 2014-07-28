@@ -9,7 +9,7 @@ def test_to_graph_decomposition():
 
     G = directed_graph_transformations.to_graph_decomposition(H)
     G._check_consistency()
-    
+
     assert G.get_node_set() == H.get_node_set()
 
     for hyperedge_id in G.hyperedge_id_iterator():

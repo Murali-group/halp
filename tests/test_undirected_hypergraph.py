@@ -2,6 +2,7 @@ from os import remove
 
 from hypergraph.undirected_hypergraph import UndirectedHypergraph
 
+
 def test_add_node():
     node_a = 'A'
     node_b = 'B'
@@ -78,6 +79,7 @@ def test_add_nodes():
     assert len(node_set) == len(node_list)
     for node in H.node_iterator():
         assert node in node_set
+
 
 def test_add_hyperedge():
     node_a = 'A'
@@ -163,6 +165,7 @@ def test_add_hyperedges():
     assert set(hyperedge_names) == H.get_hyperedge_id_set()
     for hyperedge_id in H.hyperedge_id_iterator():
         assert hyperedge_id in hyperedge_names
+
 
 def test_remove_hyperedge():
     node_a = 'A'

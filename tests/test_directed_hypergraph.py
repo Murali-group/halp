@@ -209,7 +209,7 @@ def test_add_hyperedges():
     for hyperedge_id in H.hyperedge_id_iterator():
         assert hyperedge_id in hyperedge_names
 
-  
+
 def test_remove_node():
     node_a = 'A'
     node_b = 'B'
@@ -306,7 +306,10 @@ def test_remove_nodes():
     attrib = {'weight': 6, 'color': 'black'}
     common_attrib = {'sink': False}
 
-    hyperedges = [(tail1, head1, attrib), (tail2, head2), (tail3, head3), (tail4, head4)]
+    hyperedges = [(tail1, head1, attrib),
+                  (tail2, head2),
+                  (tail3, head3),
+                  (tail4, head4)]
 
     H = DirectedHypergraph()
     hyperedge_names = \
@@ -1496,3 +1499,63 @@ def test_get_induced_subhypergraph():
         assert set(tail) - induce_on_nodes == set()
         assert set(head) - induce_on_nodes == set()
         assert H.has_hyperedge(tail, head)
+
+
+def test_is_B_hypergraph():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    assert not H.is_B_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['a', 'b'], ['c'])
+    assert H.is_B_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['x'], ['y', 'z'])
+    assert not H.is_B_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['a', 'b'], ['c'])
+    H.add_hyperedge(['x'], ['y', 'z'])
+    assert not H.is_B_hypergraph()
+
+
+def test_is_F_hypergraph():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    assert not H.is_F_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['a', 'b'], ['c'])
+    assert not H.is_F_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['x'], ['y', 'z'])
+    assert H.is_F_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['a', 'b'], ['c'])
+    H.add_hyperedge(['x'], ['y', 'z'])
+    assert not H.is_F_hypergraph()
+
+
+def test_is_BF_hypergraph():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    assert not H.is_BF_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['a', 'b'], ['c'])
+    assert H.is_BF_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['x'], ['y', 'z'])
+    assert H.is_BF_hypergraph()
+
+    H = DirectedHypergraph()
+    H.add_hyperedge(['a', 'b'], ['c'])
+    H.add_hyperedge(['x'], ['y', 'z'])
+    assert H.is_BF_hypergraph()

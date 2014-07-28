@@ -819,17 +819,52 @@ class DirectedHypergraph(object):
 
         return set(self._predecessors[frozen_head].values())
 
+    # TODO: Make this a property of the hypergraph that stays updated with
+    # the hypergraph, for constant-time calls.
     def is_B_hypergraph(self):
-        """
-            Indicates whether the hypergraph is a B-hypergraph.
-            In a B-hypergraph, all hyperedges have exactly one
-            node in the head
+        """Indicates whether the hypergraph is a B-hypergraph.
+        In a B-hypergraph, all hyperedges are B-hyperedges -- that is, every
+        hyperedge has exactly one node in the head.
 
-            :returns: True if the graph is a B-hypergraph, false otherwise
+        :returns: bool -- True iff the hypergraph is a B-hypergraph.
+
         """
         for hyperedge_id in self._hyperedge_attributes:
             head = self.get_hyperedge_head(hyperedge_id)
             if len(head) > 1:
+                return False
+        return True
+
+    # TODO: Make this a property of the hypergraph that stays updated with
+    # the hypergraph, for constant-time calls.
+    def is_F_hypergraph(self):
+        """Indicates whether the hypergraph is an F-hypergraph.
+        In an F-hypergraph, all hyperedges are F-hyperedges -- that is, every
+        hyperedge has exactly one node in the tail.
+
+        :returns: bool -- True iff the hypergraph is an F-hypergraph.
+
+        """
+        for hyperedge_id in self._hyperedge_attributes:
+            tail = self.get_hyperedge_tail(hyperedge_id)
+            if len(tail) > 1:
+                return False
+        return True
+
+    # TODO: Make this a property of the hypergraph that stays updated with
+    # the hypergraph, for constant-time calls.
+    def is_BF_hypergraph(self):
+        """Indicates whether the hypergraph is a BF-hypergraph.
+        A BF-hypergraph consists of only B-hyperedges and F-hyperedges.
+        See "is_B_hypergraph" or "is_F_hypergraph" for more details.
+
+        :returns: bool -- True iff the hypergraph is an F-hypergraph.
+
+        """
+        for hyperedge_id in self._hyperedge_attributes:
+            tail = self.get_hyperedge_tail(hyperedge_id)
+            head = self.get_hyperedge_head(hyperedge_id)
+            if len(tail) > 1 and len(head) > 1:
                 return False
         return True
 

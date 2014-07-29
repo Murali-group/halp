@@ -244,3 +244,22 @@ def test_hyperedge_cardinality_ratio_list():
     returned_list = directed_statistics.hyperedge_cardinality_ratio_list(H)
 
     assert sorted(ratio_list) == sorted(returned_list)
+
+
+def test_hyperedge_cardinality_pairs_list():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    returned = directed_statistics.hyperedge_cardinality_pairs_list(H)
+    actual = [(1,1),(1,2),(1,1),(3,2),(1,2),(1,1),(2,1),(1,1)]
+    assert sorted(returned) == sorted(actual)
+
+    # Try counting an invalid directed hypergraph
+    try:
+        directed_statistics.hyperedge_cardinality_pairs_list(
+            "invalid hypergraph")
+        assert False
+    except TypeError:
+        pass
+    except BaseException as e:
+        assert False, e

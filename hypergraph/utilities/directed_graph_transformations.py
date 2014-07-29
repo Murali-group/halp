@@ -10,7 +10,7 @@ import copy
 from hypergraph.directed_hypergraph import DirectedHypergraph
 
 
-def to_graph_decomposition(hypergraph):
+def to_graph_decomposition(H):
     """Returns a DirectedHypergraph object that has the same nodes (and
     corresponding attributes as the given hypergraph, except that for all
     hyperedges in the given hypergraph, each node in the tail of the hyperedge
@@ -19,37 +19,37 @@ def to_graph_decomposition(hypergraph):
     Said another way, each of the original hyperedges are decomposed in the
     new hypergraph into fully-connected bipartite components.
 
-    :param hypergraph: the hypergraph to decompose into a graph.
+    :param H: the hypergraph to decompose into a graph.
     :returns: DirectedHypergraph -- the decomposed hypergraph.
     :raises: TypeError -- Transformation only applicable to
             directed hypergraphs
 
     """
-    if not isinstance(hypergraph, DirectedHypergraph):
+    if not isinstance(H, DirectedHypergraph):
         raise TypeError("Transformation only applicable to \
                         directed hypergraphs")
 
-    graph = DirectedHypergraph()
+    G = DirectedHypergraph()
 
-    nodes = [(node, hypergraph.get_node_attributes(node_attributes))
-             for node in graph.node_iterator()]
-    graph.add_nodes(nodes)
+    nodes = [(node, H.get_node_attributes(node_attributes))
+             for node in G.node_iterator()]
+    G.add_nodes(nodes)
 
     edges = [([tail_node], [head_node])
-             for hyperedge_id in hypergraph.hyperedge_id_iterator()
-             for tail_node in hypergraph.get_hyperedge_tail(hyperedge_id)
-             for head_node in hypergraph.get_hyperedge_head(hyperedge_id)]
-    graph.add_hyperedges(edges)
+             for hyperedge_id in H.hyperedge_id_iterator()
+             for tail_node in H.get_hyperedge_tail(hyperedge_id)
+             for head_node in H.get_hyperedge_head(hyperedge_id)]
+    G.add_hyperedges(edges)
 
-    return graph
+    return G
 
 
-def to_networkx_digraph(hypergraph):
+def to_networkx_digraph(H):
     """Returns a NetworkX DiGraph object that is the graph decomposition of
     the given hypergraph.
     See "to_graph_decomposition()" for more details.
 
-    :param hypergraph: the hypergraph to decompose into a graph.
+    :param H: the hypergraph to decompose into a graph.
     :returns: nx.DiGraph -- NetworkX DiGraph object representing the
             decomposed hypergraph.
     :raises: TypeError -- Transformation only applicable to
@@ -58,21 +58,21 @@ def to_networkx_digraph(hypergraph):
     """
     import networkx as nx
 
-    if not isinstance(hypergraph, DirectedHypergraph):
+    if not isinstance(H, DirectedHypergraph):
         raise TypeError("Transformation only applicable to \
                         directed hypergraphs")
 
-    graph = to_graph_decomposition(hypergraph)
+    G = to_graph_decomposition(H)
 
     nx_graph = nx.DiGraph()
 
-    for node in graph.node_iterator():
-        nx_graph.add_node(node, graph.get_node_attributes(node))
+    for node in G.node_iterator():
+        nx_graph.add_node(node, G.get_node_attributes(node))
 
-    for hyperedge_id in graph.hyperedge_id_iterator():
-        tail_node = graph.get_hyperedge_tail(hyperedge_id).pop()
-        head_node = graph.get_hyperedge_head(hyperedge_id).pop()
-        edge_attributes = graph.get_hyperedge_attributes(hyperedge_id)
+    for hyperedge_id in G.hyperedge_id_iterator():
+        tail_node = G.get_hyperedge_tail(hyperedge_id).pop()
+        head_node = G.get_hyperedge_head(hyperedge_id).pop()
+        edge_attributes = G.get_hyperedge_attributes(hyperedge_id)
         nx_graph.add_edge(tail_node, head_node, edge_attributes)
 
     return nx_graph
@@ -95,16 +95,16 @@ def from_networkx_digraph(nx_digraph):
         raise TypeError("Transformation only applicable to directed \
                         NetworkX graphs")
 
-    graph = DirectedHypergraph()
+    G = DirectedHypergraph()
 
     for node in nx_digraph.nodes_iter():
-        graph.add_node(node, copy.copy(nx_digraph.node[node]))
+        G.add_node(node, copy.copy(nx_digraph.node[node]))
 
     for edge in nx_digraph.edges_iter():
         tail_node = edge[0]
         head_node = edge[1]
-        graph.add_hyperedge(tail_node,
-                            head_node,
-                            copy.copy(nx_digraph[tail_node][head_node]))
+        G.add_hyperedge(tail_node,
+                        head_node,
+                        copy.copy(nx_digraph[tail_node][head_node]))
 
-    return graph
+    return G

@@ -12,7 +12,7 @@ from scipy.sparse import linalg
 from hypergraph.undirected_hypergraph import UndirectedHypergraph
 
 
-def normalized_hypergraph_cut(hypergraph, threshold=0):
+def normalized_hypergraph_cut(H, threshold=0):
     """Executes the min-cut algorithm described in the paper:
     Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.
     "Learning with hypergraphs: Clustering, classification, and embedding."
@@ -22,7 +22,7 @@ def normalized_hypergraph_cut(hypergraph, threshold=0):
     This algorithm uses the normalized Laplacian to partition the hypergraph
     into two disjoint components.
 
-    :param hypergraph: the hypergraph to perform the 'min-cut' algorithm on.
+    :param H: the hypergraph to perform the 'min-cut' algorithm on.
     :param threshold: The threshold value for the partitioning algorithm.
                     Typically, the value zero is selected for this purpose.
     :returns: set -- the S set of nodes in the S-T partition
@@ -30,12 +30,12 @@ def normalized_hypergraph_cut(hypergraph, threshold=0):
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
+    if not isinstance(H, UndirectedHypergraph):
         raise TypeError("Algorithm only applicable to undirected hypergraphs")
 
     # TODO: make sure that the hypergraph is connected
 
-    delta = _compute_normalized_laplacian(hypergraph)
+    delta = _compute_normalized_laplacian(H)
     eigenvalues, eigenvectors = np.linalg.eig(delta.todense())
 
     # Since the eigs method in sparse.linalg library doesn't find
@@ -48,7 +48,7 @@ def normalized_hypergraph_cut(hypergraph, threshold=0):
     second_min_index = np.argsort(eigenvalues)[1]
     second_eigenvector = eigenvectors[:, second_min_index]
 
-    nodeid2nodeset, nodeset2nodeid = _get_nodeset2nodeid(hypergraph)
+    nodeid2nodeset, nodeset2nodeid = _get_nodeset2nodeid(H)
     partition_index = [i for i in range(len(second_eigenvector))
                        if second_eigenvector[i] >= threshold]
     S, T = set(), set()
@@ -61,25 +61,25 @@ def normalized_hypergraph_cut(hypergraph, threshold=0):
     return S, T
 
 
-def stationary_distribution(hypergraph, P=None):
+def stationary_distribution(H, P=None):
     """Computes the stationary distribution of a random walk on the given
     hypergraph using the iterative approach explained in the paper:
     (http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf)
 
-    :param hypergraph: the hypergraph to find the 'Stationary Distribution'
+    :param H: the hypergraph to find the 'Stationary Distribution'
                     algorithm on.
     :returns: list -- list of the stationary probabilities for all nodes
             in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
+    if not isinstance(H, UndirectedHypergraph):
         raise TypeError("Algorithm only applicable to undirected hypergraphs")
 
     if P is None:
-        P = _compute_transition_matrix(hypergraph)
+        P = _compute_transition_matrix(H)
 
-    node_number = len(hypergraph.get_node_set())
+    node_number = len(H.get_node_set())
     pi = _create_random_starter(node_number)
     pi_star = _create_random_starter(node_number)
     while not _has_converged(pi_star, pi):
@@ -89,22 +89,22 @@ def stationary_distribution(hypergraph, P=None):
     return pi
 
 
-def _create_incidence_matrix(hypergraph):
+def _create_incidence_matrix(H):
     """Creates the incidence matrix as a sparse matrix.
 
-    :param hypergraph: the hypergraph for which to find the W matrix on.
+    :param H: the hypergraph for which to find the W matrix on.
     :returns: sparse.csc_matrix -- the incidence matrix as a sparse matrix.
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
+    if not isinstance(H, UndirectedHypergraph):
         raise TypeError("Algorithm only applicable to undirected hypergraphs")
 
     rows, cols = [], []
-    _, nodeset2nodeid = _get_nodeset2nodeid(hypergraph)
+    _, nodeset2nodeid = _get_nodeset2nodeid(H)
 
-    for hyperedge_id in hypergraph.hyperedge_id_iterator():
-        for node in hypergraph.get_hyperedge_nodes(hyperedge_id):
+    for hyperedge_id in H.hyperedge_id_iterator():
+        for node in H.get_hyperedge_nodes(hyperedge_id):
             # get the mapping between the node and its ID
             rows.append(nodeset2nodeid.get(node))
             # since it starts with e, like e31
@@ -117,16 +117,16 @@ def _create_incidence_matrix(hypergraph):
                              len(set(cols))))
 
 
-def _create_hyperedge_weight_matrix(hypergraph):
+def _create_hyperedge_weight_matrix(H):
     """Creates the diagonal matrix of hyperedge weights as a sparse matrix.
 
-    :param hypergraph: the hypergraph to find the W matrix on it.
+    :param H: the hypergraph to find the W matrix on it.
     :returns: sparse.csc_matrix -- the diagonal edge weight matrix as a
             sparse matrix.
 
     """
-    number_of_edges = len(hypergraph.get_hyperedge_id_set())
-    hyperedge_weight = _get_hyperedge_weight_mapping(hypergraph)
+    number_of_edges = len(H.get_hyperedge_id_set())
+    hyperedge_weight = _get_hyperedge_weight_mapping(H)
     hyperedge_weight_vector = []
 
     for i in range(number_of_edges):
@@ -135,33 +135,33 @@ def _create_hyperedge_weight_matrix(hypergraph):
     return sparse.diags([hyperedge_weight_vector], [0])
 
 
-def _create_vertex_degree_matrix(hypergraph):
+def _create_vertex_degree_matrix(H):
     """Creates the diagonal maxtrix of vertex degrees as a sparse matrix,
     where a vertex degree is the sum of the weights of all hyperedges
     in the vertex's star.
 
-    :param hypergraph: the hypergraph to find the vertex degree matrix on.
+    :param H: the hypergraph to find the vertex degree matrix on.
     :returns: sparse.csc_matrix -- the diagonal vertex degree matrix as a
             sparse matrix.
 
     """
-    incidence_matrix = _create_incidence_matrix(hypergraph)
-    W = _create_hyperedge_weight_matrix(hypergraph)
+    incidence_matrix = _create_incidence_matrix(H)
+    W = _create_hyperedge_weight_matrix(H)
 
     return sparse.diags([incidence_matrix * W.diagonal()], [0])
 
 
-def _create_hyperedge_degree_matrix(hypergraph):
+def _create_hyperedge_degree_matrix(H):
     """Creates the diagonal matrix of hyperedge degrees as a sparse matrix,
     where a hyperedge degree is the cardinality of the hyperedge.
 
-    :param hypergraph: the hypergraph to find the D_e matrix on.
+    :param H: the hypergraph to find the D_e matrix on.
     :returns: sparse.csc_matrix -- the diagonal hyperedge degree matrix as a
             sparse matrix.
 
     """
-    number_of_edges = len(hypergraph.get_hyperedge_id_set())
-    incidence_matrix = _create_incidence_matrix(hypergraph)
+    number_of_edges = len(H.get_hyperedge_id_set())
+    incidence_matrix = _create_incidence_matrix(H)
     degrees = incidence_matrix.sum(0).transpose()
     new_degree = []
 
@@ -174,7 +174,7 @@ def _create_hyperedge_degree_matrix(hypergraph):
 def _fast_inverse(M):
     """Computes the inverse of a diagonal matrix.
 
-    :param hypergraph: the diagonal matrix to find the inverse of.
+    :param H: the diagonal matrix to find the inverse of.
     :returns: sparse.csc_matrix -- the inverse of the input matrix as a
             sparse matrix.
 
@@ -187,7 +187,7 @@ def _fast_inverse(M):
     return sparse.diags([new_diag], [0])
 
 
-def _compute_transition_matrix(hypergraph):
+def _compute_transition_matrix(H):
     """Computes the transition matrix for a random walk on the given
     hypergraph as described in the paper:
     Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.
@@ -195,66 +195,65 @@ def _compute_transition_matrix(hypergraph):
     Advances in neural information processing systems. 2006.
     (http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf)
 
-    :param hypergraph: the hypergraph to find the transition matrix of.
+    :param H: the hypergraph to find the transition matrix of.
     :returns: sparse.csc_matrix -- the transition matrix as a sparse matrix.
 
     """
-    H = _create_incidence_matrix(hypergraph)
-    D_v = _create_vertex_degree_matrix(hypergraph)
-    D_e = _create_hyperedge_degree_matrix(hypergraph)
-    W = _create_hyperedge_weight_matrix(hypergraph)
-    D_v_inverse = _fast_inverse(D_v)
-    D_e_inverse = _fast_inverse(D_e)
-    H_transpose = H.transpose()
+    inc_H = _create_incidence_matrix(H)
+    D_v = _create_vertex_degree_matrix(H)
+    D_e = _create_hyperedge_degree_matrix(H)
+    W = _create_hyperedge_weight_matrix(H)
+    D_v_inv = _fast_inverse(D_v)
+    D_e_inv = _fast_inverse(D_e)
+    inc_H_trans = inc_H.transpose()
 
-    P = D_v_inverse * H * W * D_e_inverse * H_transpose
+    P = D_v_inv * inc_H * W * D_e_inv * inc_H_trans
 
     return P
 
 
-def _compute_normalized_laplacian(hypergraph):
+def _compute_normalized_laplacian(H):
     """Computes the normalized Laplacian as described in the paper:
     Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.
     "Learning with hypergraphs: Clustering, classification, and embedding."
     Advances in neural information processing systems. 2006.
     (http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf)
 
-    :param hypergraph: the hypergraph to compute the normalized Laplacian
+    :param H: the hypergraph to compute the normalized Laplacian
                     matrix for.
     :returns: sparse.csc_matrix -- the normalized Laplacian matrix as a sparse
             matrix.
 
     """
-    H = _create_incidence_matrix(hypergraph)
-    D_v = _create_vertex_degree_matrix(hypergraph)
-    D_e = _create_hyperedge_degree_matrix(hypergraph)
-    W = _create_hyperedge_weight_matrix(hypergraph)
+    inc_H = _create_incidence_matrix(H)
+    D_v = _create_vertex_degree_matrix(H)
+    D_e = _create_hyperedge_degree_matrix(H)
+    W = _create_hyperedge_weight_matrix(H)
     D_v_sqrt = D_v.sqrt()
-    D_v_sqrt_inverse = np.real(_fast_inverse(D_v_sqrt).todense())
-    D_v_sqrt_inverse = sparse.csc_matrix(D_v_sqrt_inverse)
-    D_e_inverse = _fast_inverse(D_e)
-    H_transpose = H.transpose()
+    D_v_sqrt_inv = np.real(_fast_inverse(D_v_sqrt).todense())
+    D_v_sqrt_inv = sparse.csc_matrix(D_v_sqrt_inv)
+    D_e_inv = _fast_inverse(D_e)
+    inc_H_trans = inc_H.transpose()
 
-    theta = \
-        D_v_sqrt_inverse * H * W * D_e_inverse * H_transpose * D_v_sqrt_inverse
+    theta = D_v_sqrt_inv * inc_H * W * D_e_inv * inc_H_trans * D_v_sqrt_inv
 
-    node_number = len(hypergraph.get_node_set())
+    node_number = len(H.get_node_set())
     I = sparse.eye(node_number)
 
     delta = I - theta
     return delta
 
 
-def _get_nodeset2nodeid(hypergraph):
+def _get_nodeset2nodeid(H):
     """Computes the nodeset->nodeid mapping for all the nodes in the
     hypergraph.
 
-    :param hypergraph: the hypergraph to find all the mappings.
+    :param H: the hypergraph to find all the mappings.
     :returns: dict -- The mapping from nodeid to nodename
               dict -- The mapping from nodename to nodeid
 
     """
-    node_set = hypergraph.get_node_set()
+    node_set = H.get_node_set()
     nodeset2nodeidList, nodeidList2nodeset = {}, {}
 
     node_id = 0
@@ -266,17 +265,17 @@ def _get_nodeset2nodeid(hypergraph):
     return nodeidList2nodeset, nodeset2nodeidList
 
 
-def _get_hyperedge_weight_mapping(hypergraph):
+def _get_hyperedge_weight_mapping(H):
     """Computes the weight of each hyperedge.
 
-    :param hypergraph: the hypergraph to find the weights.
+    :param H: the hypergraph to find the weights.
     :returns: dict -- The mapping from edgeid to its weight
 
     """
     hyperedge_weight = {}
-    for hyperedge_id in hypergraph.hyperedge_id_iterator():
+    for hyperedge_id in H.hyperedge_id_iterator():
         hyperedge_weight.update({str(int(hyperedge_id[1:])-1):
-                                hypergraph.get_hyperedge_weight(hyperedge_id)})
+                                H.get_hyperedge_weight(hyperedge_id)})
 
     return hyperedge_weight
 

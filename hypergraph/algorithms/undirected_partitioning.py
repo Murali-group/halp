@@ -92,7 +92,7 @@ def stationary_distribution(hypergraph, P=None):
     return pi
 
 
-def _get_incidence_matrix(hypergraph):
+def _create_incidence_matrix(hypergraph):
     """Creates the incidence matrix as a sparse matrix.
 
     :param hypergraph: the hypergraph for which to find the W matrix on.
@@ -120,20 +120,16 @@ def _get_incidence_matrix(hypergraph):
                              len(set(cols))))
 
 
-def _get_hyperedge_weight_matrix(hypergraph):
+def _create_hyperedge_weight_matrix(hypergraph):
     """Creates the diagonal matrix of hyperedge weights as a sparse matrix.
 
     :param hypergraph: the hypergraph to find the W matrix on it.
     :returns: sparse.csc_matrix -- the diagonal edge weight matrix as a
             sparse matrix.
-    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
-        raise TypeError("Algorithm only applicable to undirected hypergraphs")
-
     number_of_edges = len(hypergraph.get_hyperedge_id_set())
-    hyperedge_weight = _get_hyperedge_weight(hypergraph)
+    hyperedge_weight = _get_hyperedge_weight_mapping(hypergraph)
     hyperedge_weight_vector = []
 
     for i in range(number_of_edges):
@@ -142,7 +138,7 @@ def _get_hyperedge_weight_matrix(hypergraph):
     return sparse.diags([hyperedge_weight_vector], [0])
 
 
-def _get_vertex_degree_matrix(hypergraph):
+def _create_vertex_degree_matrix(hypergraph):
     """Creates the diagonal maxtrix of vertex degrees as a sparse matrix,
     where a vertex degree is the sum of the weights of all hyperedges
     in the vertex's star.
@@ -150,33 +146,25 @@ def _get_vertex_degree_matrix(hypergraph):
     :param hypergraph: the hypergraph to find the vertex degree matrix on.
     :returns: sparse.csc_matrix -- the diagonal vertex degree matrix as a
             sparse matrix.
-    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
-        raise TypeError("Algorithm only applicable to undirected hypergraphs")
-
-    incidence_matrix = _get_incidence_matrix(hypergraph)
-    W = _get_hyperedge_weight_matrix(hypergraph)
+    incidence_matrix = _create_incidence_matrix(hypergraph)
+    W = _create_hyperedge_weight_matrix(hypergraph)
 
     return sparse.diags([incidence_matrix * W.diagonal()], [0])
 
 
-def _get_hyperedge_degree_matrix(hypergraph):
+def _create_hyperedge_degree_matrix(hypergraph):
     """Creates the diagonal matrix of hyperedge degrees as a sparse matrix,
     where a hyperedge degree is the cardinality of the hyperedge.
 
     :param hypergraph: the hypergraph to find the D_e matrix on.
     :returns: sparse.csc_matrix -- the diagonal hyperedge degree matrix as a
             sparse matrix.
-    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
-        raise TypeError("Algorithm only applicable to undirected hypergraphs")
-
     number_of_edges = len(hypergraph.get_hyperedge_id_set())
-    incidence_matrix = _get_incidence_matrix(hypergraph)
+    incidence_matrix = _create_incidence_matrix(hypergraph)
     degrees = incidence_matrix.sum(0).transpose()
     new_degree = []
 
@@ -212,16 +200,12 @@ def _compute_transition_matrix(hypergraph):
 
     :param hypergraph: the hypergraph to find the transition matrix of.
     :returns: sparse.csc_matrix -- the transition matrix as a sparse matrix.
-    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-    if not isinstance(hypergraph, UndirectedHypergraph):
-        raise TypeError("Algorithm only applicable to undirected hypergraphs")
-
-    H = _get_incidence_matrix(hypergraph)
-    D_v = _get_vertex_degree_matrix(hypergraph)
-    D_e = _get_hyperedge_degree_matrix(hypergraph)
-    W = _get_hyperedge_weight_matrix(hypergraph)
+    H = _create_incidence_matrix(hypergraph)
+    D_v = _create_vertex_degree_matrix(hypergraph)
+    D_e = _create_hyperedge_degree_matrix(hypergraph)
+    W = _create_hyperedge_weight_matrix(hypergraph)
     D_v_inverse = _fast_inverse(D_v)
     D_e_inverse = _fast_inverse(D_e)
     H_transpose = H.transpose()
@@ -242,17 +226,12 @@ def _compute_normalized_laplacian(hypergraph):
                     matrix for.
     :returns: sparse.csc_matrix -- the normalized Laplacian matrix as a sparse
             matrix.
-    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-
-    if not isinstance(hypergraph, UndirectedHypergraph):
-        raise TypeError("Algorithm only applicable to undirected hypergraphs")
-
-    H = _get_incidence_matrix(hypergraph)
-    D_v = _get_vertex_degree_matrix(hypergraph)
-    D_e = _get_hyperedge_degree_matrix(hypergraph)
-    W = _get_hyperedge_weight_matrix(hypergraph)
+    H = _create_incidence_matrix(hypergraph)
+    D_v = _create_vertex_degree_matrix(hypergraph)
+    D_e = _create_hyperedge_degree_matrix(hypergraph)
+    W = _create_hyperedge_weight_matrix(hypergraph)
     D_v_sqrt = D_v.sqrt()
     D_v_sqrt_inverse = np.real(_fast_inverse(D_v_sqrt).todense())
     D_v_sqrt_inverse = sparse.csc_matrix(D_v_sqrt_inverse)
@@ -290,7 +269,7 @@ def _get_nodeset2nodeid(hypergraph):
     return nodeidList2nodeset, nodeset2nodeidList
 
 
-def _get_hyperedge_weight(hypergraph):
+def _get_hyperedge_weight_mapping(hypergraph):
     """Computes the weight of each hyperedge.
 
     :param hypergraph: the hypergraph to find the weights.
@@ -331,8 +310,9 @@ def _has_converged(pi_star, pi):
 
     """
     node_number = pi.shape[0]
+    EPS = 10e-6
     for i in range(node_number):
-        if pi[i]-pi_star[i] > 10e-6:
+        if pi[i] - pi_star[i] > EPS:
             return False
 
     return True

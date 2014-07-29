@@ -1,4 +1,4 @@
-H		weight
+node_set		weight
 v1,v2,v3	9.1
 v2,v4	10
 v1,v3	1
@@ -8,3 +8,4 @@ v8,v9,v7	2
 v9,v10,v11	4
 v9,v12	3.5
 v8,v12,v13	4.1
+v6	1

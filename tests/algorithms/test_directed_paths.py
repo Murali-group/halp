@@ -295,7 +295,7 @@ def test_get_hypertree_from_predecessors():
         directed_paths.shortest_b_tree(
             H, 's', directed_paths.sum_function, True)
 
-    sub_H = directed_paths.get_hypertree_from_predecessors(H, 's', Pv, W)
+    sub_H = directed_paths.get_hypertree_from_predecessors(H, Pv, 's', W)
 
     sub_H._check_consistency()
 
@@ -317,7 +317,7 @@ def test_get_hypertree_from_predecessors():
     # Test without a weighting
     Pv, W = directed_paths.shortest_f_tree(H, 't', directed_paths.sum_function)
 
-    sub_H = directed_paths.get_hypertree_from_predecessors(H, 't', Pv)
+    sub_H = directed_paths.get_hypertree_from_predecessors(H, Pv, 't')
 
     sub_H._check_consistency()
 

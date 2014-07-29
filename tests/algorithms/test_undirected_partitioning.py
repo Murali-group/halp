@@ -6,13 +6,16 @@ def test_normalized_hypergraph_cut():
     H = UndirectedHypergraph()
     H.read('./tests/data/basic_undirected_hypergraph.txt')
     
-    partition = partitioning.normalized_hypergraph_cut(H)
+    S, T = partitioning.normalized_hypergraph_cut(H)
     
     # Correctness tests go here
+    assert S
+    assert T
+    assert not S.intersection(T)
     
     # Try partitioning an invalid undirected hypergraph
     try:
-        partition = partitioning.normalized_hypergraph_cut("H")
+        S, T = partitioning.normalized_hypergraph_cut("H")
         assert False
     except TypeError:
         pass

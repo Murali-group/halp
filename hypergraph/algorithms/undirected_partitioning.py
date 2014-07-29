@@ -25,14 +25,11 @@ def normalized_hypergraph_cut(hypergraph, threshold=0):
     :param hypergraph: the hypergraph to perform the 'min-cut' algorithm on.
     :param threshold: The threshold value for the partitioning algorithm.
                     Typically, the value zero is selected for this purpose.
-    :returns: tuple -- 2-tuple with each index containing a list of nodes,
-            where the lists correspond respectively to the 2 disjoint
-            partitions and the elements in the lists are the nodes that are
-            members of their respective partitions.
+    :returns: set -- the S set of nodes in the S-T partition
+              set -- the T set of nodes in the S-T partition
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
 
     """
-
     if not isinstance(hypergraph, UndirectedHypergraph):
         raise TypeError("Algorithm only applicable to undirected hypergraphs")
 
@@ -54,14 +51,14 @@ def normalized_hypergraph_cut(hypergraph, threshold=0):
     nodeid2nodeset, nodeset2nodeid = _get_nodeset2nodeid(hypergraph)
     partition_index = [i for i in range(len(second_eigenvector))
                        if second_eigenvector[i] >= threshold]
-    partition = (list(), list())
+    S, T = set(), set()
     for (key, value) in list(nodeset2nodeid.items()):
         if value in partition_index:
-            partition[0].append(key)
+            S.add(key)
         else:
-            partition[1].append(key)
+            T.add(key)
 
-    return partition
+    return S, T
 
 
 def stationary_distribution(hypergraph, P=None):

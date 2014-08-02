@@ -8,7 +8,7 @@ halp: Hypergraph Algorithms Library in Python<br>[Under Construction]
 
 This library provides a general hypergraph implementation, as well as several important and canonical algorithms that operate on hypergraphs.
 
-Expected v1.0 release: July 2014
+Expected v1.0 release: Aug. 2014
 
 Testing
 ---------

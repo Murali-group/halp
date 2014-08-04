@@ -26,6 +26,8 @@ class UndirectedHypergraph(object):
     This class assigns (upon adding) and refers to each hyperedge by an
     internal ID. See "add_hyperedge" or "add_hyperedges" for more details.
 
+    Self-loops and parallel (multi) hyperedges are not allowed.
+
     :note: This class uses several data structures to store a undirected
         hypergraph. Since these structures must stay in sync (see: __init__),
         we highly recommend that only the public methods be used for accessing
@@ -347,6 +349,23 @@ class UndirectedHypergraph(object):
             return copy.\
                 copy(self._node_attributes[node][attribute_name])
 
+    def get_node_attributes(self, node):
+        # Note: Code and comments unchanged from DirectedHypergraph
+        """Given a node, get a dictionary with copies of that node's
+        attributes.
+
+        :param node: reference to the node to retrieve the attributes of.
+        :returns: dict -- copy of each attribute of the specified node.
+        :raises: ValueError -- No such node exists.
+
+        """
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+        attributes = {}
+        for attr_name, attr_value in self._node_attributes[node].items():
+            attributes[attr_name] = copy.copy(attr_value)
+        return attributes
+
     def _assign_next_hyperedge_id(self):
         # Note: Code and comments unchanged from DirectedHypergraph
         """Returns the next [consecutive] ID to be assigned
@@ -620,6 +639,25 @@ class UndirectedHypergraph(object):
         else:
             return copy.\
                 copy(self._hyperedge_attributes[hyperedge_id][attribute_name])
+
+    def get_hyperedge_attributes(self, hyperedge_id):
+        """Given a hyperedge ID, get a dictionary of copies of that hyperedge's
+        attributes.
+
+        :param hyperedge_id: ID of the hyperedge to retrieve the attributes of.
+        :returns: dict -- copy of each attribute of the specified hyperedge_id
+                (except the private __frozen_nodes entry).
+        :raises: ValueError -- No such hyperedge exists.
+
+        """
+        if not self.has_hyperedge_id(hyperedge_id):
+            raise ValueError("No such hyperedge exists.")
+        dict_to_copy = self._hyperedge_attributes[hyperedge_id].items()
+        attributes = {}
+        for attr_name, attr_value in dict_to_copy:
+            if attr_name != "__frozen_nodes":
+                attributes[attr_name] = copy.copy(attr_value)
+        return attributes
 
     def get_hyperedge_nodes(self, hyperedge_id):
         """Given a hyperedge ID, get a copy of that hyperedge's nodes.

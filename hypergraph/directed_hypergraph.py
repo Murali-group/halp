@@ -26,6 +26,8 @@ class DirectedHypergraph(object):
     This class assigns (upon adding) and refers to each hyperedge by an
     internal ID. See "add_hyperedge" or "add_hyperedges" for more details.
 
+    Self-loops are allowed, but parallel (multi) hyperedges are not.
+
     :note: This class uses several data structures to store a directed
         hypergraph. Since these structures must stay in sync (see: __init__),
         we highly recommend that only the public methods be used for accessing

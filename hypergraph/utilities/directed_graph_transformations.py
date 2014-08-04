@@ -12,7 +12,7 @@ from hypergraph.directed_hypergraph import DirectedHypergraph
 
 def to_graph_decomposition(H):
     """Returns a DirectedHypergraph object that has the same nodes (and
-    corresponding attributes as the given hypergraph, except that for all
+    corresponding attributes) as the given hypergraph, except that for all
     hyperedges in the given hypergraph, each node in the tail of the hyperedge
     is pairwise connected to each node in the head of the hyperedge in the
     new hypergraph.

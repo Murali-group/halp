@@ -413,6 +413,45 @@ def test_get_hyperedge_attribute():
         assert False, e
 
 
+def test_get_hyperedge_attributes():
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    node_d = 'D'
+    node_e = 'E'
+
+    nodes1 = set([node_a, node_b, node_c])
+    frozen_nodes1 = frozenset(nodes1)
+
+    nodes2 = set([node_a, node_d])
+    frozen_nodes2 = frozenset(nodes2)
+
+    nodes3 = set([node_d, node_e])
+    frozen_nodes3 = frozenset(nodes3)
+
+    common_attrib = {'sink': False}
+
+    hyperedges = hyperedges = [nodes1, nodes2, nodes3]
+
+    H = UndirectedHypergraph()
+    hyperedge_names = \
+        H.add_hyperedges(hyperedges, common_attrib, color='white')
+
+    attrs = H.get_hyperedge_attributes('e1')
+    assert attrs['weight'] == 1
+    assert attrs['color'] == 'white'
+    assert attrs['sink'] is False
+
+    # Try requesting an invalid hyperedge
+    try:
+        H.get_hyperedge_attributes('e5')
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
 def test_get_hyperedge_nodes():
     node_a = 'A'
     node_b = 'B'
@@ -504,6 +543,34 @@ def test_get_node_attribute():
     # Try requesting an invalid attribute
     try:
         H.get_node_attribute(node_a, 'alt_name')
+        assert False
+    except ValueError:
+        pass
+    except BaseException as e:
+        assert False, e
+
+
+def test_get_node_attributes():
+    node_a = 'A'
+    node_b = 'B'
+    node_c = 'C'
+    attrib_c = {'alt_name': 1337}
+    node_d = 'D'
+    attrib_d = {'label': 'black', 'sink': True}
+
+    # Test adding unadded nodes with various attribute settings
+    H = UndirectedHypergraph()
+    H.add_node(node_a)
+    H.add_node(node_b, source=True)
+    H.add_node(node_c, attrib_c)
+    H.add_node(node_d, attrib_d, sink=False)
+
+    attrs = H.get_node_attributes(node_b)
+    assert attrs['source'] is True
+
+    # Try requesting an invalid node
+    try:
+        H.get_node_attributes("E")
         assert False
     except ValueError:
         pass

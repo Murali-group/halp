@@ -341,8 +341,12 @@ def _shortest_x_tree(H, source_node, b_tree,
                 dict -- mapping from each node to the node's weight.
                 list -- [only if valid_ordering argument is passed] a valid
                         ordering of the nodes.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
+    if not isinstance(H, DirectedHypergraph):
+        raise TypeError("Algorithm only applicable to directed hypergraphs")
+
     if b_tree:
         forward_star = H.get_forward_star
         hyperedge_tail = H.get_hyperedge_tail
@@ -468,12 +472,13 @@ def shortest_f_tree(H, source_node,
 
 def get_hypertree_from_predecessors(H, Pv, source_node,
                                     node_weights=None, attr_name="weight"):
-    """Gives the induced subhypergraph from a path algorithm beginning at a
-    source node that returns a dictionary mapping each node to the ID of the
-    hyperedge that preceeded it in the path (i.e., a Pv vector). Assigns the
-    node weights (if provided) as attributes of the nodes (e.g., the rank of
-    that node in a specific instance of the SBT algorithm, or the cardinality
-    of that node in a B-Visit traversal, etc.).
+    """Gives the hypertree (i.e., the subhypergraph formed from the union of
+    the set of paths from an execution of, e.g., the SBT algorithm) defined by
+    Pv beginning at a source node. Returns a dictionary mapping each node to
+    the ID of the hyperedge that preceeded it in the path (i.e., a Pv vector).
+    Assigns the node weights (if provided) as attributes of the nodes (e.g.,
+    the rank of that node in a specific instance of the SBT algorithm, or the
+    cardinality of that node in a B-Visit traversal, etc.).
 
     :note: The IDs of the hyperedges in the subhypergraph returned may be
         different than those in the original hypergraph (even though the
@@ -490,32 +495,43 @@ def get_hypertree_from_predecessors(H, Pv, source_node,
     :returns: DirectedHypergraph -- subhypergraph induced by the path
             algorithm specified by the predecessor vector (Pv) from a
             source node.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
+    if not isinstance(H, DirectedHypergraph):
+        raise TypeError("Algorithm only applicable to directed hypergraphs")
+
     sub_H = DirectedHypergraph()
 
+    # If node weights are not provided, simply collect all the nodes that are
+    # will be in the hypertree
     if node_weights is None:
         nodes = [node for node in Pv.keys() if Pv[node] is not None]
         nodes.append(source_node)
+    # If node weights are provided, collect all the nodes that will be in the
+    # tree and pair them with their corresponding weights
     else:
         nodes = [(node, {attr_name: node_weights[node]})
                  for node in Pv.keys() if Pv[node] is not None]
         nodes.append((source_node, {attr_name: node_weights[source_node]}))
+    # Add the collected elements to the hypergraph
     sub_H.add_nodes(nodes)
 
+    # Add all hyperedges, specified by Pv, to the hypergraph
     hyperedges = [(H.get_hyperedge_tail(hyperedge_id),
                    H.get_hyperedge_head(hyperedge_id),
                    H.get_hyperedge_attributes(hyperedge_id))
                   for hyperedge_id in Pv.values() if hyperedge_id is not None]
-    hyperedge_ids = sub_H.add_hyperedges(hyperedges)
+    sub_H.add_hyperedges(hyperedges)
 
     return sub_H
 
 
-def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node):
-    """Given a predecessor function and source and destination nodes,
-       this function returns a hyperpath (DirectedHypergraph) representing
-       the shortest B-hyperpath from the source to the destination.
+def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
+                                    node_weights=None, attr_name="weight"):
+    """Gives the hyperpath (DirectedHypergraph) representing the shortest
+    B-hyperpath from the source to the destination, given a predecessor
+    function and source and destination nodes.
 
     :note: The IDs of the hyperedges in the subhypergraph returned may be
         different than those in the original hypergraph (even though the
@@ -528,25 +544,38 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node):
     :param destination_node: the destination node of the path.
     :returns: DirectedHypergraph -- shortest B-hyperpath from source_node to
             destination_node.
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+             KeyError -- Node key in predecessor is not in H
+             KeyError -- Hyperedge key in predecessor is not in H
+             ValueError -- Multiple nodes without predecessor
+             ValueError -- Hypertree does not have source node
+
     """
-    # Check that pred_func is a valid predecessor function:
-    # keys must be nodes in H mapping to hyperedges in H; exactly one
-    # node must map to None (i.e. only one node without predecessor).
+    if not isinstance(H, DirectedHypergraph):
+        raise TypeError("Algorithm only applicable to directed hypergraphs")
+
+    # Check that Pv is a valid predecessor function:
+    # - keys must be nodes in H mapping to hyperedges in H
+    # - exactly one node must map to None (i.e., only one node
+    #   without predecessor)
     nodes_without_predecessor = 0
     for node, hyperedge_id in Pv.items():
         if not H.has_node(node):
-            raise TypeError(
-                "key %s in predecessor is not a node in H" % node)
+            raise KeyError(
+                "Node key %s in predecessor is not in H" % node)
+
         if hyperedge_id is None:
             nodes_without_predecessor += 1
         elif not H.has_hyperedge_id(hyperedge_id):
-            raise TypeError(
-                "edge %s in predecessor is not in H" % hyperedge_id)
+            raise KeyError(
+                "Hyperedge key %s in predecessor is not in H" % hyperedge_id)
+
     if nodes_without_predecessor > 1:
         raise ValueError(
             "Multiple nodes without predecessor. %s received" % Pv)
     elif nodes_without_predecessor == 0:
-        raise ValueError("Hypertree does not have root node. %s received" % Pv)
+        raise ValueError(
+            "Hypertree does not have source node. %s received" % Pv)
 
     path = DirectedHypergraph()
 

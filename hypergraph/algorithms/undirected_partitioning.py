@@ -10,6 +10,7 @@ from scipy import sparse
 from scipy.sparse import linalg
 
 from hypergraph.undirected_hypergraph import UndirectedHypergraph
+import hypergraph.utilities.undirected_graph_transformations as ugt
 
 
 def normalized_hypergraph_cut(H, threshold=0):
@@ -48,7 +49,7 @@ def normalized_hypergraph_cut(H, threshold=0):
     second_min_index = np.argsort(eigenvalues)[1]
     second_eigenvector = eigenvectors[:, second_min_index]
 
-    nodeid2nodeset, nodeset2nodeid = _get_nodeset2nodeid(H)
+    nodeid2nodeset, nodeset2nodeid = ugt.get_nodeset2nodeid(H)
     partition_index = [i for i in range(len(second_eigenvector))
                        if second_eigenvector[i] >= threshold]
     S, T = set(), set()
@@ -90,29 +91,32 @@ def stationary_distribution(H, P=None):
 
 
 def _create_incidence_matrix(H):
-    """Creates the incidence matrix as a sparse matrix.
+    """Creates the 'Incidence Matrix' as a sparse matrix using the
+    approach that is explained in the paper:
+    (http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf)
 
-    :param H: the hypergraph for which to find the W matrix on.
-    :returns: sparse.csc_matrix -- the incidence matrix as a sparse matrix.
-    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
+    This algorithm finds the H matrix as explained in the above paper
 
+    :param H: the H to find the W matrix on it.
+    :returns: sparse.csc_matrix -- The Incidence Matrix as a sparse matrix
+    :raises: TypeError -- Algorithm only applicable to undirected Hypergraphs
     """
     if not isinstance(H, UndirectedHypergraph):
-        raise TypeError("Algorithm only applicable to undirected hypergraphs")
-
-    rows, cols = [], []
-    _, nodeset2nodeid = _get_nodeset2nodeid(H)
-
-    for hyperedge_id in H.hyperedge_id_iterator():
-        for node in H.get_hyperedge_nodes(hyperedge_id):
-            # get the mapping between the node and its ID
+        raise TypeError("Algorithm only applicable to undirected Hypergraphs")
+    nodeNumber = len(H.get_node_set())
+    edgeNumber = len(H.get_hyperedge_id_set())
+    rows = []
+    cols = []
+    _, hyperedgename2hyperedgeid = ugt.get_hyperedgename2hyperedgeid(H)
+    _, nodeset2nodeid = ugt.get_nodeset2nodeid(H)
+    for (hyperedge_name, hyperedge_id) in \
+    hyperedgename2hyperedgeid.iteritems():
+        for node in H.get_hyperedge_nodes(hyperedge_name):
+            # get the mapping btw node and its id
             rows.append(nodeset2nodeid.get(node))
-            # since it starts with e, like e31
-            cols.append(int(hyperedge_id[1:])-1)
+            cols.append(hyperedge_id)
     values = np.ones(len(rows), dtype=int)
-
-    return sparse.csc_matrix((values,
-                             (rows, cols)),
+    return sparse.csc_matrix((values, (rows, cols)),
                              shape=(len(set(rows)),
                              len(set(cols))))
 
@@ -242,27 +246,6 @@ def _compute_normalized_laplacian(H):
 
     delta = I - theta
     return delta
-
-
-def _get_nodeset2nodeid(H):
-    """Computes the nodeset->nodeid mapping for all the nodes in the
-    hypergraph.
-
-    :param H: the hypergraph to find all the mappings.
-    :returns: dict -- The mapping from nodeid to nodename
-              dict -- The mapping from nodename to nodeid
-
-    """
-    node_set = H.get_node_set()
-    nodeset2nodeidList, nodeidList2nodeset = {}, {}
-
-    node_id = 0
-    for node in node_set:
-        nodeset2nodeidList.update({node: node_id})
-        nodeidList2nodeset.update({node_id: node})
-        node_id += 1
-
-    return nodeidList2nodeset, nodeset2nodeidList
 
 
 def _get_hyperedge_weight_mapping(H):

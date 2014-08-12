@@ -1,6 +1,6 @@
 """
 .. module:: undirected_graph_transformations
-   :synopsis: Defines several functions for transforming undirected hypergraphs
+   :synopsis: Defines several functions for transforming undirected Hs
             into various representations of graphs (where an edge connects
             exactly two nodes together).
 
@@ -12,21 +12,21 @@ from hypergraph.undirected_hypergraph import UndirectedHypergraph
 
 def to_graph_decomposition(H):
     """Returns an UndirectedHypergraph object that has the same nodes (and
-    corresponding attributes) as the given hypergraph, except that for all
-    hyperedges in the given hypergraph, each node in the hyperedge is pairwise
-    connected to every other node also in that hyperedge in the new hypergraph.
+    corresponding attributes) as the given H, except that for all
+    hyperedges in the given H, each node in the hyperedge is pairwise
+    connected to every other node also in that hyperedge in the new H.
     Said another way, each of the original hyperedges are decomposed in the
-    new hypergraph into cliques (aka the "2-section" or "clique graph").
+    new H into cliques (aka the "2-section" or "clique graph").
 
-    :param H: the hypergraph to decompose into a graph.
-    :returns: UndirectedHypergraph -- the decomposed hypergraph.
+    :param H: the H to decompose into a graph.
+    :returns: UndirectedHypergraph -- the decomposed H.
     :raises: TypeError -- Transformation only applicable to
-            undirected hypergraphs
+            undirected Hs
 
     """
     if not isinstance(H, UndirectedHypergraph):
         raise TypeError("Transformation only applicable to \
-                        undirected hypergraphs")
+                        undirected Hs")
 
     G = UndirectedHypergraph()
 
@@ -47,21 +47,21 @@ def to_graph_decomposition(H):
 
 def to_networkx_graph(H):
     """Returns a NetworkX Graph object that is the graph decomposition of
-    the given hypergraph.
+    the given H.
     See "to_graph_decomposition()" for more details.
 
-    :param H: the hypergraph to decompose into a graph.
+    :param H: the H to decompose into a graph.
     :returns: nx.Graph -- NetworkX Graph object representing the
-            decomposed hypergraph.
+            decomposed H.
     :raises: TypeError -- Transformation only applicable to
-            undirected hypergraphs
+            undirected Hs
 
     """
     import networkx as nx
 
     if not isinstance(H, UndirectedHypergraph):
         raise TypeError("Transformation only applicable to \
-                        undirected hypergraphs")
+                        undirected Hs")
 
     G = to_graph_decomposition(H)
 
@@ -83,7 +83,7 @@ def from_networkx_graph(nx_graph):
     the given NetworkX Graph object.
 
     :param nx_graph: the NetworkX undirected graph object to transform.
-    :returns: UndirectedHypergraph -- hypergraph object equivalent to the
+    :returns: UndirectedHypergraph -- H object equivalent to the
             NetworkX undirected graph.
     :raises: TypeError -- Transformation only applicable to undirected
             NetworkX graphs

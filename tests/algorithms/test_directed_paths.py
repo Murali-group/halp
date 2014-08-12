@@ -308,6 +308,13 @@ def test_get_hypertree_from_predecessors():
     assert sub_H.get_node_attribute('u', 'weight') == 8
     assert sub_H.get_node_attribute('t', 'weight') == 8
 
+    assert Pv['s'] == None
+    assert Pv['x'] == "e1"
+    assert Pv['y'] == "e2"
+    assert Pv['z'] == "e3"
+    assert (Pv['u'], Pv['t']) == ("e4", "e4")
+    assert (Pv['a'], Pv['b']) == (None, None)
+
     assert len(sub_H.get_hyperedge_id_set()) == 4
     assert sub_H.has_hyperedge(['s'], ['x'])
     assert sub_H.has_hyperedge(['s'], ['x', 'y'])
@@ -338,7 +345,7 @@ class TestGetHyperpathFromPredecessors(unittest.TestCase):
         H.add_nodes([s1, s2])
         e1 = H.add_hyperedge([s1], [s2])
         T = {s1: None, s3: e1}
-        self.assertRaises(TypeError,
+        self.assertRaises(KeyError,
                           directed_paths.get_hyperpath_from_predecessors,
                           H, T, s1, s2)
 
@@ -349,7 +356,7 @@ class TestGetHyperpathFromPredecessors(unittest.TestCase):
         H.add_nodes([s1, s2])
         e1 = H.add_hyperedge([s1], [s2])
         T = {s1: None, s2: 'e2'}
-        self.assertRaises(TypeError,
+        self.assertRaises(KeyError,
                           directed_paths.get_hyperpath_from_predecessors,
                           H, T, s1, s2)
 

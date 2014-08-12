@@ -63,27 +63,26 @@ def k_shortest_hyperpaths(H, source_node, destination_node, k, F=sum_function):
     if k <= 0:
         raise ValueError("k must be a positive integer. %s received" % k)
 
-    # container for the k-shortest hyperpaths
+    # Container for the k-shortest hyperpaths
     paths = []
-    # container for the candidate paths. Every item is a 4-tuple:
+    
+    # Container for the candidate paths. Every item is a 4-tuple:
     # 1) subgraph H'
     # 2) lower bound on shortest hyperpath weight
     # 3) predecessor function of shortest hypertree rootes at s on H'
     # 4) valid ordering of the nodes in H'
-
     candidates = []
 
-    shortest_hypertree, W, ordering = shortest_b_tree(
-        H, source_node, F=F, valid_ordering=True)
-    # check if there is source-destination hyperpath
+    shortest_hypertree, W, ordering = \
+        shortest_b_tree(H, source_node, F=F, valid_ordering=True)
+    # Check if there is source-destination hyperpath
     # if there isn't the for loop below
     # will break immediately and the function returns an empty list
     if W[destination_node] != float('inf'):
         candidates.append((H, W, shortest_hypertree, ordering))
+    
     i = 1
-    while i <= k:
-        if not candidates:
-            break
+    while i <= k and candidates:
         ind = candidates.index(
             min(candidates, key=lambda x: x[1][destination_node]))
         kShortest = candidates[ind]
@@ -98,6 +97,7 @@ def k_shortest_hyperpaths(H, source_node, destination_node, k, F=sum_function):
             pathOrdering = \
                 [node for node in kShortest[3] if node in pathPredecessor]
             paths.append(path)
+            
             # check if we are done
             if len(paths) == k:
                 break
@@ -114,12 +114,13 @@ def k_shortest_hyperpaths(H, source_node, destination_node, k, F=sum_function):
                                       None, None))
             i += 1
         else:
-            # compute shortest hypertree for kShortest[0] and exact bound
+            # Compute shortest hypertree for kShortest[0] and exact bound
             # reinsert into candidates
             H_sub = kShortest[0]
             tree_sub, W_sub, ordering_sub = \
                 shortest_b_tree(H_sub, source_node, valid_ordering=True)
             candidates[ind] = (H_sub, W_sub, tree_sub, ordering_sub)
+    
     return paths
 
 
@@ -135,7 +136,6 @@ def _branching_step(H, predecessor, ordering):
 
     """
     branches = []
-
     for i in range(len(ordering) - 1):
         branch = H.copy()
         for j in range(i + 2, len(ordering)):
@@ -145,6 +145,7 @@ def _branching_step(H, predecessor, ordering):
                     branch.remove_hyperedge(hyperedge)
         branch.remove_hyperedge(predecessor[ordering[i + 1]])
         branches.append(branch)
+    
     return branches
 
 
@@ -170,10 +171,12 @@ def _compute_lower_bound(H_i, i, predecessor, ordering,
     # Initialize the weight vector for the nodes in the branched graph
     W_bar = {node: weight for node, weight in W.items()}
     backstar = H_i.get_backward_star(ordering[i + 1])
+    
     # There is no s-t path left in this branch
     # return infinity
     if not backstar:
         return float('inf')
+    
     W_bar[ordering[i + 1]] = min([F(H_i.get_hyperedge_tail(e), W) +
                                   H_i.get_hyperedge_weight(e)
                                   for e in backstar])

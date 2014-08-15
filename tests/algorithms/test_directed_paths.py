@@ -215,6 +215,15 @@ def test_shortest_sum_b_tree():
     assert W['a'] == float('inf')
     assert W['b'] == float('inf')
 
+    # Try an invalid hypergraph
+    try:
+        directed_paths.shortest_b_tree('s', 't')
+        assert False
+    except TypeError:
+        pass
+    except BaseException as e:
+        assert False, e
+
 
 def test_shortest_distance_b_tree():
     H = DirectedHypergraph()
@@ -333,6 +342,15 @@ def test_get_hypertree_from_predecessors():
     assert len(sub_H.get_hyperedge_id_set()) == 2
     assert sub_H.has_hyperedge(['x'], ['s'])
     assert sub_H.has_hyperedge(['s'], ['t'])
+
+	# Try an invalid hypergraph
+    try:
+        directed_paths.shortest_b_tree('s', 't')
+        assert False
+    except TypeError:
+        pass
+    except BaseException as e:
+        assert False, e
 
 
 class TestGetHyperpathFromPredecessors(unittest.TestCase):

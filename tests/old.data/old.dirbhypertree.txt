@@ -1,9 +1,0 @@
-T	H	weight
-x2,x4	x1
-x4,x5	x2
-x1,x4	x3
-x5,x6	x4
-
-R	x5,x6
-
-

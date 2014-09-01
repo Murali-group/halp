@@ -113,13 +113,17 @@ def _compute_normalized_laplacian(H,
     return delta
 
 
-def stationary_distribution(H, P=None):
+def stationary_distribution(H, pi=None, P=None):
     """Computes the stationary distribution of a random walk on the given
     hypergraph using the iterative approach explained in the paper:
     (http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf)
 
     :param H: the hypergraph to find the 'Stationary Distribution'
                     algorithm on.
+    :param pi: the initial distribution over the nodes. If not provided,
+            it will be created with a random distribution.
+    :param P: the transition matrix for the hypergraph. If not provided,
+            it will be created.
     :returns: list -- list of the stationary probabilities for all nodes
             in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
@@ -139,7 +143,8 @@ def stationary_distribution(H, P=None):
                                        hyperedge_ids_to_indices)
 
     node_count = len(H.get_node_set())
-    pi = _create_random_starter(node_count)
+    if pi is None:
+        pi = _create_random_starter(node_count)
     pi_star = _create_random_starter(node_count)
     while not _has_converged(pi_star, pi):
         pi = pi_star

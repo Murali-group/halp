@@ -77,11 +77,11 @@ def get_incidence_matrix(H, nodes_to_indices, hyperedge_ids_to_indices):
             # get the mapping between the node and its ID
             rows.append(nodes_to_indices.get(node))
             cols.append(hyperedge_index)
-    
+
     values = np.ones(len(rows), dtype=int)
     node_count = len(H.get_node_set())
     hyperedge_count = len(H.get_hyperedge_id_set())
-    
+
     return sparse.csc_matrix((values, (rows, cols)),
                              shape=(node_count, hyperedge_count))
 

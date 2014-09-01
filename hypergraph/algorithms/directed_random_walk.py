@@ -16,7 +16,7 @@ from hypergraph.utilities import directed_matrices as dmat
 def stationary_distribution(H, pi=None, P=None):
     """Computes the stationary distribution of a random walk on the given
     hypergraph using the iterative approach explained in the paper:
-    Aurélien Ducournau, Alain Bretto, Random walks in directed hypergraphs and
+    Aurelien Ducournau, Alain Bretto, Random walks in directed hypergraphs and
     application to semi-supervised image segmentation,
     Computer Vision and Image Understanding, Volume 120, March 2014,
     Pages 91-102, ISSN 1077-3142, http://dx.doi.org/10.1016/j.cviu.2013.10.012.
@@ -31,10 +31,17 @@ def stationary_distribution(H, pi=None, P=None):
     :returns: list -- list of the stationary probabilities for all nodes
             in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
+             AssertionError -- Each node must have at least 1 outgoing
+                            hyperedge (even if it's only a self-loop).
 
     """
     if not isinstance(H, DirectedHypergraph):
         raise TypeError("Algorithm only applicable to undirected hypergraphs")
+
+    for node in H.node_iterator():
+        if len(H.get_forward_star(node)) == 0:
+            raise AssertionError("Each node must have at least 1 outgoing \
+                                  hyperedge (even if it's only a self-loop).")
 
     indices_to_nodes, nodes_to_indices = \
         dmat.get_node_mapping(H)
@@ -62,7 +69,7 @@ def _compute_transition_matrix(H,
                                hyperedge_ids_to_indices):
     """Computes the transition matrix for a random walk on the given
     hypergraph as described in the paper:
-    Aurélien Ducournau, Alain Bretto, Random walks in directed hypergraphs and
+    Aurelien Ducournau, Alain Bretto, Random walks in directed hypergraphs and
     application to semi-supervised image segmentation,
     Computer Vision and Image Understanding, Volume 120, March 2014,
     Pages 91-102, ISSN 1077-3142, http://dx.doi.org/10.1016/j.cviu.2013.10.012.

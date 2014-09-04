@@ -26,15 +26,14 @@ class UndirectedHypergraph(object):
     This class assigns (upon adding) and refers to each hyperedge by an
     internal ID. See "add_hyperedge" or "add_hyperedges" for more details.
 
-    Self-loops and parallel (multi) hyperedges are not allowed.
+    Self-loops and parallel (multi-) hyperedges are not allowed.
 
     :note: This class uses several data structures to store a undirected
         hypergraph. Since these structures must stay in sync (see: __init__),
         we highly recommend that only the public methods be used for accessing
         and modifying the hypergraph.
 
-    Examples
-    --------
+    Examples:
     Create an empty undirected hypergraph (no nodes or hyperedges).
 
     >>> H = UndirectedHypergraph()
@@ -141,11 +140,11 @@ class UndirectedHypergraph(object):
             with attr.
 
         :param attr_dict: dictionary of attributes of the node.
-        :param **attr: keyword arguments of attributes of the node;
+        :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: dict -- single dictionary of [combined] attributes.
-        :raises: AttributeError - attr_dict argument must be a dictionary.
+        raises: AttributeError -- attr_dict argument must be a dictionary.
 
         """
         # If no attribute dict was passed, treat the keyword
@@ -178,7 +177,7 @@ class UndirectedHypergraph(object):
 
         :param node: reference to the node being added.
         :param attr_dict: dictionary of attributes of the node.
-        :param **attr: keyword arguments of attributes of the node;
+        :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
         :note: Following the NetworkX model, we allow both a dictionary
@@ -188,13 +187,14 @@ class UndirectedHypergraph(object):
             as add_nodes, add_hyperedge, and add_hyperedges.
 
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> attributes = {label: "positive"}
-        >>> H.add_node("A", attributes)
-        >>> H.add_node("B", label="negative")
-        >>> H.add_node("C", attributes, root=True)
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> H.add_node("A", attributes)
+            >>> H.add_node("B", label="negative")
+            >>> H.add_node("C", attributes, root=True)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -219,20 +219,22 @@ class UndirectedHypergraph(object):
                     its values will override both attr_dict's and attr's
                     values.
         :param attr_dict: dictionary of attributes shared by all the nodes.
-        :param **attr: keyword arguments of attributes of the node;
+        :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
 
-        See also
-        --------
+        See also:
         add_node
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> attributes = {label: "positive"}
-        >>> node_list = ["A", ("B", {label="negative"}), ("C", {root=True})]
-        >>> H.add_nodes(node_list, attributes)
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> node_list = ["A",
+                             ("B", {label="negative"}),
+                             ("C", {root=True})]
+            >>> H.add_nodes(node_list, attributes)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -256,13 +258,14 @@ class UndirectedHypergraph(object):
         every hyperedge that contains this node.
 
         :param node: reference to the node being added.
-        :raises: ValueError - No such node exists.
+        raises: ValueError -- No such node exists.
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> H.add_node("A", label="positive")
-        >>> H.remove_node("A")
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> H.add_node("A", label="positive")
+            >>> H.remove_node("A")
 
         """
         if not self.has_node(node):
@@ -296,17 +299,19 @@ class UndirectedHypergraph(object):
                     its values will override both attr_dict's and attr's
                     values.
 
-        See also
-        --------
+        See also:
         remove_node
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> attributes = {label: "positive"}
-        >>> node_list = ["A", ("B", {label="negative"}), ("C", {root=True})]
-        >>> H.add_nodes(node_list, attributes)
-        >>> H.remove_nodes(["A", "B", "C"])
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> node_list = ["A",
+                             ("B", {label="negative"}),
+                             ("C", {root=True})]
+            >>> H.add_nodes(node_list, attributes)
+            >>> H.remove_nodes(["A", "B", "C"])
 
         """
         for node in nodes:
@@ -337,8 +342,8 @@ class UndirectedHypergraph(object):
         :param attribute_name: name of the attribute to retrieve.
         :returns: attribute value of the attribute_name key for the
                 specified node.
-        :raises: ValueError -- No such node exists.
-                            -- No such attribute exists.
+        raises: ValueError -- No such node exists.
+        raises: ValueError -- No such attribute exists.
 
         """
         if not self.has_node(node):
@@ -356,7 +361,7 @@ class UndirectedHypergraph(object):
 
         :param node: reference to the node to retrieve the attributes of.
         :returns: dict -- copy of each attribute of the specified node.
-        :raises: ValueError -- No such node exists.
+        raises: ValueError -- No such node exists.
 
         """
         if not self.has_node(node):
@@ -388,19 +393,19 @@ class UndirectedHypergraph(object):
                     hyperedge to be added.
         :param attr_dict: dictionary of attributes of the hyperedge being
                         added.
-                    the hyperedges.
-        :param **attr: keyword arguments of attributes of the hyperedge;
+        :param attr: keyword arguments of attributes of the hyperedge;
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: str -- the ID of the hyperedge that was added.
-        :raises: ValueError - nodes arguments cannot be empty.
+        raises: ValueError -- nodes arguments cannot be empty.
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> x = H.add_hyperedge(["A", "B", "C"])
-        >>> y = H.add_hyperedge(("A", "D"), weight=2)
-        >>> z = H.add_hyperedge(set(["B", "D"]), {color: "red"})
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> x = H.add_hyperedge(["A", "B", "C"])
+            >>> y = H.add_hyperedge(("A", "D"), weight=2)
+            >>> z = H.add_hyperedge(set(["B", "D"]), {color: "red"})
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -452,23 +457,23 @@ class UndirectedHypergraph(object):
         :param hyperedges: iterable container to references of the node sets
         :param attr_dict: dictionary of attributes shared by all
                     the hyperedges being added.
-        :param **attr: keyword arguments of attributes of the hyperedges;
+        :param attr: keyword arguments of attributes of the hyperedges;
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: list -- the IDs of the hyperedges added in the order
                     specified by the hyperedges container's iterator.
 
-        See also
-        --------
+        See also:
         add_hyperedge
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> hyperedge_list = (["A", "B", "C"], \
-                                    ("A", "D"), \
-                                    set(["B", "D"]))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> hyperedge_list = (["A", "B", "C"],
+                                  ("A", "D"),
+                                  set(["B", "D"]))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -485,18 +490,19 @@ class UndirectedHypergraph(object):
         """Removes a hyperedge and its attributes from the hypergraph.
 
         :param hyperedge_id: ID of the hyperedge to be removed.
-        :raises: ValueError - No such hyperedge exists.
+        raises: ValueError -- No such hyperedge exists.
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> hyperedge_list = (["A", "B", "C"], \
-                                    ("A", "D"), \
-                                    set(["B", "D"]))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedge(hyperedge_ids[0])
-        >>> BD_id = H.get_hyperedge_id(set(["B", "D"]))
-        >>> H.remove_hyperedge(BD_id)
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> hyperedge_list = (["A", "B", "C"],
+                                  ("A", "D"),
+                                  set(["B", "D"]))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> H.remove_hyperedge(hyperedge_ids[0])
+            >>> BD_id = H.get_hyperedge_id(set(["B", "D"]))
+            >>> H.remove_hyperedge(BD_id)
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -522,20 +528,20 @@ class UndirectedHypergraph(object):
 
         :param hyperedge_ids: iterable container of IDs of the hyperedges
                         to be removed.
-        :raises: ValueError - No such hyperedge exists.
+        raises: ValueError -- No such hyperedge exists.
 
-        See also
-        --------
+        See also:
         remove_hyperedge
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> hyperedge_list = (["A", "B", "C"], \
-                                    ("A", "D"), \
-                                    set(["B", "D"]))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedges(hyperedge_ids)
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> hyperedge_list = (["A", "B", "C"],
+                                  ("A", "D"),
+                                  set(["B", "D"]))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> H.remove_hyperedges(hyperedge_ids)
 
         """
         for hyperedge_id in hyperedge_ids:
@@ -591,16 +597,17 @@ class UndirectedHypergraph(object):
                     the hyperedge to be added
         :returns: str -- ID of the hyperedge that has that the specified
                 node set comprises.
-        :raises: ValueError - No such hyperedge exists.
+        raises: ValueError -- No such hyperedge exists.
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> hyperedge_list = (["A", "B", "C"], \
-                                    ("A", "D"), \
-                                    set(["B", "D"]))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> x = H.get_hyperedge_id(["A", "B", "C"])
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> hyperedge_list = (["A", "B", "C"],
+                                  ("A", "D"),
+                                  set(["B", "D"]))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> x = H.get_hyperedge_id(["A", "B", "C"])
 
         """
         frozen_nodes = frozenset(nodes)
@@ -619,17 +626,18 @@ class UndirectedHypergraph(object):
         :param attribute_name: name of the attribute to retrieve.
         :returns: attribute value of the attribute_name key for the
                 specified hyperedge.
-        :raises: ValueError -- No such hyperedge exists.
-                            -- No such attribute exists.
+        raises: ValueError -- No such hyperedge exists.
+        raises: ValueError -- No such attribute exists.
 
-        Examples
-        --------
-        >>> H = UndirectedHypergraph()
-        >>> hyperedge_list = (["A", "B", "C"], \
-                                    ("A", "D"), \
-                                    set(["B", "D"]))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
+        Examples:
+        ::
+
+            >>> H = UndirectedHypergraph()
+            >>> hyperedge_list = (["A", "B", "C"],
+                                  ("A", "D"),
+                                  set(["B", "D"]))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -647,7 +655,7 @@ class UndirectedHypergraph(object):
         :param hyperedge_id: ID of the hyperedge to retrieve the attributes of.
         :returns: dict -- copy of each attribute of the specified hyperedge_id
                 (except the private __frozen_nodes entry).
-        :raises: ValueError -- No such hyperedge exists.
+        raises: ValueError -- No such hyperedge exists.
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -687,7 +695,7 @@ class UndirectedHypergraph(object):
         :param node: node to retrieve the star of.
         :returns: set -- set of hyperedge_ids for the hyperedges
                         in the node's star.
-        :raises: ValueError -- No such node exists.
+        raises: ValueError -- No such node exists.
 
         """
         if node not in self._node_attributes:
@@ -771,7 +779,10 @@ class UndirectedHypergraph(object):
 
         As a concrete example, an arbitrary line with delim=',' and
         sep='    ' (4 spaces) may look like:
+        ::
+
             x1,x2,x3,x5    12
+
         which defines a hyperedge of weight 12 from a node set containing
         nodes "x1", "x2", "x3", and "x5".
 
@@ -818,7 +829,10 @@ class UndirectedHypergraph(object):
 
         As a concrete example, an arbitrary line with delim=',' and
         sep='    ' (4 spaces) may look like:
+        ::
+
             x1,x2,x3,x5    12
+
         which defines a hyperedge of weight 12 from a node set containing
         nodes "x1", "x2", "x3", and "x5".
 

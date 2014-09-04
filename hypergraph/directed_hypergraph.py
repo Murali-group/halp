@@ -10,7 +10,6 @@ import copy
 
 
 class DirectedHypergraph(object):
-
     """
     The DirectedHypergraph class provides a directed hypergraph object
     and associated functions for basic properties of directed hypergraphs.
@@ -33,24 +32,23 @@ class DirectedHypergraph(object):
         we highly recommend that only the public methods be used for accessing
         and modifying the hypergraph.
 
-    Examples
-    --------
-    Create an empty directed hypergraph (no nodes or hyperedges).
+    Examples:
+    Create an empty directed hypergraph (no nodes or hyperedges):
 
     >>> H = DirectedHypergraph()
 
     Add nodes (with or without attributes) to the hypergraph
-    one at a time (see: add_node) or several at a time (see: add_nodes).
+    one at a time (see: add_node) or several at a time (see: add_nodes):
 
     >>> H.add_nodes(["A", "B", "C", "D"], {color: "black"})
 
     Add hyperedges (with or without attributes) to the hypergraph one
-    at a time (see: add_hyperedge) or several at a time (see: add_hyperedges).
+    at a time (see: add_hyperedge) or several at a time (see: add_hyperedges):
 
     >>> H.add_hyperedges((["A"], ["B"]), (["A", "B"], ["C", "D"]))
 
     Update attributes of existing nodes and hyperedges by simulating adding the
-    node or hyperedge again, with the [potentially new] attribute appended.
+    node or hyperedge again, with the [potentially new] attribute appended:
 
     >>> H.add_node("A", label="sink")
     >>> H.add_hyperedge((["A", "B"], ["C", "D"]), weight=5)
@@ -173,11 +171,11 @@ class DirectedHypergraph(object):
             with attr.
 
         :param attr_dict: dictionary of attributes of the node.
-        :param **attr: keyword arguments of attributes of the node;
+        :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: dict -- single dictionary of [combined] attributes.
-        :raises: AttributeError - attr_dict argument must be a dictionary.
+        :raises: AttributeError -- attr_dict argument must be a dictionary.
 
         """
         # If no attribute dict was passed, treat the keyword
@@ -209,17 +207,18 @@ class DirectedHypergraph(object):
 
         :param node: reference to the node being added.
         :param attr_dict: dictionary of attributes of the node.
-        :param **attr: keyword arguments of attributes of the node;
+        :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> attributes = {label: "positive"}
-        >>> H.add_node("A", attributes)
-        >>> H.add_node("B", label="negative")
-        >>> H.add_node("C", attributes, root=True)
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> H.add_node("A", attributes)
+            >>> H.add_node("B", label="negative")
+            >>> H.add_node("C", attributes, root=True)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -244,20 +243,22 @@ class DirectedHypergraph(object):
                     its values will override both attr_dict's and attr's
                     values.
         :param attr_dict: dictionary of attributes shared by all the nodes.
-        :param **attr: keyword arguments of attributes of the node;
+        :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
                     if both are provided.
 
-        See also
-        --------
+        See also:
         add_node
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> attributes = {label: "positive"}
-        >>> node_list = ["A", ("B", {label="negative"}), ("C", {root=True})]
-        >>> H.add_nodes(node_list, attributes)
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> node_list = ["A",
+                             ("B", {label="negative"}),
+                             ("C", {root=True})]
+            >>> H.add_nodes(node_list, attributes)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -281,13 +282,14 @@ class DirectedHypergraph(object):
         every hyperedge that contains this node in either the head or the tail.
 
         :param node: reference to the node being added.
-        :raises: ValueError - No such node exists.
+        :raises: ValueError -- No such node exists.
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> H.add_node("A", label="positive")
-        >>> H.remove_node("A")
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> H.add_node("A", label="positive")
+            >>> H.remove_node("A")
 
         """
         if not self.has_node(node):
@@ -323,17 +325,19 @@ class DirectedHypergraph(object):
                     its values will override both attr_dict's and attr's
                     values.
 
-        See also
-        --------
+        See also:
         remove_node
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> attributes = {label: "positive"}
-        >>> node_list = ["A", ("B", {label="negative"}), ("C", {root=True})]
-        >>> H.add_nodes(node_list, attributes)
-        >>> H.remove_nodes(["A", "B", "C"])
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> node_list = ["A",
+                             ("B", {label="negative"}),
+                             ("C", {root=True})]
+            >>> H.add_nodes(node_list, attributes)
+            >>> H.remove_nodes(["A", "B", "C"])
 
         """
         for node in nodes:
@@ -362,7 +366,7 @@ class DirectedHypergraph(object):
         :returns: attribute value of the attribute_name key for the
                 specified node.
         :raises: ValueError -- No such node exists.
-                            -- No such attribute exists.
+        :raises: ValueError -- No such attribute exists.
 
         """
         if not self.has_node(node):
@@ -400,11 +404,11 @@ class DirectedHypergraph(object):
 
     def add_hyperedge(self, tail, head, attr_dict=None, **attr):
         """Adds a hyperedge to the hypergraph, along with any related
-            attributes of the hyperedge.
-            This method will automatically add any node from the tail and
-            head that was not in the hypergraph.
-            A hyperedge without a "weight" attribute specified will be
-            assigned the default value of 1.
+        attributes of the hyperedge.
+        This method will automatically add any node from the tail and
+        head that was not in the hypergraph.
+        A hyperedge without a "weight" attribute specified will be
+        assigned the default value of 1.
 
         :param tail: iterable container of references to nodes in the
                     tail of the hyperedge to be added.
@@ -412,18 +416,21 @@ class DirectedHypergraph(object):
                     head of the hyperedge to be added.
         :param attr_dict: dictionary of attributes shared by all
                     the hyperedges.
-        :param **attr: keyword arguments of attributes of the hyperedge;
+        :param attr: keyword arguments of attributes of the hyperedge;
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: str -- the ID of the hyperedge that was added.
-        :raises: ValueError - tail and head arguments cannot both be empty.
+        :raises: ValueError -- tail and head arguments cannot both be empty.
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> x = H.add_hyperedge(["A", "B"], ["C", "D"])
-        >>> y = H.add_hyperedge(("A", "C"), ("B"), weight=2)
-        >>> z = H.add_hyperedge(set(["D"]), set(["A", "C"])), {color: "red"})
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> x = H.add_hyperedge(["A", "B"], ["C", "D"])
+            >>> y = H.add_hyperedge(("A", "C"), ("B"), weight=2)
+            >>> z = H.add_hyperedge(set(["D"]),
+                                    set(["A", "C"])),
+                                    {color: "red"})
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -496,23 +503,23 @@ class DirectedHypergraph(object):
                     values.
         :param attr_dict: dictionary of attributes shared by all
                     the hyperedges.
-        :param **attr: keyword arguments of attributes of the hyperedges;
+        :param attr: keyword arguments of attributes of the hyperedges;
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: list -- the IDs of the hyperedges added in the order
                     specified by the hyperedges container's iterator.
 
-        See also
-        --------
+        See also:
         add_hyperedge
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A", "B"], ["C", "D"]), \
-                                    (("A", "C"), ("B"), {weight: 2}), \
-                                    (set(["D"]), set(["A", "C"])))
-        >>> H.add_hyperedges(hyperedge_list)
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> xyz = hyperedge_list = (["A", "B"], ["C", "D"]),
+                                        (("A", "C"), ("B"), {weight: 2}),
+                                        (set(["D"]), set(["A", "C"])))
+            >>> H.add_hyperedges(hyperedge_list)
 
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
@@ -542,16 +549,17 @@ class DirectedHypergraph(object):
         """Removes a hyperedge and its attributes from the hypergraph.
 
         :param hyperedge_id: ID of the hyperedge to be removed.
-        :raises: ValueError - No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> xyz = hyperedge_list = (["A"], ["B", "C"]), \
-                                    (("A", "B"), ("C"), {weight: 2}), \
-                                    (set(["B"]), set(["A", "C"])))
-        >>> H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedge(xyz[0])
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> xyz = hyperedge_list = (["A"], ["B", "C"]),
+                                        (("A", "B"), ("C"), {weight: 2}),
+                                        (set(["B"]), set(["A", "C"])))
+            >>> H.add_hyperedges(hyperedge_list)
+            >>> H.remove_hyperedge(xyz[0])
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -591,20 +599,20 @@ class DirectedHypergraph(object):
 
         :param hyperedge_ids: iterable container of IDs of the hyperedges
                         to be removed.
-        :raises: ValueError - No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
-        See also
-        --------
+        See also:
         remove_hyperedge
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> hyperedge_list = (["A"], ["B", "C"]), \
-                                    (("A", "B"), ("C"), {weight: 2}), \
-                                    (set(["B"]), set(["A", "C"])))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> H.remove_hyperedges(hyperedge_ids)
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> hyperedge_list = (["A"], ["B", "C"]),
+                                  (("A", "B"), ("C"), {weight: 2}),
+                                  (set(["B"]), set(["A", "C"])))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> H.remove_hyperedges(hyperedge_ids)
 
         """
         for hyperedge_id in hyperedge_ids:
@@ -663,16 +671,17 @@ class DirectedHypergraph(object):
                     head of the hyperedge to be added
         :returns: str -- ID of the hyperedge that has that the specified
                 tail and head sets comprise.
-        :raises: ValueError - No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> hyperedge_list = (["A"], ["B", "C"]), \
-                                    (("A", "B"), ("C"), {weight: 2}), \
-                                    (set(["B"]), set(["A", "C"])))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> x = H.get_hyperedge_id(["A"], ["B", "C"])
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> hyperedge_list = (["A"], ["B", "C"]),
+                                  (("A", "B"), ("C"), {weight: 2}),
+                                  (set(["B"]), set(["A", "C"])))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> x = H.get_hyperedge_id(["A"], ["B", "C"])
 
         """
         frozen_tail = frozenset(tail)
@@ -692,16 +701,17 @@ class DirectedHypergraph(object):
         :returns: attribute value of the attribute_name key for the
                 specified hyperedge.
         :raises: ValueError -- No such hyperedge exists.
-                            -- No such attribute exists.
+        :raises: ValueError -- No such attribute exists.
 
-        Examples
-        --------
-        >>> H = DirectedHypergraph()
-        >>> hyperedge_list = (["A"], ["B", "C"]), \
-                                    (("A", "B"), ("C"), {weight: 2}), \
-                                    (set(["B"]), set(["A", "C"])))
-        >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-        >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
+        Examples:
+        ::
+
+            >>> H = DirectedHypergraph()
+            >>> hyperedge_list = (["A"], ["B", "C"]),
+                                  (("A", "B"), ("C"), {weight: 2}),
+                                  (set(["B"]), set(["A", "C"])))
+            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
+            >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -1002,7 +1012,10 @@ class DirectedHypergraph(object):
 
         As a concrete example, an arbitrary line with delim=',' and
         sep='    ' (4 spaces) may look like:
+        ::
+
             x1,x2    x3,x4,x5    12
+
         which defines a hyperedge of weight 12 from a tail set containing
         nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
 
@@ -1050,7 +1063,10 @@ class DirectedHypergraph(object):
 
         As a concrete example, an arbitrary line with delim=',' and
         sep='    ' (4 spaces) may look like:
+        ::
+
             x1,x2    x3,x4,x5    12
+
         which defines a hyperedge of weight 12 from a tail set containing
         nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
 

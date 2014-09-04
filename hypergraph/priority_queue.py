@@ -13,7 +13,8 @@ class PriorityQueue(object):
     Priority queue implementation based on the suggested "mark-as-invalid"
     technique by Python's heapq documentation:
     https://docs.python.org/3.4/library/heapq.html#priority-queue-implementation-notes
-    :note: This implementation only allows unique elements. TODO: Generalize.
+
+    :note: This implementation only allows unique elements.
 
     """
 

@@ -309,11 +309,11 @@ def mean_hyperedge_head_cardinality(H):
 
 
 def hyperedge_cardinality_pairs_list(H):
-    """Returns a list of 2-tuples of (|tail|, |head|) for each hyperedge
+    """Returns a list of 2-tuples of (\|tail\|, \|head\|) for each hyperedge
     in the hypergraph.
 
     :param H: the hypergraph whose cardinality ratios will be
-                    operated on.
+            operated on.
     :returns: list -- list of 2-tuples for each hyperedge's cardinality.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 

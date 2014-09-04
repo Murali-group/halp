@@ -1,7 +1,7 @@
 """
 .. module:: directed_paths
    :synopsis: Defines several functions for executing various
-   path/connectivity queries on a directed hypergraph.
+            path/connectivity queries on a directed hypergraph.
 
 """
 try:
@@ -35,11 +35,11 @@ def visit(H, source_node):
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were visited in this traversal.
               dict -- mapping from each node to the ID of the hyperedge that
-                    preceeded it in this traversal; will map a node to None
-                    if that node wasn't visited or if that node is the source
-                    node.
+              preceeded it in this traversal; will map a node to None
+              if that node wasn't visited or if that node is the source
+              node.
               dict -- mapping from each hyperedge ID to the node that preceeded
-                    it in this traversal.
+              it in this traversal.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
 
     """
@@ -202,11 +202,11 @@ def b_visit(H, source_node):
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were B-visited in this traversal.
               dict -- mapping from each node visited to the ID of the hyperedge
-                    that preceeded it in this traversal.
+              that preceeded it in this traversal.
               dict -- mapping from each hyperedge ID to the node that preceeded
-                    it in this traversal.
+              it in this traversal.
               dict -- mapping from each node to an integer representing the
-                    cardinality of the path from the source node to that node.
+              cardinality of the path from the source node to that node.
 
     """
     return _x_visit(H, source_node, True)
@@ -218,7 +218,8 @@ def is_b_connected(H, source_node, target_node):
     A node t is B-connected to a node s iff:
         - t is s, or
         - there exists an edge in the backward star of t such that all nodes in
-        the tail of that edge are B-connected to s
+            the tail of that edge are B-connected to s
+
     In other words, this method determines if a target node can be B-visited
     from the source node in the sense of the 'B-Visit' algorithm. Refer to
     'b_visit's documentation for more details.
@@ -249,11 +250,11 @@ def f_visit(H, source_node):
     :param source_node: the initial node to begin traversal from.
     :returns: set -- nodes that were F-visited in this traversal.
               dict -- mapping from each node to the ID of the hyperedge that
-                    preceeded it in this traversal.
+              preceeded it in this traversal.
               dict -- mapping from each hyperedge ID to the node that preceeded
-                    it in this traversal.
+              it in this traversal.
               dict -- mapping from each node to an integer representing the
-                    cardinality of the path from the source node to that node.
+              cardinality of the path from the source node to that node.
 
     """
     return _x_visit(H, source_node, False)
@@ -437,10 +438,10 @@ def shortest_b_tree(H, source_node,
     :param valid_ordering: a boolean flag to signal whether or not a valid
                         ordering of the nodes should be returned.
     :returns:   dict -- mapping from each node to the ID of the hyperedge that
-                     preceeded it in this traversal.
+                preceeded it in this traversal.
                 dict -- mapping from each node to the node's weight.
                 list -- [only if valid_ordering argument is passed] a valid
-                        ordering of the nodes.
+                ordering of the nodes.
 
     """
     return _shortest_x_tree(H, source_node, True, F, valid_ordering)
@@ -461,10 +462,10 @@ def shortest_f_tree(H, source_node,
     :param valid_ordering: a boolean flag to signal whether or not a valid
                         ordering of the nodes should be returned.
     :returns:   dict -- mapping from each node to the ID of the hyperedge that
-                     preceeded it in this traversal.
+                preceeded it in this traversal.
                 dict -- mapping from each node to the node's weight.
                 list -- [only if valid_ordering argument is passed] a valid
-                        ordering of the nodes.
+                ordering of the nodes.
 
     """
     return _shortest_x_tree(H, source_node, False, F, valid_ordering)
@@ -545,10 +546,10 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
     :returns: DirectedHypergraph -- shortest B-hyperpath from source_node to
             destination_node.
     :raises: TypeError -- Algorithm only applicable to directed hypergraphs
-             KeyError -- Node key in predecessor is not in H
-             KeyError -- Hyperedge key in predecessor is not in H
-             ValueError -- Multiple nodes without predecessor
-             ValueError -- Hypertree does not have source node
+    :raises: KeyError -- Node key in predecessor is not in H
+    :raises: KeyError -- Hyperedge key in predecessor is not in H
+    :raises: ValueError -- Multiple nodes without predecessor
+    :raises: ValueError -- Hypertree does not have source node
 
     """
     if not isinstance(H, DirectedHypergraph):

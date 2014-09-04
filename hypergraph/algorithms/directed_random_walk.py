@@ -23,7 +23,7 @@ def stationary_distribution(H, pi=None, P=None):
     (http://www.sciencedirect.com/science/article/pii/S1077314213002038)
 
     :param H: the hypergraph to find the 'Stationary Distribution'
-                    algorithm on.
+            algorithm on.
     :param pi: the initial distribution over the nodes. If not provided,
             it will be created with a random distribution.
     :param P: the transition matrix for the hypergraph. If not provided,
@@ -31,8 +31,8 @@ def stationary_distribution(H, pi=None, P=None):
     :returns: list -- list of the stationary probabilities for all nodes
             in the hypergraph.
     :raises: TypeError -- Algorithm only applicable to undirected hypergraphs
-             AssertionError -- Each node must have at least 1 outgoing
-                            hyperedge (even if it's only a self-loop).
+    :raises: AssertionError -- Each node must have at least 1 outgoing
+             hyperedge (even if it's only a self-loop).
 
     """
     if not isinstance(H, DirectedHypergraph):

@@ -18,14 +18,14 @@ class PyTest(TestCommand):
 
 setup(
     name="halp",
-    packages=["halp", "Net"],
+    packages=["halp", "tests", "examples"],
     version="1.0.0",
     description = "Hypergraph Algorithms Library in Python",
     author = "Brendan Avent",
     author_email = "bavent@vt.edu",
     url = "http://tmmurali.github.io/halp/",
     download_url = "https://github.com/tmmurali/halp/tarball/master",
-    keywords = ["hypergraph", "algorithms", "applications", "signaling", "graph", "network", "Hypergraph Theory"],
+    keywords = ["hypergraph", "algorithms", "applications", "graph", "network", "directed hypergraph", "undirected hypergraph"],
     classifiers = [
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
@@ -39,7 +39,7 @@ setup(
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Scientific/Engineering :: Mathematics"
         ],
-    license = "GNU GPLv2",
+    license = "GNU GPLv3",
     long_description=open("README.md").read(),
     
     tests_require=["pytest"],

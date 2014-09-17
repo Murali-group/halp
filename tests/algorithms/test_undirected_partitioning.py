@@ -50,6 +50,7 @@ def test_laplacian():
         index = nodes_to_indices.get(key)
         assert fabs(delta_column_sum[index]-value) < 10e-4
 
+
 def test_normalized_hypergraph_cut():
     H = UndirectedHypergraph()
     H.read('./tests/data/basic_undirected_hypergraph.txt')
@@ -77,7 +78,7 @@ def test_stationary_distribution():
     pi = partitioning.stationary_distribution(H)
 
     # Correctness tests go here
-    assert sum(pi)-1.0<10e-4
+    assert sum(pi)-1.0 < 10e-4
     # Try partitioning an invalid undirected hypergraph
     try:
         pi = partitioning.stationary_distribution("H")

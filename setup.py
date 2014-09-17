@@ -17,8 +17,8 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(
-    name="halp",
-    packages=["halp", "tests", "examples"],
+    name="hypergraph",
+    packages=["hypergraph", "tests", "examples"],
     version="1.0.0",
     description = "Hypergraph Algorithms Library in Python",
     author = "Brendan Avent",

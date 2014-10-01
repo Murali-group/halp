@@ -38,7 +38,8 @@ def test_laplacian():
 
     delta = partitioning._compute_normalized_laplacian(H, nodes_to_indices,
                                                        hyperedge_id_to_indices)
-    delta_column_sum = map(sum, zip(*delta.todense()))
+    
+    delta_column_sum = np.sum(delta.todense(), axis=0)
     delta_column_sum = np.squeeze(np.asarray(delta_column_sum))
 
     Matlab_output = {'v1': 0.0973, 'v2': -0.3008, 'v3': 0.0973,
@@ -46,7 +47,7 @@ def test_laplacian():
                      'v9': -0.2176, 'v10': 0.1170, 'v11': 0.1170,
                      'v12': -0.0616, 'v13': 0.1486}
 
-    for (key, value) in Matlab_output.iteritems():
+    for key, value in Matlab_output.items():
         index = nodes_to_indices.get(key)
         assert fabs(delta_column_sum[index]-value) < 10e-4
 

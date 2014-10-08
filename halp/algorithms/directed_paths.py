@@ -9,8 +9,8 @@ try:
 except ImportError:
     from Queue import Queue
 
-from halp.priority_queue import PriorityQueue
 from halp.directed_hypergraph import DirectedHypergraph
+from halp.utilities.priority_queue import PriorityQueue
 
 # TODO-A: consider including target_node (with default value as None) in visit
 # and b-visit to allow for early stoppage in an is_connected check and in an

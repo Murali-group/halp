@@ -1,4 +1,4 @@
-from halp.priority_queue import PriorityQueue
+from halp.utilities.priority_queue import PriorityQueue
 
 
 def test_priority_queue():

@@ -21,8 +21,8 @@ install:
   - pip install git+http://github.com/scipy/scipy/
 
 script:
-  - pep8 hypergraph
-  - coverage run --source=hypergraph setup.py test
+  - pep8 halp
+  - coverage run --source=halp setup.py test
 
 after_success:
     coveralls

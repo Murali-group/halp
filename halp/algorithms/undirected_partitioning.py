@@ -23,7 +23,7 @@ def normalized_hypergraph_cut(H, threshold=0):
     This algorithm uses the normalized Laplacian to partition the hypergraph
     into two disjoint components.
 
-    :param H: the hypergraph to perform the 'min-cut' algorithm on.
+    :param H: the hypergraph to perform the hypergraph-cut algorithm on.
     :param threshold: The threshold value for the partitioning algorithm.
                     Typically, the value zero is selected for this purpose.
     :returns: set -- the S set of nodes in the S-T partition
@@ -118,8 +118,7 @@ def stationary_distribution(H, pi=None, P=None):
     hypergraph using the iterative approach explained in the paper:
     (http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf)
 
-    :param H: the hypergraph to find the 'Stationary Distribution'
-                    algorithm on.
+    :param H: the hypergraph to find the stationary distribution on.
     :param pi: the initial distribution over the nodes. If not provided,
             it will be created with a random distribution.
     :param P: the transition matrix for the hypergraph. If not provided,

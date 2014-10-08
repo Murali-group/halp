@@ -427,9 +427,9 @@ class DirectedHypergraph(object):
 
             >>> H = DirectedHypergraph()
             >>> x = H.add_hyperedge(["A", "B"], ["C", "D"])
-            >>> y = H.add_hyperedge(("A", "C"), ("B"), weight=2)
+            >>> y = H.add_hyperedge(("A", "C"), ("B"), 'weight'=2)
             >>> z = H.add_hyperedge(set(["D"]),
-                                    set(["A", "C"])),
+                                    set(["A", "C"]),
                                     {color: "red"})
 
         """
@@ -516,8 +516,8 @@ class DirectedHypergraph(object):
         ::
 
             >>> H = DirectedHypergraph()
-            >>> xyz = hyperedge_list = (["A", "B"], ["C", "D"]),
-                                        (("A", "C"), ("B"), {weight: 2}),
+            >>> xyz = hyperedge_list = ((["A", "B"], ["C", "D"]),
+                                        (("A", "C"), ("B"), {'weight': 2}),
                                         (set(["D"]), set(["A", "C"])))
             >>> H.add_hyperedges(hyperedge_list)
 
@@ -555,8 +555,8 @@ class DirectedHypergraph(object):
         ::
 
             >>> H = DirectedHypergraph()
-            >>> xyz = hyperedge_list = (["A"], ["B", "C"]),
-                                        (("A", "B"), ("C"), {weight: 2}),
+            >>> xyz = hyperedge_list = ((["A"], ["B", "C"]),
+                                        (("A", "B"), ("C"), {'weight': 2}),
                                         (set(["B"]), set(["A", "C"])))
             >>> H.add_hyperedges(hyperedge_list)
             >>> H.remove_hyperedge(xyz[0])
@@ -608,8 +608,8 @@ class DirectedHypergraph(object):
         ::
 
             >>> H = DirectedHypergraph()
-            >>> hyperedge_list = (["A"], ["B", "C"]),
-                                  (("A", "B"), ("C"), {weight: 2}),
+            >>> hyperedge_list = ((["A"], ["B", "C"]),
+                                  (("A", "B"), ("C"), {'weight': 2}),
                                   (set(["B"]), set(["A", "C"])))
             >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
             >>> H.remove_hyperedges(hyperedge_ids)

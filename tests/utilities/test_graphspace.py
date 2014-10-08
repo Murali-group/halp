@@ -1,7 +1,7 @@
 import sys
 
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.utilities import graphspace
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.utilities import graphspace
 
 
 def test_graphspace():

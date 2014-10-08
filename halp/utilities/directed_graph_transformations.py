@@ -7,7 +7,7 @@
 """
 import copy
 
-from hypergraph.directed_hypergraph import DirectedHypergraph
+from halp.directed_hypergraph import DirectedHypergraph
 
 
 def to_graph_decomposition(H):

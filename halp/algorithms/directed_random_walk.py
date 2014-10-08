@@ -9,8 +9,8 @@ from scipy import sparse
 from scipy.sparse import linalg
 import random
 
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.utilities import directed_matrices as dmat
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.utilities import directed_matrices as dmat
 
 
 def stationary_distribution(H, pi=None, P=None):

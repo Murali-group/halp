@@ -6,7 +6,7 @@
 """
 import numpy as np
 
-from hypergraph.directed_hypergraph import DirectedHypergraph
+from halp.directed_hypergraph import DirectedHypergraph
 
 
 def number_of_nodes(H):

@@ -1,8 +1,8 @@
 import unittest
 
-from hypergraph.algorithms import k_shortest_hyperpaths as ksh
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.algorithms.directed_paths import sum_function
+from halp.algorithms import k_shortest_hyperpaths as ksh
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.algorithms.directed_paths import sum_function
 
 
 class TestBranchingStep(unittest.TestCase):

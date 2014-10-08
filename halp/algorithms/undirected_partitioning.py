@@ -9,8 +9,8 @@ from scipy import sparse
 from scipy.sparse import linalg
 import random
 
-from hypergraph.undirected_hypergraph import UndirectedHypergraph
-from hypergraph.utilities import undirected_matrices as umat
+from halp.undirected_hypergraph import UndirectedHypergraph
+from halp.utilities import undirected_matrices as umat
 
 
 def normalized_hypergraph_cut(H, threshold=0):

@@ -1,5 +1,5 @@
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.algorithms import directed_paths
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.algorithms import directed_paths
 import unittest
 
 

@@ -1,6 +1,6 @@
 from os import remove
 
-from hypergraph.undirected_hypergraph import UndirectedHypergraph
+from halp.undirected_hypergraph import UndirectedHypergraph
 
 
 def test_add_node():

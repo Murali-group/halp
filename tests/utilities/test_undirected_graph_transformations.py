@@ -1,6 +1,6 @@
-from hypergraph.undirected_hypergraph import UndirectedHypergraph
+from halp.undirected_hypergraph import UndirectedHypergraph
 
-from hypergraph.utilities import undirected_graph_transformations
+from halp.utilities import undirected_graph_transformations
 
 
 def test_to_graph_decomposition():

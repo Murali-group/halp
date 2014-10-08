@@ -17,15 +17,15 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(
-    name="hypergraph",
-    packages=["hypergraph", "tests", "examples"],
+    name="halp",
+    packages=["halp", "tests", "examples"],
     version="1.0.0",
-    description = "Hypergraph Algorithms Library in Python",
+    description = "Hypergraph Algorithms Package",
     author = "Brendan Avent",
     author_email = "bavent@vt.edu",
     url = "http://tmmurali.github.io/halp/",
     download_url = "https://github.com/tmmurali/halp/tarball/master",
-    keywords = ["hypergraph", "algorithms", "applications", "graph", "network", "directed hypergraph", "undirected hypergraph"],
+    keywords = ["halp", "hypergraph", "algorithms", "applications", "graph", "network", "directed hypergraph", "undirected hypergraph"],
     classifiers = [
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

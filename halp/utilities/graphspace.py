@@ -10,7 +10,7 @@ from Net.GraphSpace.Node import Node
 from Net.GraphSpace.Edge import Edge
 from Net.GraphSpace.Graph import Graph
 
-from hypergraph.directed_hypergraph import DirectedHypergraph
+from halp.directed_hypergraph import DirectedHypergraph
 
 
 def post_to_graphspace(hypergraph, graphid, username, password, group=None):

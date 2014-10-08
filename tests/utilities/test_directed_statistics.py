@@ -1,5 +1,5 @@
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.utilities import directed_statistics
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.utilities import directed_statistics
 
 
 def test_number_of_nodes():

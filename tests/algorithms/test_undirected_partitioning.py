@@ -1,6 +1,6 @@
-from hypergraph.undirected_hypergraph import UndirectedHypergraph
-from hypergraph.algorithms import undirected_partitioning as partitioning
-from hypergraph.utilities import undirected_matrices as umat
+from halp.undirected_hypergraph import UndirectedHypergraph
+from halp.algorithms import undirected_partitioning as partitioning
+from halp.utilities import undirected_matrices as umat
 from math import fabs
 import numpy as np
 

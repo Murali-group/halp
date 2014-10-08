@@ -1,7 +1,7 @@
 """
 .. module:: priority_queue
-   :synopsis: Wrapper for python's heapq to provide standard operations
-            expected from any reasonable priority queue data structure.
+   :synopsis: Wrapper for python's heapq to provide some standard
+            operations expected a priority queue.
 
 """
 import heapq

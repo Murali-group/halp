@@ -1,5 +1,5 @@
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.algorithms import directed_random_walk as rw
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.algorithms import directed_random_walk as rw
 
 
 def test_stationary_distribution():

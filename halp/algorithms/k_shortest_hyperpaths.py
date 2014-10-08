@@ -7,10 +7,9 @@ __version__ = '0.1.0'
 __author__ = 'Jose Cadena'
 __email__ = 'jcadena@vbi.vt.edu'
 
-from hypergraph.directed_hypergraph import DirectedHypergraph
-from hypergraph.algorithms.directed_paths import sum_function, shortest_b_tree
-from hypergraph.algorithms.directed_paths import \
-    get_hyperpath_from_predecessors
+from halp.directed_hypergraph import DirectedHypergraph
+from halp.algorithms.directed_paths import sum_function, shortest_b_tree
+from halp.algorithms.directed_paths import get_hyperpath_from_predecessors
 
 
 def k_shortest_hyperpaths(H, source_node, destination_node, k, F=sum_function):

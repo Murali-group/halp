@@ -18,7 +18,7 @@ class PyTest(TestCommand):
 
 setup(
     name="halp",
-    packages=["halp", "tests", "examples"],
+    packages=["halp", "tests"],
     version="1.0.0",
     description = "Hypergraph Algorithms Package",
     author = "Brendan Avent",

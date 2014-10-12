@@ -144,7 +144,7 @@ class UndirectedHypergraph(object):
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: dict -- single dictionary of [combined] attributes.
-        raises: AttributeError -- attr_dict argument must be a dictionary.
+        :raises: AttributeError -- attr_dict argument must be a dictionary.
 
         """
         # If no attribute dict was passed, treat the keyword
@@ -258,7 +258,7 @@ class UndirectedHypergraph(object):
         every hyperedge that contains this node.
 
         :param node: reference to the node being added.
-        raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such node exists.
 
         Examples:
         ::
@@ -342,8 +342,8 @@ class UndirectedHypergraph(object):
         :param attribute_name: name of the attribute to retrieve.
         :returns: attribute value of the attribute_name key for the
                 specified node.
-        raises: ValueError -- No such node exists.
-        raises: ValueError -- No such attribute exists.
+        :raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such attribute exists.
 
         """
         if not self.has_node(node):
@@ -361,7 +361,7 @@ class UndirectedHypergraph(object):
 
         :param node: reference to the node to retrieve the attributes of.
         :returns: dict -- copy of each attribute of the specified node.
-        raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such node exists.
 
         """
         if not self.has_node(node):
@@ -397,7 +397,7 @@ class UndirectedHypergraph(object):
                     attr's values will override attr_dict's values
                     if both are provided.
         :returns: str -- the ID of the hyperedge that was added.
-        raises: ValueError -- nodes arguments cannot be empty.
+        :raises: ValueError -- nodes arguments cannot be empty.
 
         Examples:
         ::
@@ -490,7 +490,7 @@ class UndirectedHypergraph(object):
         """Removes a hyperedge and its attributes from the hypergraph.
 
         :param hyperedge_id: ID of the hyperedge to be removed.
-        raises: ValueError -- No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
         Examples:
         ::
@@ -528,7 +528,7 @@ class UndirectedHypergraph(object):
 
         :param hyperedge_ids: iterable container of IDs of the hyperedges
                         to be removed.
-        raises: ValueError -- No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
         See also:
         remove_hyperedge
@@ -597,7 +597,7 @@ class UndirectedHypergraph(object):
                     the hyperedge to be added
         :returns: str -- ID of the hyperedge that has that the specified
                 node set comprises.
-        raises: ValueError -- No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
         Examples:
         ::
@@ -626,8 +626,8 @@ class UndirectedHypergraph(object):
         :param attribute_name: name of the attribute to retrieve.
         :returns: attribute value of the attribute_name key for the
                 specified hyperedge.
-        raises: ValueError -- No such hyperedge exists.
-        raises: ValueError -- No such attribute exists.
+        :raises: ValueError -- No such hyperedge exists.
+        :raises: ValueError -- No such attribute exists.
 
         Examples:
         ::
@@ -655,7 +655,7 @@ class UndirectedHypergraph(object):
         :param hyperedge_id: ID of the hyperedge to retrieve the attributes of.
         :returns: dict -- copy of each attribute of the specified hyperedge_id
                 (except the private __frozen_nodes entry).
-        raises: ValueError -- No such hyperedge exists.
+        :raises: ValueError -- No such hyperedge exists.
 
         """
         if not self.has_hyperedge_id(hyperedge_id):
@@ -695,7 +695,7 @@ class UndirectedHypergraph(object):
         :param node: node to retrieve the star of.
         :returns: set -- set of hyperedge_ids for the hyperedges
                         in the node's star.
-        raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such node exists.
 
         """
         if node not in self._node_attributes:

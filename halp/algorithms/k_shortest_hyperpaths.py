@@ -34,12 +34,12 @@ def k_shortest_hyperpaths(H, source_node, destination_node, k, F=sum_function):
               function.
     :returns: a list containing at most k hyperpaths (DirectedHypergraph) from
               source to destination in ascending order of path length.
-    :raises TypeError -- Input hypergraph must be a B-hypergraph
-    :raises TypeError -- Algorithm only applicable to directed hypergraphs
-    :raises ValueError -- source_node must be a node in H
-    :raises ValueError -- destination_node must be a node in H
-    :raises TypeError -- k must be an integer
-    :raises ValueError -- k must be a positive integer
+    :raises: TypeError -- Input hypergraph must be a B-hypergraph
+    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
+    :raises: ValueError -- source_node must be a node in H
+    :raises: ValueError -- destination_node must be a node in H
+    :raises: TypeError -- k must be an integer
+    :raises: ValueError -- k must be a positive integer
 
     """
     try:

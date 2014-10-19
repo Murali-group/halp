@@ -16,9 +16,10 @@ install:
   # causes errors in the TravisCI framework otherwise
   # downside: TravisCI now takes ~20-25 minutes to finish its run
   - sudo apt-get install libatlas-base-dev gfortran
-  - pip install git+http://github.com/cython/cython/
+  - pip install git+http://github.com/cython/cython.git@0.20.x
   - pip install git+http://github.com/numpy/numpy/
   - pip install git+http://github.com/scipy/scipy/
+  - pip install git+http://github.com/scipy/scipy.git@maintenance/0.14.x
 
 script:
   - pep8 halp

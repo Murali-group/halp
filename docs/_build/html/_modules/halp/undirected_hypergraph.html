@@ -1,0 +1,919 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.undirected_hypergraph &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.undirected_hypergraph</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.undirected_hypergraph</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: undirected_hypergraph</span>
+<span class="sd">   :synopsis: Defines UndirectedHypergraph class for the basic properties</span>
+<span class="sd">            of an undirected hypergraph, along with the relevant structures</span>
+<span class="sd">            regarding nodes, hyperedges, adjacency, etc.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+
+
+<div class="viewcode-block" id="UndirectedHypergraph"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph">[docs]</a><span class="k">class</span> <span class="nc">UndirectedHypergraph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The UndirectedHypergraph class provides an undirected hypergraph object</span>
+<span class="sd">    and associated functions for basic properties of undirected hypergraphs.</span>
+
+<span class="sd">    An undirected hypergraph contains nodes and undirected hyperedges. Each</span>
+<span class="sd">    undirected hyperedge simply connects a set of nodes. An undirected</span>
+<span class="sd">    hypergraph is a special case of an undirected graph, where each edge</span>
+<span class="sd">    connects exactly 2 nodes. The set of nodes cannot be empty.</span>
+
+<span class="sd">    A node is simply any hashable type. See &quot;add_node&quot; or &quot;add_nodes&quot; for</span>
+<span class="sd">    more details.</span>
+
+<span class="sd">    An undirected hyperedge is any iterable container of nodes.</span>
+<span class="sd">    This class assigns (upon adding) and refers to each hyperedge by an</span>
+<span class="sd">    internal ID. See &quot;add_hyperedge&quot; or &quot;add_hyperedges&quot; for more details.</span>
+
+<span class="sd">    Self-loops and parallel (multi-) hyperedges are not allowed.</span>
+
+<span class="sd">    :note: This class uses several data structures to store a undirected</span>
+<span class="sd">        hypergraph. Since these structures must stay in sync (see: __init__),</span>
+<span class="sd">        we highly recommend that only the public methods be used for accessing</span>
+<span class="sd">        and modifying the hypergraph.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">    Create an empty undirected hypergraph (no nodes or hyperedges).</span>
+
+<span class="sd">    &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+
+<span class="sd">    Add nodes (with or without attributes) to the hypergraph</span>
+<span class="sd">    one at a time (see: add_node) or several at a time (see: add_nodes).</span>
+
+<span class="sd">    &gt;&gt;&gt; H.add_nodes([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;], {color: &quot;black&quot;})</span>
+
+<span class="sd">    Add hyperedges to the hypergraph one at a time (see: add_hyperedge)</span>
+<span class="sd">    or several at a time (see: add_hyperedges).</span>
+
+<span class="sd">    &gt;&gt;&gt; H.add_hyperedges([&quot;A&quot;, &quot;B&quot;], (&quot;A&quot;, &quot;C&quot;, &quot;D&quot;))</span>
+
+<span class="sd">    Update attributes of existing nodes and hyperedges by simulating adding the</span>
+<span class="sd">    node or hyperedge again, with the [potentially new] attribute appended.</span>
+
+<span class="sd">    &gt;&gt;&gt; H.add_node(&quot;A&quot;, label=&quot;sink&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; H.add_hyperedge([&quot;A&quot;, &quot;C&quot;, &quot;D&quot;], weight=5)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the UndirectedHypergraph class.</span>
+<span class="sd">        Initializes all internal data structures used for the rapid</span>
+<span class="sd">        execution of most of the fundamental hypergraph queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># _node_attributes: a dictionary mapping a node (any hashable type)</span>
+        <span class="c"># to a dictionary of attributes of that node.</span>
+        <span class="c">#</span>
+        <span class="c"># Provides O(1) time access to the attributes of a node.</span>
+        <span class="c">#</span>
+        <span class="c"># Used in the implementation of methods such as add_node and</span>
+        <span class="c"># get_node_attributes.</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># _hyperedge_attributes: a dictionary mapping a hyperedge ID</span>
+        <span class="c"># (initially created by the call to add_hyperedge or add_hyperedges)</span>
+        <span class="c"># to a dictionary of attributes of that hyperedge.</span>
+        <span class="c"># Given a hyperedge ID, _hyperedge_attributes[hyperedge_id] stores</span>
+        <span class="c"># the nodes of the hyperedge as specified by the user (as &quot;nodes&quot;)</span>
+        <span class="c"># and the weight of the hyperedge (as &quot;weight&quot;).</span>
+        <span class="c"># For internal purposes, it also stores the frozenset version of</span>
+        <span class="c"># the nodes (as &quot;_frozen_nodes&quot;).</span>
+        <span class="c">#</span>
+        <span class="c"># Provides O(1) time access to the attributes of a hyperedge.</span>
+        <span class="c">#</span>
+        <span class="c"># Used in the implementation of methods such as add_hyperedge and</span>
+        <span class="c"># get_hyperedge_attributes.</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># The star of a node is the set of hyperedges such that the</span>
+        <span class="c"># node is a member of.</span>
+        <span class="c">#</span>
+        <span class="c"># _star: a dictionary mapping a node to the set of hyperedges</span>
+        <span class="c"># that are in that node&#39;s star.</span>
+        <span class="c">#</span>
+        <span class="c"># Provides O(1) time access to a reference to the set of hyperedges</span>
+        <span class="c"># that a node is a member of.</span>
+        <span class="c">#</span>
+        <span class="c"># Used in the implementation of methods such as add_node and</span>
+        <span class="c"># remove_hyperedge.</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_star</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># _node_set_to_hyperedge: a dictionary mapping a set of nodes to the ID</span>
+        <span class="c"># of the hyperedge they compose. We represent the node set by a</span>
+        <span class="c"># frozenset, so that the structure is hashable.</span>
+        <span class="c">#</span>
+        <span class="c"># Provides O(1) time access to the ID of the hyperedge that</span>
+        <span class="c"># a specific frozenset of nodes composes.</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># _current_hyperedge_id: an int representing the hyperedge ID that</span>
+        <span class="c"># was most recently assigned by the class (since users don&#39;t</span>
+        <span class="c"># name/ID their own hyperedges); hyperedges being added are issued</span>
+        <span class="c"># ID &quot;e&quot;+_current_hyperedge_id.</span>
+        <span class="c">#</span>
+        <span class="c"># Since the class takes responsibility for giving hyperedges</span>
+        <span class="c"># their IDs (i.e. a unique identifier; could be alternatively viewed</span>
+        <span class="c"># as a unique name, label, etc.), the class keeps track of the issued</span>
+        <span class="c"># IDs. A consecutive issuing of integer IDs to the hyperedges is a</span>
+        <span class="c"># simple strategy to ensure their uniqueness while allowing for</span>
+        <span class="c"># readability.</span>
+        <span class="c">#</span>
+        <span class="c"># e.g., _current_hyperedge_id = 4  implies that 4 hyperedges have</span>
+        <span class="c"># been added to the hypergraph, and that &quot;e4&quot; was the most recently</span>
+        <span class="c"># assigned hyperedge.</span>
+        <span class="c">#</span>
+        <span class="c"># Note: An hyperedge, once added, will receive a unique ID. If this</span>
+        <span class="c"># hyperedge is removed and subsequently re-added, it will not receive</span>
+        <span class="c"># the same ID as it was issued when it was originally added.</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_hyperedge_id</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_combine_attribute_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_dict</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="c"># Note: Code &amp; comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Combines attr_dict and attr dictionaries, by updating attr_dict</span>
+<span class="sd">            with attr.</span>
+
+<span class="sd">        :param attr_dict: dictionary of attributes of the node.</span>
+<span class="sd">        :param attr: keyword arguments of attributes of the node;</span>
+<span class="sd">                    attr&#39;s values will override attr_dict&#39;s values</span>
+<span class="sd">                    if both are provided.</span>
+<span class="sd">        :returns: dict -- single dictionary of [combined] attributes.</span>
+<span class="sd">        :raises: AttributeError -- attr_dict argument must be a dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># If no attribute dict was passed, treat the keyword</span>
+        <span class="c"># arguments as the dict</span>
+        <span class="k">if</span> <span class="n">attr_dict</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">attr_dict</span> <span class="o">=</span> <span class="n">attr</span>
+        <span class="c"># Otherwise, combine the passed attribute dict with</span>
+        <span class="c"># the keyword arguments</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">attr_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;attr_dict argument </span><span class="se">\</span>
+<span class="s">                                     must be a dictionary.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">attr_dict</span>
+
+<div class="viewcode-block" id="UndirectedHypergraph.has_node"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.has_node">[docs]</a>    <span class="k">def</span> <span class="nf">has_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c"># Note: Code &amp; comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Determines if a specific node is present in the hypergraph.</span>
+
+<span class="sd">        :param node: reference to the node whose presence is being checked.</span>
+<span class="sd">        :returns: bool -- true iff the node exists in the hypergraph.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.add_node"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a node to the graph, along with any related attributes</span>
+<span class="sd">           of the node.</span>
+
+<span class="sd">        :param node: reference to the node being added.</span>
+<span class="sd">        :param attr_dict: dictionary of attributes of the node.</span>
+<span class="sd">        :param attr: keyword arguments of attributes of the node;</span>
+<span class="sd">                    attr&#39;s values will override attr_dict&#39;s values</span>
+<span class="sd">                    if both are provided.</span>
+<span class="sd">        :note: Following the NetworkX model, we allow both a dictionary</span>
+<span class="sd">            of attributes to be passed in by the user as well as key-value</span>
+<span class="sd">            pairs of attributes to be passed in by the user to provide</span>
+<span class="sd">            greater flexibility. This pattern is followed in methods such</span>
+<span class="sd">            as add_nodes, add_hyperedge, and add_hyperedges.</span>
+
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; attributes = {label: &quot;positive&quot;}</span>
+<span class="sd">            &gt;&gt;&gt; H.add_node(&quot;A&quot;, attributes)</span>
+<span class="sd">            &gt;&gt;&gt; H.add_node(&quot;B&quot;, label=&quot;negative&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; H.add_node(&quot;C&quot;, attributes, root=True)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attr_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine_attribute_arguments</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+        <span class="c"># If the node hasn&#39;t previously been added, add it along</span>
+        <span class="c"># with its attributes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_dict</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="c"># Otherwise, just update the node&#39;s attributes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.add_nodes"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.add_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">add_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
+        <span class="c"># Note: Code &amp; comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Adds multiple nodes to the graph, along with any related attributes</span>
+<span class="sd">            of the nodes.</span>
+
+<span class="sd">        :param nodes: iterable container to either references of the nodes</span>
+<span class="sd">                    OR tuples of (node reference, attribute dictionary);</span>
+<span class="sd">                    if an attribute dictionary is provided in the tuple,</span>
+<span class="sd">                    its values will override both attr_dict&#39;s and attr&#39;s</span>
+<span class="sd">                    values.</span>
+<span class="sd">        :param attr_dict: dictionary of attributes shared by all the nodes.</span>
+<span class="sd">        :param attr: keyword arguments of attributes of the node;</span>
+<span class="sd">                    attr&#39;s values will override attr_dict&#39;s values</span>
+<span class="sd">                    if both are provided.</span>
+
+<span class="sd">        See also:</span>
+<span class="sd">        add_node</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; attributes = {label: &quot;positive&quot;}</span>
+<span class="sd">            &gt;&gt;&gt; node_list = [&quot;A&quot;,</span>
+<span class="sd">                             (&quot;B&quot;, {label=&quot;negative&quot;}),</span>
+<span class="sd">                             (&quot;C&quot;, {root=True})]</span>
+<span class="sd">            &gt;&gt;&gt; H.add_nodes(node_list, attributes)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attr_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine_attribute_arguments</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="c"># Note: This won&#39;t behave properly if the node is actually a tuple</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="c"># See (&quot;B&quot;, {label=&quot;negative&quot;}) in the documentation example</span>
+                <span class="n">new_node</span><span class="p">,</span> <span class="n">node_attr_dict</span> <span class="o">=</span> <span class="n">node</span>
+                <span class="c"># Create a new dictionary and load it with node_attr_dict and</span>
+                <span class="c"># attr_dict, with the former (node_attr_dict) taking precedence</span>
+                <span class="n">new_dict</span> <span class="o">=</span> <span class="n">attr_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">new_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">node_attr_dict</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">new_node</span><span class="p">,</span> <span class="n">new_dict</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># See &quot;A&quot; in the documentation example</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.remove_node"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.remove_node">[docs]</a>    <span class="k">def</span> <span class="nf">remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes a node and its attributes from the hypergraph. Removes</span>
+<span class="sd">        every hyperedge that contains this node.</span>
+
+<span class="sd">        :param node: reference to the node being added.</span>
+<span class="sd">        :raises: ValueError -- No such node exists.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; H.add_node(&quot;A&quot;, label=&quot;positive&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; H.remove_node(&quot;A&quot;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such node exists.&quot;</span><span class="p">)</span>
+
+        <span class="c"># Loop over every hyperedge in the star of the node;</span>
+        <span class="c"># i.e., over every hyperedge that contains the node</span>
+        <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+            <span class="n">frozen_nodes</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">][</span><span class="s">&quot;__frozen_nodes&quot;</span><span class="p">]</span>
+            <span class="c"># Remove the node set composing the hyperedge</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="p">[</span><span class="n">frozen_nodes</span><span class="p">]</span>
+            <span class="c"># Remove this hyperedge&#39;s attributes</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span>
+
+        <span class="c"># Remove node&#39;s star</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+
+        <span class="c"># Remove node&#39;s attributes dictionary</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.remove_nodes"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.remove_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">remove_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+        <span class="c"># Note: Code unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Removes multiple nodes and their attributes from the graph. If</span>
+<span class="sd">        the nodes are part of any hyperedges, those hyperedges are removed</span>
+<span class="sd">        as well.</span>
+
+<span class="sd">        :param nodes: iterable container to either references of the nodes</span>
+<span class="sd">                    OR tuples of (node reference, attribute dictionary);</span>
+<span class="sd">                    if an attribute dictionary is provided in the tuple,</span>
+<span class="sd">                    its values will override both attr_dict&#39;s and attr&#39;s</span>
+<span class="sd">                    values.</span>
+
+<span class="sd">        See also:</span>
+<span class="sd">        remove_node</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; attributes = {label: &quot;positive&quot;}</span>
+<span class="sd">            &gt;&gt;&gt; node_list = [&quot;A&quot;,</span>
+<span class="sd">                             (&quot;B&quot;, {label=&quot;negative&quot;}),</span>
+<span class="sd">                             (&quot;C&quot;, {root=True})]</span>
+<span class="sd">            &gt;&gt;&gt; H.add_nodes(node_list, attributes)</span>
+<span class="sd">            &gt;&gt;&gt; H.remove_nodes([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_node_set"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_node_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Returns the set of nodes that are currently in the hypergraph.</span>
+
+<span class="sd">        :returns: set -- all nodes currently in the hypergraph</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.node_iterator"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.node_iterator">[docs]</a>    <span class="k">def</span> <span class="nf">node_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Provides an iterator over the nodes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_node_attribute"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_node_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Given a node and the name of an attribute, get a copy</span>
+<span class="sd">        of that node&#39;s attribute.</span>
+
+<span class="sd">        :param node: reference to the node to retrieve the attribute of.</span>
+<span class="sd">        :param attribute_name: name of the attribute to retrieve.</span>
+<span class="sd">        :returns: attribute value of the attribute_name key for the</span>
+<span class="sd">                specified node.</span>
+<span class="sd">        :raises: ValueError -- No such node exists.</span>
+<span class="sd">        :raises: ValueError -- No such attribute exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such node exists.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">attribute_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such attribute exists.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span>\
+                <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">attribute_name</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_node_attributes"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_node_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Given a node, get a dictionary with copies of that node&#39;s</span>
+<span class="sd">        attributes.</span>
+
+<span class="sd">        :param node: reference to the node to retrieve the attributes of.</span>
+<span class="sd">        :returns: dict -- copy of each attribute of the specified node.</span>
+<span class="sd">        :raises: ValueError -- No such node exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such node exists.&quot;</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">attr_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">attributes</span>
+</div>
+    <span class="k">def</span> <span class="nf">_assign_next_hyperedge_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Returns the next [consecutive] ID to be assigned</span>
+<span class="sd">            to a hyperedge.</span>
+<span class="sd">        :returns: str -- hyperedge ID to be assigned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_hyperedge_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="s">&quot;e&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_hyperedge_id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UndirectedHypergraph.add_hyperedge"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.add_hyperedge">[docs]</a>    <span class="k">def</span> <span class="nf">add_hyperedge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a hyperedge to the hypergraph, along with any related</span>
+<span class="sd">            attributes of the hyperedge.</span>
+<span class="sd">            This method will automatically add any node from the node set</span>
+<span class="sd">            that was not in the hypergraph.</span>
+<span class="sd">            A hyperedge without a &quot;weight&quot; attribute specified will be</span>
+<span class="sd">            assigned the default value of 1.</span>
+
+<span class="sd">        :param nodes: iterable container of references to nodes in the</span>
+<span class="sd">                    hyperedge to be added.</span>
+<span class="sd">        :param attr_dict: dictionary of attributes of the hyperedge being</span>
+<span class="sd">                        added.</span>
+<span class="sd">        :param attr: keyword arguments of attributes of the hyperedge;</span>
+<span class="sd">                    attr&#39;s values will override attr_dict&#39;s values</span>
+<span class="sd">                    if both are provided.</span>
+<span class="sd">        :returns: str -- the ID of the hyperedge that was added.</span>
+<span class="sd">        :raises: ValueError -- nodes arguments cannot be empty.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; x = H.add_hyperedge([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; y = H.add_hyperedge((&quot;A&quot;, &quot;D&quot;), weight=2)</span>
+<span class="sd">            &gt;&gt;&gt; z = H.add_hyperedge(set([&quot;B&quot;, &quot;D&quot;]), {color: &quot;red&quot;})</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attr_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine_attribute_arguments</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+        <span class="c"># Don&#39;t allow empty node set (invalid hyperedge)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;nodes argument cannot be empty.&quot;</span><span class="p">)</span>
+
+        <span class="c"># Use frozensets for node sets to allow for hashable keys</span>
+        <span class="n">frozen_nodes</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+
+        <span class="n">is_new_hyperedge</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_hyperedge</span><span class="p">(</span><span class="n">frozen_nodes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_new_hyperedge</span><span class="p">:</span>
+            <span class="c"># Add nodes to graph (if not already present)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">(</span><span class="n">frozen_nodes</span><span class="p">)</span>
+
+            <span class="c"># Create new hyperedge name to use as reference for that hyperedge</span>
+            <span class="n">hyperedge_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_next_hyperedge_id</span><span class="p">()</span>
+
+            <span class="c"># For each node in the node set, add hyperedge to the node&#39;s star</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">frozen_nodes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span>
+
+            <span class="c"># Add the hyperedge ID as the hyperedge that the node set composes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="p">[</span><span class="n">frozen_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="n">hyperedge_id</span>
+
+            <span class="c"># Assign some special attributes to this hyperedge. We assign</span>
+            <span class="c"># a default weight of 1 to the hyperedge. We also store the</span>
+            <span class="c"># original node set in order to return them exactly as the</span>
+            <span class="c"># user passed them into add_hyperedge.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="p">{</span><span class="s">&quot;nodes&quot;</span><span class="p">:</span> <span class="n">nodes</span><span class="p">,</span> <span class="s">&quot;__frozen_nodes&quot;</span><span class="p">:</span> <span class="n">frozen_nodes</span><span class="p">,</span> <span class="s">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># If its not a new hyperedge, just get its ID to update attributes</span>
+            <span class="n">hyperedge_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="p">[</span><span class="n">frozen_nodes</span><span class="p">]</span>
+
+        <span class="c"># Set attributes and return hyperedge ID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hyperedge_id</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.add_hyperedges"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.add_hyperedges">[docs]</a>    <span class="k">def</span> <span class="nf">add_hyperedges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedges</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds multiple hyperedges to the graph, along with any related</span>
+<span class="sd">            attributes of the hyperedges.</span>
+<span class="sd">            If any node of a hyperedge has not previously been added to the</span>
+<span class="sd">            hypergraph, it will automatically be added here.</span>
+<span class="sd">            Hyperedges without a &quot;weight&quot; attribute specified will be</span>
+<span class="sd">            assigned the default value of 1.</span>
+
+<span class="sd">        :param hyperedges: iterable container to references of the node sets</span>
+<span class="sd">        :param attr_dict: dictionary of attributes shared by all</span>
+<span class="sd">                    the hyperedges being added.</span>
+<span class="sd">        :param attr: keyword arguments of attributes of the hyperedges;</span>
+<span class="sd">                    attr&#39;s values will override attr_dict&#39;s values</span>
+<span class="sd">                    if both are provided.</span>
+<span class="sd">        :returns: list -- the IDs of the hyperedges added in the order</span>
+<span class="sd">                    specified by the hyperedges container&#39;s iterator.</span>
+
+<span class="sd">        See also:</span>
+<span class="sd">        add_hyperedge</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_list = ([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],</span>
+<span class="sd">                                  (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="sd">                                  set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_ids = H.add_hyperedges(hyperedge_list)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attr_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine_attribute_arguments</span><span class="p">(</span><span class="n">attr_dict</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+        <span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">nodes</span> <span class="ow">in</span> <span class="n">hyperedges</span><span class="p">:</span>
+            <span class="n">hyperedge_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">attr_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="n">hyperedge_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">hyperedge_ids</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.remove_hyperedge"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.remove_hyperedge">[docs]</a>    <span class="k">def</span> <span class="nf">remove_hyperedge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes a hyperedge and its attributes from the hypergraph.</span>
+
+<span class="sd">        :param hyperedge_id: ID of the hyperedge to be removed.</span>
+<span class="sd">        :raises: ValueError -- No such hyperedge exists.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_list = ([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],</span>
+<span class="sd">                                  (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="sd">                                  set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_ids = H.add_hyperedges(hyperedge_list)</span>
+<span class="sd">            &gt;&gt;&gt; H.remove_hyperedge(hyperedge_ids[0])</span>
+<span class="sd">            &gt;&gt;&gt; BD_id = H.get_hyperedge_id(set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="sd">            &gt;&gt;&gt; H.remove_hyperedge(BD_id)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_hyperedge_id</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such hyperedge exists.&quot;</span><span class="p">)</span>
+
+        <span class="n">frozen_nodes</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">][</span><span class="s">&quot;__frozen_nodes&quot;</span><span class="p">]</span>
+
+        <span class="c"># Remove this hyperedge from the star of every node in the hyperedge</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">frozen_nodes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span>
+
+        <span class="c"># Remove this set as the composer of the hyperedge</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="p">[</span><span class="n">frozen_nodes</span><span class="p">]</span>
+
+        <span class="c"># Remove hyperedge&#39;s attributes dictionary</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.remove_hyperedges"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.remove_hyperedges">[docs]</a>    <span class="k">def</span> <span class="nf">remove_hyperedges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_ids</span><span class="p">):</span>
+        <span class="c"># Note: Code unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Removes a set of hyperedges and their attributes from</span>
+<span class="sd">        the hypergraph.</span>
+
+<span class="sd">        :param hyperedge_ids: iterable container of IDs of the hyperedges</span>
+<span class="sd">                        to be removed.</span>
+<span class="sd">        :raises: ValueError -- No such hyperedge exists.</span>
+
+<span class="sd">        See also:</span>
+<span class="sd">        remove_hyperedge</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_list = ([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],</span>
+<span class="sd">                                  (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="sd">                                  set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_ids = H.add_hyperedges(hyperedge_list)</span>
+<span class="sd">            &gt;&gt;&gt; H.remove_hyperedges(hyperedge_ids)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">hyperedge_ids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_hyperedge</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.has_hyperedge"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.has_hyperedge">[docs]</a>    <span class="k">def</span> <span class="nf">has_hyperedge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Given a set of nodes, returns whether there is a hyperedge in the</span>
+<span class="sd">        hypergraph that is precisely composed of those nodes.</span>
+
+<span class="sd">        :param nodes: iterable container of references to nodes in the</span>
+<span class="sd">                    hyperedge being checked.</span>
+<span class="sd">        :returns: bool -- true iff a hyperedge exists composed of the</span>
+<span class="sd">                specified nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frozen_nodes</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">frozen_nodes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.has_hyperedge_id"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.has_hyperedge_id">[docs]</a>    <span class="k">def</span> <span class="nf">has_hyperedge_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_id</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Determines if a hyperedge referenced by hyperedge_id</span>
+<span class="sd">        exists in the hypergraph.</span>
+
+<span class="sd">        :param hyperedge_id: ID of the hyperedge whose existence is</span>
+<span class="sd">                            being checked.</span>
+<span class="sd">        :returns: bool -- true iff a hyperedge exists that has id hyperedge_id.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_hyperedge_id_set"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_id_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperedge_id_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Returns the set of IDs of hyperedges that are currently</span>
+<span class="sd">        in the hypergraph.</span>
+
+<span class="sd">        :returns: set -- all IDs of hyperedges currently in the hypergraph</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.hyperedge_id_iterator"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.hyperedge_id_iterator">[docs]</a>    <span class="k">def</span> <span class="nf">hyperedge_id_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Provides an iterator over the list of hyperedge IDs.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_hyperedge_id"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperedge_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;From a set of nodes, returns the ID of the hyperedge that this</span>
+<span class="sd">        set comprises.</span>
+
+<span class="sd">        :param nodes: iterable container of references to nodes in the</span>
+<span class="sd">                    the hyperedge to be added</span>
+<span class="sd">        :returns: str -- ID of the hyperedge that has that the specified</span>
+<span class="sd">                node set comprises.</span>
+<span class="sd">        :raises: ValueError -- No such hyperedge exists.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_list = ([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],</span>
+<span class="sd">                                  (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="sd">                                  set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_ids = H.add_hyperedges(hyperedge_list)</span>
+<span class="sd">            &gt;&gt;&gt; x = H.get_hyperedge_id([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frozen_nodes</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_hyperedge</span><span class="p">(</span><span class="n">frozen_nodes</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such hyperedge exists.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="p">[</span><span class="n">frozen_nodes</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_hyperedge_attribute"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperedge_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_id</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">):</span>
+        <span class="c"># Note: Code unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Given a hyperedge ID and the name of an attribute, get a copy</span>
+<span class="sd">        of that hyperedge&#39;s attribute.</span>
+
+<span class="sd">        :param hyperedge_id: ID of the hyperedge to retrieve the attribute of.</span>
+<span class="sd">        :param attribute_name: name of the attribute to retrieve.</span>
+<span class="sd">        :returns: attribute value of the attribute_name key for the</span>
+<span class="sd">                specified hyperedge.</span>
+<span class="sd">        :raises: ValueError -- No such hyperedge exists.</span>
+<span class="sd">        :raises: ValueError -- No such attribute exists.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; H = UndirectedHypergraph()</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_list = ([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],</span>
+<span class="sd">                                  (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="sd">                                  set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="sd">            &gt;&gt;&gt; hyperedge_ids = H.add_hyperedges(hyperedge_list)</span>
+<span class="sd">            &gt;&gt;&gt; attribute = H.get_hyperedge_attribute(hyperedge_ids[0])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_hyperedge_id</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such hyperedge exists.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">attribute_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such attribute exists.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span>\
+                <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">][</span><span class="n">attribute_name</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_hyperedge_attributes"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperedge_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a hyperedge ID, get a dictionary of copies of that hyperedge&#39;s</span>
+<span class="sd">        attributes.</span>
+
+<span class="sd">        :param hyperedge_id: ID of the hyperedge to retrieve the attributes of.</span>
+<span class="sd">        :returns: dict -- copy of each attribute of the specified hyperedge_id</span>
+<span class="sd">                (except the private __frozen_nodes entry).</span>
+<span class="sd">        :raises: ValueError -- No such hyperedge exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_hyperedge_id</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such hyperedge exists.&quot;</span><span class="p">)</span>
+        <span class="n">dict_to_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">dict_to_copy</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr_name</span> <span class="o">!=</span> <span class="s">&quot;__frozen_nodes&quot;</span><span class="p">:</span>
+                <span class="n">attributes</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">attr_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">attributes</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_hyperedge_nodes"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperedge_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a hyperedge ID, get a copy of that hyperedge&#39;s nodes.</span>
+
+<span class="sd">        :param hyperedge_id: ID of the hyperedge to retrieve the nodes from.</span>
+<span class="sd">        :returns: a copy of the container of nodes that the user provided</span>
+<span class="sd">                for the hyperedge referenced as hyperedge_id.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperedge_attribute</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">,</span> <span class="s">&quot;nodes&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_hyperedge_weight"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_weight">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperedge_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperedge_id</span><span class="p">):</span>
+        <span class="c"># Note: Code and comments unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Given a hyperedge ID, get that hyperedge&#39;s weight.</span>
+
+<span class="sd">        :param hyperedge: ID of the hyperedge to retrieve the weight from.</span>
+<span class="sd">        :returns: int -- the weight of the hyperedge referenced as</span>
+<span class="sd">                hyperedge_id.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperedge_attribute</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">,</span> <span class="s">&quot;weight&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.get_star"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.get_star">[docs]</a>    <span class="k">def</span> <span class="nf">get_star</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a node, get a copy of that node&#39;s star, that is, the set of</span>
+<span class="sd">        hyperedges that the node belongs to.</span>
+
+<span class="sd">        :param node: node to retrieve the star of.</span>
+<span class="sd">        :returns: set -- set of hyperedge_ids for the hyperedges</span>
+<span class="sd">                        in the node&#39;s star.</span>
+<span class="sd">        :raises: ValueError -- No such node exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such node exists.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="UndirectedHypergraph.copy"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Note: Code unchanged from DirectedHypergraph</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new UndirectedHypergraph object with the same node and</span>
+<span class="sd">        hyperedge structure.</span>
+<span class="sd">        Copies of the nodes&#39; and hyperedges&#39; attributes are stored</span>
+<span class="sd">        and used in the new hypergraph.</span>
+
+<span class="sd">        :returns: UndirectedHypergraph -- a new hypergraph that is a copy of</span>
+<span class="sd">                the current hypergraph</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy__</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new UndirectedHypergraph object with the same node and</span>
+<span class="sd">        hyperedge structure.</span>
+<span class="sd">        Copies of the nodes&#39; and hyperedges&#39; attributes are stored</span>
+<span class="sd">        and used in the new hypergraph.</span>
+
+<span class="sd">        :returns: UndirectedHypergraph -- a new hypergraph that is a copy of</span>
+<span class="sd">                the current hypergraph</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+
+        <span class="c"># Loop over every node and its corresponding attribute dict</span>
+        <span class="c"># in the original hypergraph&#39;s _node_attributes dict</span>
+        <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">attr_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c"># Create a new dict for that node to store that node&#39;s attributes</span>
+            <span class="n">new_H</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c"># Loop over each attribute of that node in the original hypergraph</span>
+            <span class="c"># and, for each key, copy the corresponding value into the new</span>
+            <span class="c"># hypergraph&#39;s dictionary using the same key</span>
+            <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">attr_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new_H</span><span class="o">.</span><span class="n">_node_attributes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">attr_value</span><span class="p">)</span>
+
+        <span class="c"># Loop over every hyperedge_id and its corresponding attribute dict</span>
+        <span class="c"># in the original hypergraph&#39;s _hyperedge_attributes dict</span>
+        <span class="k">for</span> <span class="n">hyperedge_id</span><span class="p">,</span> <span class="n">attr_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c"># Create a new dict for that node to store that node&#39;s attributes</span>
+            <span class="n">new_H</span><span class="o">.</span><span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c"># Loop over each attribute of that hyperedge in the original</span>
+            <span class="c"># hypergraph and, for each key, copy the corresponding value</span>
+            <span class="c"># the new hypergraph&#39;s dictionary</span>
+            <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">attr_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new_H</span><span class="o">.</span>\
+                    <span class="n">_hyperedge_attributes</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">][</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">attr_value</span><span class="p">)</span>
+
+        <span class="c"># Copy the original hypergraph&#39;s nodes&#39; stars</span>
+        <span class="n">new_H</span><span class="o">.</span><span class="n">_star</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">new_H</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_star</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c"># Copy the original hypergraph&#39;s composed hyperedges</span>
+        <span class="k">for</span> <span class="n">frozen_nodes</span><span class="p">,</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">new_H</span><span class="o">.</span><span class="n">_node_set_to_hyperedge</span><span class="p">[</span><span class="n">frozen_nodes</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span>
+
+        <span class="c"># Start assigning edge labels at the same</span>
+        <span class="n">new_H</span><span class="o">.</span><span class="n">_current_hyperedge_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_hyperedge_id</span>
+
+        <span class="k">return</span> <span class="n">new_H</span>
+
+    <span class="c"># TODO: make reading more extensible (attributes, variable ordering, etc.)</span>
+<div class="viewcode-block" id="UndirectedHypergraph.read"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads an undirected hypergraph from a file, where nodes are</span>
+<span class="sd">        represented as strings.</span>
+<span class="sd">        Each column is separated by &quot;sep&quot;, and the individual nodes are</span>
+<span class="sd">        delimited by &quot;delim&quot;.</span>
+<span class="sd">        The header line is currently ignored, but columns should be of</span>
+<span class="sd">        the format:</span>
+<span class="sd">        node1[delim]..nodeM[sep]weight</span>
+
+<span class="sd">        As a concrete example, an arbitrary line with delim=&#39;,&#39; and</span>
+<span class="sd">        sep=&#39;    &#39; (4 spaces) may look like:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            x1,x2,x3,x5    12</span>
+
+<span class="sd">        which defines a hyperedge of weight 12 from a node set containing</span>
+<span class="sd">        nodes &quot;x1&quot;, &quot;x2&quot;, &quot;x3&quot;, and &quot;x5&quot;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">in_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+
+        <span class="c"># Skip the header line</span>
+        <span class="n">in_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+        <span class="n">line_number</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">in_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="c"># Skip empty lines</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="k">raise</span> \
+                    <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Line {} &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line_number</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="s">&quot;contains {} &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))</span> <span class="o">+</span>
+                            <span class="s">&quot;columns -- must contain only 1 or 2.&quot;</span><span class="p">)</span>
+
+            <span class="n">nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delim</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delim</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+
+            <span class="n">line_number</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">in_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c"># TODO: make writing more extensible (attributes, variable ordering, etc.)</span></div>
+<div class="viewcode-block" id="UndirectedHypergraph.write"><a class="viewcode-back" href="../../halp.html#halp.undirected_hypergraph.UndirectedHypergraph.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Writes an undirected hypergraph from a file, where nodes are</span>
+<span class="sd">        represented as strings.</span>
+<span class="sd">        Each column is separated by &quot;sep&quot;, and the individual nodes are</span>
+<span class="sd">        delimited by &quot;delim&quot;.</span>
+<span class="sd">        The header line is currently ignored, but columns should be of</span>
+<span class="sd">        the format:</span>
+<span class="sd">        node1[delim]..nodeM[sep]node1[delim]..nodeN[sep]weight</span>
+
+<span class="sd">        As a concrete example, an arbitrary line with delim=&#39;,&#39; and</span>
+<span class="sd">        sep=&#39;    &#39; (4 spaces) may look like:</span>
+<span class="sd">        ::</span>
+
+<span class="sd">            x1,x2,x3,x5    12</span>
+
+<span class="sd">        which defines a hyperedge of weight 12 from a node set containing</span>
+<span class="sd">        nodes &quot;x1&quot;, &quot;x2&quot;, &quot;x3&quot;, and &quot;x5&quot;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+
+        <span class="c"># write first header line</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;nodes&quot;</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s">&quot;weight</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">():</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="c"># Write each node to the line, separated by delim</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperedge_nodes</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="n">node</span> <span class="o">+</span> <span class="n">delim</span>
+            <span class="c"># Remove last (extra) delim</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c"># Write the weight to the line and end the line</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="n">sep</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_hyperedge_weight</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">))</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+
+            <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="n">out_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.utilities package &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="index.html" />
+    <link rel="up" title="halp package" href="halp.html" />
+    <link rel="prev" title="halp.algorithms package" href="halp.algorithms.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.utilities package</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="halp.algorithms.html">halp.algorithms package</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="halp-utilities-package">
+<h1>halp.utilities package<a class="headerlink" href="#halp-utilities-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-halp.utilities.directed_graph_transformations">
+<span id="halp-utilities-directed-graph-transformations-module"></span><h2>halp.utilities.directed_graph_transformations module<a class="headerlink" href="#module-halp.utilities.directed_graph_transformations" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-directed_graph_transformations"></span><dl class="function">
+<dt id="halp.utilities.directed_graph_transformations.from_networkx_digraph">
+<tt class="descclassname">halp.utilities.directed_graph_transformations.</tt><tt class="descname">from_networkx_digraph</tt><big>(</big><em>nx_digraph</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_graph_transformations.html#from_networkx_digraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_graph_transformations.from_networkx_digraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a DirectedHypergraph object that is the graph equivalent of the
+given NetworkX DiGraph object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nx_digraph</strong> &#8211; the NetworkX directed graph object to transform.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DirectedHypergraph &#8211; hypergraph object equivalent to the
+NetworkX directed graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Transformation only applicable to directed
+NetworkX graphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_graph_transformations.to_graph_decomposition">
+<tt class="descclassname">halp.utilities.directed_graph_transformations.</tt><tt class="descname">to_graph_decomposition</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_graph_transformations.html#to_graph_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_graph_transformations.to_graph_decomposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a DirectedHypergraph object that has the same nodes (and
+corresponding attributes) as the given hypergraph, except that for all
+hyperedges in the given hypergraph, each node in the tail of the hyperedge
+is pairwise connected to each node in the head of the hyperedge in the
+new hypergraph.
+Said another way, each of the original hyperedges are decomposed in the
+new hypergraph into fully-connected bipartite components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph to decompose into a graph.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DirectedHypergraph &#8211; the decomposed hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Transformation only applicable to
+directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_graph_transformations.to_networkx_digraph">
+<tt class="descclassname">halp.utilities.directed_graph_transformations.</tt><tt class="descname">to_networkx_digraph</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_graph_transformations.html#to_networkx_digraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_graph_transformations.to_networkx_digraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a NetworkX DiGraph object that is the graph decomposition of
+the given hypergraph.
+See &#8220;to_graph_decomposition()&#8221; for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph to decompose into a graph.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">nx.DiGraph &#8211; NetworkX DiGraph object representing the
+decomposed hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Transformation only applicable to
+directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.utilities.directed_matrices">
+<span id="halp-utilities-directed-matrices-module"></span><h2>halp.utilities.directed_matrices module<a class="headerlink" href="#module-halp.utilities.directed_matrices" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-directed_matrices"></span><dl class="function">
+<dt id="halp.utilities.directed_matrices.fast_inverse">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">fast_inverse</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#fast_inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.fast_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the inverse of a diagonal matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the diagonal matrix to find the inverse of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sparse.csc_matrix &#8211; the inverse of the input matrix as a
+sparse matrix.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_head_incidence_matrix">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_head_incidence_matrix</tt><big>(</big><em>H</em>, <em>nodes_to_indices</em>, <em>hyperedge_ids_to_indices</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_head_incidence_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_head_incidence_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the incidence matrix of the head nodes of the given
+hypergraph as a sparse matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph for which to create the incidence matrix of.</li>
+<li><strong>nodes_to_indices</strong> &#8211; for each node, maps the node to its
+corresponding integer index.</li>
+<li><strong>hyperedge_ids_to_indices</strong> &#8211; for each hyperedge ID, maps the hyperedge
+ID to its corresponding integer index.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">sparse.csc_matrix &#8211; the incidence matrix as a sparse matrix.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to directed hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_hyperedge_degree_matrix">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_hyperedge_degree_matrix</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_hyperedge_degree_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_hyperedge_degree_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the diagonal matrix of hyperedge degrees D_e as a sparse matrix,
+where a hyperedge degree is the cardinality of the hyperedge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>M</strong> &#8211; the incidence matrix of the hypergraph to find the D_e matrix on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sparse.csc_matrix &#8211; the diagonal hyperedge degree matrix as a
+sparse matrix.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_hyperedge_id_mapping">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_hyperedge_id_mapping</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_hyperedge_id_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_hyperedge_id_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates mappings between the set of hyperedge IDs and integer indices
+(where every hyperedge ID corresponds to exactly 1 integer index).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph to find the hyperedge ID mapping on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>dict &#8211; for each integer index, maps the index to the hyperedge</dt>
+<dd>ID.</dd>
+<dt>dict &#8211; for each hyperedge ID, maps the hyperedge ID to the</dt>
+<dd>integer index.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_hyperedge_weight_matrix">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_hyperedge_weight_matrix</tt><big>(</big><em>H</em>, <em>hyperedge_ids_to_indices</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_hyperedge_weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_hyperedge_weight_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the diagonal matrix W of hyperedge weights as a sparse matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to find the weights.</li>
+<li><strong>hyperedge_weights</strong> &#8211; the mapping from the indices of hyperedge IDs to
+the corresponding hyperedge weights.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sparse.csc_matrix &#8211; the diagonal edge weight matrix as a
+sparse matrix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_node_mapping">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_node_mapping</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_node_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_node_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates mappings between the set of nodes and integer indices (where
+every node corresponds to exactly 1 integer index).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph to find the node mapping on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; for each integer index, maps the index to the node.
+dict &#8211; for each node, maps the node to the integer index.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_tail_incidence_matrix">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_tail_incidence_matrix</tt><big>(</big><em>H</em>, <em>nodes_to_indices</em>, <em>hyperedge_ids_to_indices</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_tail_incidence_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_tail_incidence_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the incidence matrix of the tail nodes of the given
+hypergraph as a sparse matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph for which to create the incidence matrix of.</li>
+<li><strong>nodes_to_indices</strong> &#8211; for each node, maps the node to its
+corresponding integer index.</li>
+<li><strong>hyperedge_ids_to_indices</strong> &#8211; for each hyperedge ID, maps the hyperedge
+ID to its corresponding integer index.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">sparse.csc_matrix &#8211; the incidence matrix as a sparse matrix.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to directed hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_matrices.get_vertex_degree_matrix">
+<tt class="descclassname">halp.utilities.directed_matrices.</tt><tt class="descname">get_vertex_degree_matrix</tt><big>(</big><em>M</em>, <em>W</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_matrices.html#get_vertex_degree_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_matrices.get_vertex_degree_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the diagonal maxtrix D_v of vertex degrees as a sparse matrix,
+where a vertex degree is the sum of the weights of all hyperedges
+in the vertex&#8217;s star.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>M</strong> &#8211; the incidence matrix of the hypergraph to find the D_v matrix on.</li>
+<li><strong>W</strong> &#8211; the diagonal hyperedge weight matrix of the hypergraph.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sparse.csc_matrix &#8211; the diagonal vertex degree matrix as a
+sparse matrix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.utilities.directed_statistics">
+<span id="halp-utilities-directed-statistics-module"></span><h2>halp.utilities.directed_statistics module<a class="headerlink" href="#module-halp.utilities.directed_statistics" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-directed_statistics"></span><dl class="function">
+<dt id="halp.utilities.directed_statistics.hyperedge_cardinality_pairs_list">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">hyperedge_cardinality_pairs_list</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#hyperedge_cardinality_pairs_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.hyperedge_cardinality_pairs_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of 2-tuples of (|tail|, |head|) for each hyperedge
+in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose cardinality ratios will be
+operated on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; list of 2-tuples for each hyperedge&#8217;s cardinality.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.hyperedge_cardinality_ratio_list">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">hyperedge_cardinality_ratio_list</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#hyperedge_cardinality_ratio_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.hyperedge_cardinality_ratio_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the hypergraph&#8217;s hyperedges&#8217; cardinality ratios.
+Use this to manually perform statistics on the hypergraph&#8217;s
+hyperedges&#8217; cardinality ratios or to avoid the performance cost of calling
+several built-in statistics functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose cardinality ratios are to
+be returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; cardinality ratios for each hyperedge in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.hyperedge_head_cardinality_list">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">hyperedge_head_cardinality_list</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#hyperedge_head_cardinality_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.hyperedge_head_cardinality_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the hypergraph&#8217;s hyperedges&#8217; head cardinalities.
+Use this to manually perform statistics on the hypergraph&#8217;s
+hyperedges&#8217; head cardinalities or to avoid the performance cost of calling
+several built-in statistics functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose head cardinalities are to
+be returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; head cardinalities for each hyperedge in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.hyperedge_tail_cardinality_list">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">hyperedge_tail_cardinality_list</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#hyperedge_tail_cardinality_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.hyperedge_tail_cardinality_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the hypergraph&#8217;s hyperedges&#8217; tail cardinalities.
+Use this to manually perform statistics on the hypergraph&#8217;s
+hyperedges&#8217; tail cardinalities or to avoid the performance cost of calling
+several built-in statistics functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose tail cardinalities are to
+be returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; tail cardinalities for each hyperedge in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.indegree_list">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">indegree_list</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#indegree_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.indegree_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the hypergraph&#8217;s nodes&#8217; indegrees.
+Use this to manually perform statistics on the hypergraph&#8217;s nodes&#8217;
+indegrees or to avoid the performance cost of calling several
+built-in statistics functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose indegrees are to be returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; indegrees for each node in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.max_hyperedge_cardinality_ratio">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">max_hyperedge_cardinality_ratio</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#max_hyperedge_cardinality_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.max_hyperedge_cardinality_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s largest hyperedge cardinality ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose max hyperedge cardinality ratio
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the max hyperedge cardinality ratio in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.max_hyperedge_head_cardinality">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">max_hyperedge_head_cardinality</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#max_hyperedge_head_cardinality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.max_hyperedge_head_cardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s largest hyperedge head cardinality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose max hyperedge head cardinality
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the max hyperedge head cardinality in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.max_hyperedge_tail_cardinality">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">max_hyperedge_tail_cardinality</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#max_hyperedge_tail_cardinality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.max_hyperedge_tail_cardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s largest hyperedge tail cardinality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose max hyperedge tail cardinality
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the max hyperedge tail cardinality in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.max_indegree">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">max_indegree</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#max_indegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.max_indegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s largest indegree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose max indegree is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the max indegree in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.max_outdegree">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">max_outdegree</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#max_outdegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.max_outdegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s largest outdegree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose max outdegree is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the max outdegree in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.mean_hyperedge_cardinality_ratio">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">mean_hyperedge_cardinality_ratio</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#mean_hyperedge_cardinality_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.mean_hyperedge_cardinality_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s mean hyperedge cardinality ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose mean hyperedge cardinality ratio
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the mean hyperedge cardinality ratio in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.mean_hyperedge_head_cardinality">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">mean_hyperedge_head_cardinality</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#mean_hyperedge_head_cardinality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.mean_hyperedge_head_cardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s mean hyperedge head cardinality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose np.mean hyperedge head cardinality
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; the np.mean hyperedge head cardinality in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.mean_hyperedge_tail_cardinality">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">mean_hyperedge_tail_cardinality</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#mean_hyperedge_tail_cardinality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.mean_hyperedge_tail_cardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s mean hyperedge tail cardinality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose np.mean hyperedge tail cardinality
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; the np.mean hyperedge tail cardinality in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.mean_indegree">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">mean_indegree</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#mean_indegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.mean_indegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s mean indegree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose mean indegree is to be
+determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; the mean indegree in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.mean_outdegree">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">mean_outdegree</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#mean_outdegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.mean_outdegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s mean outdegree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose mean outdegree is to be
+determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">float &#8211; the mean outdegree in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.min_hyperedge_cardinality_ratio">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">min_hyperedge_cardinality_ratio</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#min_hyperedge_cardinality_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.min_hyperedge_cardinality_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s smallest hyperedge cardinality ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose min hyperedge cardinality ratio
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the min hyperedge cardinality ratio in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.min_hyperedge_head_cardinality">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">min_hyperedge_head_cardinality</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#min_hyperedge_head_cardinality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.min_hyperedge_head_cardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s smallest hyperedge head cardinality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose min hyperedge head cardinality
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the min hyperedge head cardinality in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.min_hyperedge_tail_cardinality">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">min_hyperedge_tail_cardinality</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#min_hyperedge_tail_cardinality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.min_hyperedge_tail_cardinality" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s smallest hyperedge tail cardinality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose min hyperedge tail cardinality
+is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the min hyperedge tail cardinality in the graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.min_indegree">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">min_indegree</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#min_indegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.min_indegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s smallest indegree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose min indegree is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the min indegree in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.min_outdegree">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">min_outdegree</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#min_outdegree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.min_outdegree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the hypergraph&#8217;s smallest outdegree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose min outdegree is to be determined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the min outdegree in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.number_of_hyperedges">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">number_of_hyperedges</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#number_of_hyperedges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.number_of_hyperedges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of hyperedges in the given hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose hyperedges are to be counted.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; number of hyperedges in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.number_of_nodes">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">number_of_nodes</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#number_of_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.number_of_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of nodes in the given hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose nodes are to be counted.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; number of nodes in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.directed_statistics.outdegree_list">
+<tt class="descclassname">halp.utilities.directed_statistics.</tt><tt class="descname">outdegree_list</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/directed_statistics.html#outdegree_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.directed_statistics.outdegree_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the hypergraph&#8217;s nodes&#8217; outdegrees.
+Use this to manually perform statistics on the hypergraph&#8217;s nodes&#8217;
+outdegrees or to avoid the performance cost of calling several
+built-in statistics functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph whose outdegrees are to be returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list &#8211; outdegrees for each node in the hypergraph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to directed hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.utilities.priority_queue">
+<span id="halp-utilities-priority-queue-module"></span><h2>halp.utilities.priority_queue module<a class="headerlink" href="#module-halp.utilities.priority_queue" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-priority_queue"></span><dl class="class">
+<dt id="halp.utilities.priority_queue.PriorityQueue">
+<em class="property">class </em><tt class="descclassname">halp.utilities.priority_queue.</tt><tt class="descname">PriorityQueue</tt><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Priority queue implementation based on the suggested &#8220;mark-as-invalid&#8221;
+technique by Python&#8217;s heapq documentation:
+<a class="reference external" href="https://docs.python.org/3.4/library/heapq.html#priority-queue-implementation-notes">https://docs.python.org/3.4/library/heapq.html#priority-queue-implementation-notes</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">This implementation only allows unique elements.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.add_element">
+<tt class="descname">add_element</tt><big>(</big><em>priority</em>, <em>element</em>, <em>count=None</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.add_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.add_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an element with a specific priority.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>priority</strong> &#8211; priority of the element.</li>
+<li><strong>element</strong> &#8211; element to add.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.contains_element">
+<tt class="descname">contains_element</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.contains_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.contains_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if an element is contained in the priority queue.&#8221;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; true iff element is in the priority queue.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.delete_element">
+<tt class="descname">delete_element</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.delete_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.delete_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes an element (lazily).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such element in the priority queue.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.get_top_priority">
+<tt class="descname">get_top_priority</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.get_top_priority"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.get_top_priority" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops the element that has the top (smallest) priority.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">element with the top (smallest) priority.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">IndexError &#8211; Priority queue is empty.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if the priority queue has any elements.
+Performs removal of any elements that were &#8220;marked-as-invalid&#8221;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">true iff the priority queue has no elements.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.peek">
+<tt class="descname">peek</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.peek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.peek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the element with top (lowest) priority without popping it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">element with top (lowest) priority.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">IndexError &#8211; Priority queue is empty.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.utilities.priority_queue.PriorityQueue.reprioritize">
+<tt class="descname">reprioritize</tt><big>(</big><em>priority</em>, <em>element</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/priority_queue.html#PriorityQueue.reprioritize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.priority_queue.PriorityQueue.reprioritize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the priority of an element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such element in the priority queue.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.utilities.undirected_graph_transformations">
+<span id="halp-utilities-undirected-graph-transformations-module"></span><h2>halp.utilities.undirected_graph_transformations module<a class="headerlink" href="#module-halp.utilities.undirected_graph_transformations" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-undirected_graph_transformations"></span><dl class="function">
+<dt id="halp.utilities.undirected_graph_transformations.from_networkx_graph">
+<tt class="descclassname">halp.utilities.undirected_graph_transformations.</tt><tt class="descname">from_networkx_graph</tt><big>(</big><em>nx_graph</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_graph_transformations.html#from_networkx_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_graph_transformations.from_networkx_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an UndirectedHypergraph object that is the graph equivalent of
+the given NetworkX Graph object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nx_graph</strong> &#8211; the NetworkX undirected graph object to transform.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UndirectedHypergraph &#8211; H object equivalent to the
+NetworkX undirected graph.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Transformation only applicable to undirected
+NetworkX graphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_graph_transformations.to_graph_decomposition">
+<tt class="descclassname">halp.utilities.undirected_graph_transformations.</tt><tt class="descname">to_graph_decomposition</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_graph_transformations.html#to_graph_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_graph_transformations.to_graph_decomposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an UndirectedHypergraph object that has the same nodes (and
+corresponding attributes) as the given H, except that for all
+hyperedges in the given H, each node in the hyperedge is pairwise
+connected to every other node also in that hyperedge in the new H.
+Said another way, each of the original hyperedges are decomposed in the
+new H into cliques (aka the &#8220;2-section&#8221; or &#8220;clique graph&#8221;).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the H to decompose into a graph.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UndirectedHypergraph &#8211; the decomposed H.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Transformation only applicable to
+undirected Hs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_graph_transformations.to_networkx_graph">
+<tt class="descclassname">halp.utilities.undirected_graph_transformations.</tt><tt class="descname">to_networkx_graph</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_graph_transformations.html#to_networkx_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_graph_transformations.to_networkx_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a NetworkX Graph object that is the graph decomposition of
+the given H.
+See &#8220;to_graph_decomposition()&#8221; for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the H to decompose into a graph.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">nx.Graph &#8211; NetworkX Graph object representing the
+decomposed H.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Transformation only applicable to
+undirected Hs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.utilities.undirected_matrices">
+<span id="halp-utilities-undirected-matrices-module"></span><h2>halp.utilities.undirected_matrices module<a class="headerlink" href="#module-halp.utilities.undirected_matrices" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-undirected_matrices"></span><dl class="function">
+<dt id="halp.utilities.undirected_matrices.fast_inverse">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">fast_inverse</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#fast_inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.fast_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the inverse of a diagonal matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the diagonal matrix to find the inverse of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sparse.csc_matrix &#8211; the inverse of the input matrix as a
+sparse matrix.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_matrices.get_hyperedge_degree_matrix">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">get_hyperedge_degree_matrix</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#get_hyperedge_degree_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.get_hyperedge_degree_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the diagonal matrix of hyperedge degrees D_e as a sparse matrix,
+where a hyperedge degree is the cardinality of the hyperedge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>M</strong> &#8211; the incidence matrix of the hypergraph to find the D_e matrix on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sparse.csc_matrix &#8211; the diagonal hyperedge degree matrix as a
+sparse matrix.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_matrices.get_hyperedge_id_mapping">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">get_hyperedge_id_mapping</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#get_hyperedge_id_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.get_hyperedge_id_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates mappings between the set of hyperedge IDs and integer indices
+(where every hyperedge ID corresponds to exactly 1 integer index).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph to find the hyperedge ID mapping on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>dict &#8211; for each integer index, maps the index to the hyperedge</dt>
+<dd>ID.</dd>
+<dt>dict &#8211; for each hyperedge ID, maps the hyperedge ID to the</dt>
+<dd>integer index.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">TypeError &#8211; Algorithm only applicable to undirected hypergraphs</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_matrices.get_hyperedge_weight_matrix">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">get_hyperedge_weight_matrix</tt><big>(</big><em>H</em>, <em>hyperedge_ids_to_indices</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#get_hyperedge_weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.get_hyperedge_weight_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the diagonal matrix W of hyperedge weights as a sparse matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to find the weights.</li>
+<li><strong>hyperedge_weights</strong> &#8211; the mapping from the indices of hyperedge IDs to
+the corresponding hyperedge weights.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sparse.csc_matrix &#8211; the diagonal edge weight matrix as a
+sparse matrix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_matrices.get_incidence_matrix">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">get_incidence_matrix</tt><big>(</big><em>H</em>, <em>nodes_to_indices</em>, <em>hyperedge_ids_to_indices</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#get_incidence_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.get_incidence_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the incidence matrix of the given hypergraph as a sparse matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph for which to create the incidence matrix of.</li>
+<li><strong>nodes_to_indices</strong> &#8211; for each node, maps the node to its
+corresponding integer index.</li>
+<li><strong>hyperedge_ids_to_indices</strong> &#8211; for each hyperedge ID, maps the hyperedge
+ID to its corresponding integer index.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">sparse.csc_matrix &#8211; the incidence matrix as a sparse matrix.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to undirected hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_matrices.get_node_mapping">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">get_node_mapping</tt><big>(</big><em>H</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#get_node_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.get_node_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates mappings between the set of nodes and integer indices (where
+every node corresponds to exactly 1 integer index).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>H</strong> &#8211; the hypergraph to find the node mapping on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; for each integer index, maps the index to the node.
+dict &#8211; for each node, maps the node to the integer index.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.utilities.undirected_matrices.get_vertex_degree_matrix">
+<tt class="descclassname">halp.utilities.undirected_matrices.</tt><tt class="descname">get_vertex_degree_matrix</tt><big>(</big><em>M</em>, <em>W</em><big>)</big><a class="reference internal" href="_modules/halp/utilities/undirected_matrices.html#get_vertex_degree_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.utilities.undirected_matrices.get_vertex_degree_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the diagonal maxtrix D_v of vertex degrees as a sparse matrix,
+where a vertex degree is the sum of the weights of all hyperedges
+in the vertex&#8217;s star.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>M</strong> &#8211; the incidence matrix of the hypergraph to find the D_v matrix on.</li>
+<li><strong>W</strong> &#8211; the diagonal hyperedge weight matrix of the hypergraph.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sparse.csc_matrix &#8211; the diagonal vertex degree matrix as a
+sparse matrix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.utilities">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-halp.utilities" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="halp.algorithms.html">halp.algorithms package</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

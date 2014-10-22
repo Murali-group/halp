@@ -1,0 +1,663 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.algorithms.directed_paths &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.algorithms.directed_paths</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.algorithms.directed_paths</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: directed_paths</span>
+<span class="sd">   :synopsis: Defines several functions for executing various</span>
+<span class="sd">            path/connectivity queries on a directed hypergraph.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">Queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+
+<span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+<span class="kn">from</span> <span class="nn">halp.utilities.priority_queue</span> <span class="kn">import</span> <span class="n">PriorityQueue</span>
+
+<span class="c"># TODO-A: consider including target_node (with default value as None) in visit</span>
+<span class="c"># and b-visit to allow for early stoppage in an is_connected check and in an</span>
+<span class="c"># is_b_connected check</span>
+<span class="c"># TODO-B: consider maybe also caching the results from one execution of</span>
+<span class="c"># is_connected and is_b_connected to be able to check many node&#39;s for</span>
+<span class="c"># connectivity in only a single call of either visit or b_visit</span>
+
+
+<div class="viewcode-block" id="visit"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.visit">[docs]</a><span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Executes the &#39;Visit&#39; algorithm described in the paper:</span>
+<span class="sd">    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,</span>
+<span class="sd">    Directed hypergraphs and applications, Discrete Applied Mathematics,</span>
+<span class="sd">    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,</span>
+<span class="sd">    http://dx.doi.org/10.1016/0166-218X(93)90045-P.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)</span>
+
+<span class="sd">    The Visit algorithm begins from a source node and traverses a hyperedge</span>
+<span class="sd">    after any node in the hyperedge&#39;s tail has been reached.</span>
+
+<span class="sd">    :param H: the hypergraph to perform the &#39;Visit&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the initial node to begin traversal from.</span>
+<span class="sd">    :returns: set -- nodes that were visited in this traversal.</span>
+<span class="sd">              dict -- mapping from each node to the ID of the hyperedge that</span>
+<span class="sd">              preceeded it in this traversal; will map a node to None</span>
+<span class="sd">              if that node wasn&#39;t visited or if that node is the source</span>
+<span class="sd">              node.</span>
+<span class="sd">              dict -- mapping from each hyperedge ID to the node that preceeded</span>
+<span class="sd">              it in this traversal.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="n">node_set</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()</span>
+    <span class="c"># Pv keeps track of the ID of the hyperedge that directely</span>
+    <span class="c"># preceeded each node in the traversal</span>
+    <span class="n">Pv</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">}</span>
+
+    <span class="n">hyperedge_id_set</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">()</span>
+    <span class="c"># Pe keeps track of the node that directedly preceeded</span>
+    <span class="c"># each hyperedge in the traversal</span>
+    <span class="n">Pe</span> <span class="o">=</span> <span class="p">{</span><span class="n">hyperedge_id</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">hyperedge_id_set</span><span class="p">}</span>
+
+    <span class="c"># Explicitly tracks the set of visited nodes</span>
+    <span class="n">visited_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">source_node</span><span class="p">])</span>
+
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">Q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">source_node</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">Q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+        <span class="n">current_node</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="c"># At current_node, we can traverse each hyperedge in its forward star</span>
+        <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_forward_star</span><span class="p">(</span><span class="n">current_node</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">Pe</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">Pe</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_node</span>
+            <span class="c"># Traversing a hyperedge in current_node&#39;s forward star yields</span>
+            <span class="c"># the set of head nodes of the hyperedge; visit each head node</span>
+            <span class="k">for</span> <span class="n">head_node</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">head_node</span> <span class="ow">in</span> <span class="n">visited_nodes</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">Pv</span><span class="p">[</span><span class="n">head_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">hyperedge_id</span>
+                <span class="n">Q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">head_node</span><span class="p">)</span>
+                <span class="n">visited_nodes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">head_node</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">visited_nodes</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">Pe</span>
+
+</div>
+<div class="viewcode-block" id="is_connected"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.is_connected">[docs]</a><span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">target_node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if a target node is connected to a source node. That is,</span>
+<span class="sd">    this method determines if a target node can be visited from the source</span>
+<span class="sd">    node in the sense of the &#39;Visit&#39; algorithm.</span>
+
+<span class="sd">    Refer to &#39;visit&#39;s documentation for more details.</span>
+
+<span class="sd">    :param H: the hypergraph to check connectedness on.</span>
+<span class="sd">    :param source_node: the node to check connectedness to.</span>
+<span class="sd">    :param target_node: the node to check connectedness of.</span>
+<span class="sd">    :returns: bool -- whether target_node can be visited from source_node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">visited_nodes</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">Pe</span> <span class="o">=</span> <span class="n">visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target_node</span> <span class="ow">in</span> <span class="n">visited_nodes</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_x_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">b_visit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;General form of the B-Visit algorithm, extended to also perform</span>
+<span class="sd">    an implicit F-Visit if the b_visit flag is not set (providing better</span>
+<span class="sd">    time/memory performance than explcitily taking the hypergraph&#39;s</span>
+<span class="sd">    symmetric image and then performing the B-Visit on that).</span>
+
+<span class="sd">    Refer to &#39;b_visit&#39;s or &#39;f_visit&#39;s documentation for more details.</span>
+
+<span class="sd">    :param H: the hypergraph to perform the &#39;B-Visit&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the initial node to begin traversal from.</span>
+<span class="sd">    :param b_visit: boolean flag representing whether a B-Visit should</span>
+<span class="sd">                    be performed (vs an F-Visit).</span>
+<span class="sd">    :returns: set -- nodes that were x-visited in this traversal.</span>
+<span class="sd">              dict -- mapping from each node visited to the ID of the hyperedge</span>
+<span class="sd">                    that preceeded it in this traversal.</span>
+<span class="sd">              dict -- mapping from each hyperedge ID to the node that preceeded</span>
+<span class="sd">                    it in this traversal.</span>
+<span class="sd">              dict -- mapping from each node to an integer representing the</span>
+<span class="sd">                    cardinality of the path from the source node to that node.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="c"># If the b_visit flag is set, perform a traditional B-Visit</span>
+    <span class="k">if</span> <span class="n">b_visit</span><span class="p">:</span>
+        <span class="n">forward_star</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_forward_star</span>
+        <span class="n">hyperedge_tail</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span>
+        <span class="n">hyperedge_head</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span>
+    <span class="c"># If the b_visit flag is not set, implicitly perform an F-Visit by</span>
+    <span class="c"># implicitly taking the symmetric image (what the &#39;else&#39; statement</span>
+    <span class="c"># is for) and then performing a traditional B-Visit</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">forward_star</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_backward_star</span>
+        <span class="n">hyperedge_tail</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span>
+        <span class="n">hyperedge_head</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span>
+
+    <span class="n">node_set</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()</span>
+    <span class="c"># Pv keeps track of the ID of the hyperedge that directely</span>
+    <span class="c"># preceeded each node in the traversal</span>
+    <span class="n">Pv</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">}</span>
+
+    <span class="c"># v keeps track of the cardinality of the path from the source node to</span>
+    <span class="c"># any other B-connected node (&#39;inf&#39; cardinality for non-B-connected nodes)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s">&quot;inf&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">}</span>
+    <span class="n">v</span><span class="p">[</span><span class="n">source_node</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">hyperedge_id_set</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">()</span>
+    <span class="c"># Pe keeps track of the node that directedly preceeded</span>
+    <span class="c"># each hyperedge in the traversal</span>
+    <span class="n">Pe</span> <span class="o">=</span> <span class="p">{</span><span class="n">hyperedge_id</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">hyperedge_id_set</span><span class="p">}</span>
+
+    <span class="c"># k keeps track of how many nodes in the tail of each hyperedge are</span>
+    <span class="c"># B-connected (when all nodes in a tail are B-connected, that hyperedge</span>
+    <span class="c"># can then be traversed)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">{</span><span class="n">hyperedge_id</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">hyperedge_id_set</span><span class="p">}</span>
+
+    <span class="c"># Explicitly tracks the set of B-visited nodes</span>
+    <span class="n">x_visited_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">source_node</span><span class="p">])</span>
+
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">Q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">source_node</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">Q</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+        <span class="n">current_node</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="c"># At current_node, we can traverse each hyperedge in its forward star</span>
+        <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">forward_star</span><span class="p">(</span><span class="n">current_node</span><span class="p">):</span>
+            <span class="c"># Since we&#39;re arrived at a new node, we increment</span>
+            <span class="c"># k[hyperedge_id] to indicate that we&#39;ve reached 1 new</span>
+            <span class="c"># node in this hyperedge&#39;s tail</span>
+            <span class="n">k</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c"># Traverse this hyperedge only when we have reached all the nodes</span>
+            <span class="c"># in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)</span>
+            <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)):</span>
+                <span class="n">Pe</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_node</span>
+                <span class="c"># Traversing the hyperedge yields the set of head nodes of</span>
+                <span class="c"># the hyperedge; B-visit each head node</span>
+                <span class="k">for</span> <span class="n">head_node</span> <span class="ow">in</span> <span class="n">hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">head_node</span> <span class="ow">in</span> <span class="n">x_visited_nodes</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">Pv</span><span class="p">[</span><span class="n">head_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">hyperedge_id</span>
+                    <span class="n">Q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">head_node</span><span class="p">)</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">head_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">Pe</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]]</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">x_visited_nodes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">head_node</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x_visited_nodes</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">Pe</span><span class="p">,</span> <span class="n">v</span>
+
+
+<div class="viewcode-block" id="b_visit"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.b_visit">[docs]</a><span class="k">def</span> <span class="nf">b_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Executes the &#39;B-Visit&#39; algorithm described in the paper:</span>
+<span class="sd">    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,</span>
+<span class="sd">    Directed hypergraphs and applications, Discrete Applied Mathematics,</span>
+<span class="sd">    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,</span>
+<span class="sd">    http://dx.doi.org/10.1016/0166-218X(93)90045-P.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)</span>
+
+<span class="sd">    The B-Visit algorithm begins from a source node and traverses a hyperedge</span>
+<span class="sd">    after all nodes in the hyperedge&#39;s tail have been reached.</span>
+
+<span class="sd">    :param H: the hypergraph to perform the &#39;B-Visit&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the initial node to begin traversal from.</span>
+<span class="sd">    :returns: set -- nodes that were B-visited in this traversal.</span>
+<span class="sd">              dict -- mapping from each node visited to the ID of the hyperedge</span>
+<span class="sd">              that preceeded it in this traversal.</span>
+<span class="sd">              dict -- mapping from each hyperedge ID to the node that preceeded</span>
+<span class="sd">              it in this traversal.</span>
+<span class="sd">              dict -- mapping from each node to an integer representing the</span>
+<span class="sd">              cardinality of the path from the source node to that node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_x_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="is_b_connected"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.is_b_connected">[docs]</a><span class="k">def</span> <span class="nf">is_b_connected</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">target_node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if a target node is B-connected to a source node.</span>
+
+<span class="sd">    A node t is B-connected to a node s iff:</span>
+<span class="sd">        - t is s, or</span>
+<span class="sd">        - there exists an edge in the backward star of t such that all nodes in</span>
+<span class="sd">            the tail of that edge are B-connected to s</span>
+
+<span class="sd">    In other words, this method determines if a target node can be B-visited</span>
+<span class="sd">    from the source node in the sense of the &#39;B-Visit&#39; algorithm. Refer to</span>
+<span class="sd">    &#39;b_visit&#39;s documentation for more details.</span>
+
+<span class="sd">    :param H: the hypergraph to check B-connectedness on.</span>
+<span class="sd">    :param source_node: the node to check B-connectedness to.</span>
+<span class="sd">    :param target_node: the node to check B-connectedness of.</span>
+<span class="sd">    :returns: bool -- whether target_node can be visited from source_node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">b_visited_nodes</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">Pe</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">b_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target_node</span> <span class="ow">in</span> <span class="n">b_visited_nodes</span>
+
+</div>
+<div class="viewcode-block" id="f_visit"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.f_visit">[docs]</a><span class="k">def</span> <span class="nf">f_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Executes the &#39;F-Visit&#39; algorithm alluded to in the paper:</span>
+<span class="sd">    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,</span>
+<span class="sd">    Directed hypergraphs and applications, Discrete Applied Mathematics,</span>
+<span class="sd">    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,</span>
+<span class="sd">    http://dx.doi.org/10.1016/0166-218X(93)90045-P.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)</span>
+
+<span class="sd">    The F-Visit algorithm performs a B-Visit on the hypergraph&#39;s symmetric</span>
+<span class="sd">    image, beginning at the source node. Refer to &#39;b_visit&#39;s documentation</span>
+<span class="sd">    for more details.</span>
+
+<span class="sd">    :param H: the hypergraph to perform the &#39;F-Visit&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the initial node to begin traversal from.</span>
+<span class="sd">    :returns: set -- nodes that were F-visited in this traversal.</span>
+<span class="sd">              dict -- mapping from each node to the ID of the hyperedge that</span>
+<span class="sd">              preceeded it in this traversal.</span>
+<span class="sd">              dict -- mapping from each hyperedge ID to the node that preceeded</span>
+<span class="sd">              it in this traversal.</span>
+<span class="sd">              dict -- mapping from each node to an integer representing the</span>
+<span class="sd">              cardinality of the path from the source node to that node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_x_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="is_f_connected"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.is_f_connected">[docs]</a><span class="k">def</span> <span class="nf">is_f_connected</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">target_node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if a target node is F-connected to a source node.</span>
+
+<span class="sd">    A node t is F-connected to a node s iff s if B-connected to t.</span>
+<span class="sd">    Refer to &#39;f_visit&#39;s or &#39;is_b_connected&#39;s documentation for more details.</span>
+
+<span class="sd">    :param H: the hypergraph to check F-connectedness on.</span>
+<span class="sd">    :param source_node: the node to check F-connectedness to.</span>
+<span class="sd">    :param target_node: the node to check F-connectedness of.</span>
+<span class="sd">    :returns: bool -- whether target_node can be visited from source_node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f_visited_nodes</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">Pe</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">f_visit</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target_node</span> <span class="ow">in</span> <span class="n">f_visited_nodes</span>
+
+</div>
+<div class="viewcode-block" id="sum_function"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.sum_function">[docs]</a><span class="k">def</span> <span class="nf">sum_function</span><span class="p">(</span><span class="n">tail_nodes</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Additive sum function for nodes in the tail of a hyperedge.</span>
+
+<span class="sd">    :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction</span>
+<span class="sd">                    with the weight of the hyperedge, will additively</span>
+<span class="sd">                    constitute the weight of the head node</span>
+<span class="sd">    :param W: node weighting function.</span>
+<span class="sd">    :returns: int -- sum of the weights of tail_nodes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tail_nodes</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="distance_function"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.distance_function">[docs]</a><span class="k">def</span> <span class="nf">distance_function</span><span class="p">(</span><span class="n">tail_nodes</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Additive distance (max) function for nodes in the tail of a hyperedge.</span>
+<span class="sd">    Also commonly referred to as the &#39;rank&#39; function.</span>
+
+<span class="sd">    :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction</span>
+<span class="sd">                    with the weight of the hyperedge, will additively</span>
+<span class="sd">                    constitute the weight of the head node.</span>
+<span class="sd">    :param W: node weighting function.</span>
+<span class="sd">    :returns: int -- max of the weights of tail_nodes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tail_nodes</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="gap_function"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.gap_function">[docs]</a><span class="k">def</span> <span class="nf">gap_function</span><span class="p">(</span><span class="n">tail_nodes</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Additive min function for nodes in the tail of a hyperedge.</span>
+
+<span class="sd">    :param tail_nodes: nodes in the tail of a hyperedge that, in conjunction</span>
+<span class="sd">                    with the weight of the hyperedge, will additively</span>
+<span class="sd">                    constitute the weight of the head node</span>
+<span class="sd">    :param W: node weighting function</span>
+<span class="sd">    :returns: int -- max of the weights of tail_nodes</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tail_nodes</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_shortest_x_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">b_tree</span><span class="p">,</span>
+                     <span class="n">F</span><span class="o">=</span><span class="n">sum_function</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;General form of the Shorest B-Tree algorithm, extended to also</span>
+<span class="sd">    perform the implicit Shortest F-Tree procedure if the b_tree flag is</span>
+<span class="sd">    not set (providing better time/memory performance than explcitily taking</span>
+<span class="sd">    the hypergraph&#39;s symmetric image and then performing the SBT procedure</span>
+<span class="sd">    on that).</span>
+<span class="sd">    Uses priority queue to achieve O(size(H)*lg(n)) runtime.</span>
+
+<span class="sd">    Refer to &#39;shorest_b_tree&#39;s or &#39;shorest_f_tree&#39;s documentation for</span>
+<span class="sd">    more details.</span>
+
+<span class="sd">    :param H: the H to perform the &#39;SXT&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the root of the tree to be found.</span>
+<span class="sd">    :param b_tree: boolean flag representing whether the Shortest B-Tree</span>
+<span class="sd">                algorithm should be executed (vs the Shortest F-Tree).</span>
+<span class="sd">    :param F: function pointer to any additive weight function; that is,</span>
+<span class="sd">            any function that is only a function of the weights of the</span>
+<span class="sd">            nodes in the tail of a hyperedge.</span>
+<span class="sd">    :param valid_ordering: a boolean flag to signal whether or not a valid</span>
+<span class="sd">                        ordering of the nodes should be returned.</span>
+<span class="sd">    :returns:   dict -- mapping from each node to the ID of the hyperedge that</span>
+<span class="sd">                     preceeded it in this traversal.</span>
+<span class="sd">                dict -- mapping from each node to the node&#39;s weight.</span>
+<span class="sd">                list -- [only if valid_ordering argument is passed] a valid</span>
+<span class="sd">                        ordering of the nodes.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">b_tree</span><span class="p">:</span>
+        <span class="n">forward_star</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_forward_star</span>
+        <span class="n">hyperedge_tail</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span>
+        <span class="n">hyperedge_head</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">forward_star</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_backward_star</span>
+        <span class="n">hyperedge_tail</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span>
+        <span class="n">hyperedge_head</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span>
+    <span class="n">hyperedge_weight</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_weight</span>
+
+    <span class="n">node_set</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()</span>
+    <span class="c"># Pv keeps track of the ID of the hyperedge that directely</span>
+    <span class="c"># preceeded each node in the traversal</span>
+    <span class="n">Pv</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">}</span>
+
+    <span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">()</span>
+    <span class="c"># W keeps track of the smallest weight path from the source node</span>
+    <span class="c"># to each node</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s">&quot;inf&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">}</span>
+    <span class="n">W</span><span class="p">[</span><span class="n">source_node</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c"># k keeps track of how many nodes in the tail of each hyperedge are</span>
+    <span class="c"># B-connected (when all nodes in a tail are B-connected, that hyperedge</span>
+    <span class="c"># can then be traversed)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">{</span><span class="n">hyperedge_id</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">hyperedge_ids</span><span class="p">}</span>
+
+    <span class="c"># List of nodes removed from the priority queue in the order that</span>
+    <span class="c"># they were removed</span>
+    <span class="n">ordering</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">PriorityQueue</span><span class="p">()</span>
+    <span class="n">Q</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">source_node</span><span class="p">],</span> <span class="n">source_node</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">Q</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+        <span class="c"># At current_node, we can traverse each hyperedge in its forward star</span>
+        <span class="n">current_node</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">get_top_priority</span><span class="p">()</span>
+        <span class="n">ordering</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_node</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">forward_star</span><span class="p">(</span><span class="n">current_node</span><span class="p">):</span>
+            <span class="c"># Since we&#39;re arrived at a new node, we increment</span>
+            <span class="c"># k[hyperedge_id] to indicate that we&#39;ve reached 1 new</span>
+            <span class="c"># node in this hyperedge&#39;s tail</span>
+            <span class="n">k</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c"># Traverse this hyperedge only when we have reached all the nodes</span>
+            <span class="c"># in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)</span>
+            <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">),</span> <span class="n">W</span><span class="p">)</span>
+                <span class="c"># For each node in the head of the newly-traversed hyperedge,</span>
+                <span class="c"># if the previous weight of the node is more than the new</span>
+                <span class="c"># weight...</span>
+                <span class="k">for</span> <span class="n">head_node</span> <span class="ow">in</span> \
+                    <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span> <span class="k">if</span>
+                     <span class="n">W</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">hyperedge_weight</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">]:</span>
+                    <span class="c"># Update its weight to the new, smaller weight</span>
+                    <span class="n">W</span><span class="p">[</span><span class="n">head_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">hyperedge_weight</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span>
+                    <span class="n">Pv</span><span class="p">[</span><span class="n">head_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">hyperedge_id</span>
+                    <span class="c"># If it&#39;s not already in the priority queue...</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">Q</span><span class="o">.</span><span class="n">contains_element</span><span class="p">(</span><span class="n">head_node</span><span class="p">):</span>
+                        <span class="c"># Add it to the priority queue</span>
+                        <span class="n">Q</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">head_node</span><span class="p">],</span> <span class="n">head_node</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c"># Otherwise, decrease it&#39;s key in the priority queue</span>
+                        <span class="n">Q</span><span class="o">.</span><span class="n">reprioritize</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">head_node</span><span class="p">],</span> <span class="n">head_node</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">valid_ordering</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">ordering</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">W</span>
+
+
+<div class="viewcode-block" id="shortest_b_tree"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.shortest_b_tree">[docs]</a><span class="k">def</span> <span class="nf">shortest_b_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span>
+                    <span class="n">F</span><span class="o">=</span><span class="n">sum_function</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Executes the Shortest B-Tree (SBT) algorithm described in the paper:</span>
+<span class="sd">    Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,</span>
+<span class="sd">    Directed hypergraphs and applications, Discrete Applied Mathematics,</span>
+<span class="sd">    Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,</span>
+<span class="sd">    http://dx.doi.org/10.1016/0166-218X(93)90045-P.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/0166218X9390045P)</span>
+
+<span class="sd">    SBT finds a set of minimum weight B-paths from a source node to all</span>
+<span class="sd">    the nodes y which are B-connected to it (when additive weight functions</span>
+<span class="sd">    are used). Refer to &#39;is_b_connected&#39;s documentation for more details.</span>
+
+<span class="sd">    :param H: the hypergraph to perform the &#39;SBT&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the root of the tree to be found.</span>
+<span class="sd">    :param F: function pointer to any additive weight function; that is,</span>
+<span class="sd">            any function that is only a function of the weights of the</span>
+<span class="sd">            nodes in the tail of a hyperedge.</span>
+<span class="sd">    :param valid_ordering: a boolean flag to signal whether or not a valid</span>
+<span class="sd">                        ordering of the nodes should be returned.</span>
+<span class="sd">    :returns:   dict -- mapping from each node to the ID of the hyperedge that</span>
+<span class="sd">                preceeded it in this traversal.</span>
+<span class="sd">                dict -- mapping from each node to the node&#39;s weight.</span>
+<span class="sd">                list -- [only if valid_ordering argument is passed] a valid</span>
+<span class="sd">                ordering of the nodes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_shortest_x_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="shortest_f_tree"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.shortest_f_tree">[docs]</a><span class="k">def</span> <span class="nf">shortest_f_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span>
+                    <span class="n">F</span><span class="o">=</span><span class="n">sum_function</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Executes the Shortest F-Tree algorithm, which is simply an execution</span>
+<span class="sd">    of the Shorest B-Tree procedure from the source node on the hypergraph&#39;s</span>
+<span class="sd">    symmetric image. Refer to &#39;shortest_b_tree&#39;s documentation for more</span>
+<span class="sd">    details.</span>
+
+<span class="sd">    :param hypergraph: the hypergraph to perform the &#39;SFT&#39; algorithm on.</span>
+<span class="sd">    :param source_node: the root of the tree to be found.</span>
+<span class="sd">    :param F: function pointer to any additive weight function; that is,</span>
+<span class="sd">            any function that is only a function of the weights of the</span>
+<span class="sd">            nodes in the tail of a hyperedge.</span>
+<span class="sd">    :param valid_ordering: a boolean flag to signal whether or not a valid</span>
+<span class="sd">                        ordering of the nodes should be returned.</span>
+<span class="sd">    :returns:   dict -- mapping from each node to the ID of the hyperedge that</span>
+<span class="sd">                preceeded it in this traversal.</span>
+<span class="sd">                dict -- mapping from each node to the node&#39;s weight.</span>
+<span class="sd">                list -- [only if valid_ordering argument is passed] a valid</span>
+<span class="sd">                ordering of the nodes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_shortest_x_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_hypertree_from_predecessors"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.get_hypertree_from_predecessors">[docs]</a><span class="k">def</span> <span class="nf">get_hypertree_from_predecessors</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span>
+                                    <span class="n">node_weights</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="s">&quot;weight&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gives the hypertree (i.e., the subhypergraph formed from the union of</span>
+<span class="sd">    the set of paths from an execution of, e.g., the SBT algorithm) defined by</span>
+<span class="sd">    Pv beginning at a source node. Returns a dictionary mapping each node to</span>
+<span class="sd">    the ID of the hyperedge that preceeded it in the path (i.e., a Pv vector).</span>
+<span class="sd">    Assigns the node weights (if provided) as attributes of the nodes (e.g.,</span>
+<span class="sd">    the rank of that node in a specific instance of the SBT algorithm, or the</span>
+<span class="sd">    cardinality of that node in a B-Visit traversal, etc.).</span>
+
+<span class="sd">    :note: The IDs of the hyperedges in the subhypergraph returned may be</span>
+<span class="sd">        different than those in the original hypergraph (even though the</span>
+<span class="sd">        tail and head sets are identical).</span>
+
+<span class="sd">    :param H: the hypergraph which the path algorithm was executed on.</span>
+<span class="sd">    :param Pv: dictionary mapping each node to the ID of the hyperedge that</span>
+<span class="sd">            preceeded it in the path.</span>
+<span class="sd">    :param source_node: the root of the executed path algorithm.</span>
+<span class="sd">    :param node_weights: [optional] dictionary mapping each node to some weight</span>
+<span class="sd">                        measure.</span>
+<span class="sd">    :param attr_name: key into the nodes&#39; attribute dictionaries for their</span>
+<span class="sd">                    weight values (if node_weights is provided).</span>
+<span class="sd">    :returns: DirectedHypergraph -- subhypergraph induced by the path</span>
+<span class="sd">            algorithm specified by the predecessor vector (Pv) from a</span>
+<span class="sd">            source node.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="n">sub_H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+
+    <span class="c"># If node weights are not provided, simply collect all the nodes that are</span>
+    <span class="c"># will be in the hypertree</span>
+    <span class="k">if</span> <span class="n">node_weights</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">Pv</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">Pv</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source_node</span><span class="p">)</span>
+    <span class="c"># If node weights are provided, collect all the nodes that will be in the</span>
+    <span class="c"># tree and pair them with their corresponding weights</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">node</span><span class="p">,</span> <span class="p">{</span><span class="n">attr_name</span><span class="p">:</span> <span class="n">node_weights</span><span class="p">[</span><span class="n">node</span><span class="p">]})</span>
+                 <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">Pv</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">Pv</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">source_node</span><span class="p">,</span> <span class="p">{</span><span class="n">attr_name</span><span class="p">:</span> <span class="n">node_weights</span><span class="p">[</span><span class="n">source_node</span><span class="p">]}))</span>
+    <span class="c"># Add the collected elements to the hypergraph</span>
+    <span class="n">sub_H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+
+    <span class="c"># Add all hyperedges, specified by Pv, to the hypergraph</span>
+    <span class="n">hyperedges</span> <span class="o">=</span> <span class="p">[(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">),</span>
+                   <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">),</span>
+                   <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_attributes</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">))</span>
+                  <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">Pv</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">hyperedge_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]</span>
+    <span class="n">sub_H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedges</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sub_H</span>
+
+</div>
+<div class="viewcode-block" id="get_hyperpath_from_predecessors"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_paths.get_hyperpath_from_predecessors">[docs]</a><span class="k">def</span> <span class="nf">get_hyperpath_from_predecessors</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">destination_node</span><span class="p">,</span>
+                                    <span class="n">node_weights</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="s">&quot;weight&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gives the hyperpath (DirectedHypergraph) representing the shortest</span>
+<span class="sd">    B-hyperpath from the source to the destination, given a predecessor</span>
+<span class="sd">    function and source and destination nodes.</span>
+
+<span class="sd">    :note: The IDs of the hyperedges in the subhypergraph returned may be</span>
+<span class="sd">        different than those in the original hypergraph (even though the</span>
+<span class="sd">        tail and head sets are identical).</span>
+
+<span class="sd">    :param H: the hypergraph which the path algorithm was executed on.</span>
+<span class="sd">    :param Pv: dictionary mapping each node to the ID of the hyperedge that</span>
+<span class="sd">            preceeded it in the path.</span>
+<span class="sd">    :param source_node: the source node of the path.</span>
+<span class="sd">    :param destination_node: the destination node of the path.</span>
+<span class="sd">    :returns: DirectedHypergraph -- shortest B-hyperpath from source_node to</span>
+<span class="sd">            destination_node.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+<span class="sd">    :raises: KeyError -- Node key in predecessor is not in H</span>
+<span class="sd">    :raises: KeyError -- Hyperedge key in predecessor is not in H</span>
+<span class="sd">    :raises: ValueError -- Multiple nodes without predecessor</span>
+<span class="sd">    :raises: ValueError -- Hypertree does not have source node</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="c"># Check that Pv is a valid predecessor function:</span>
+    <span class="c"># - keys must be nodes in H mapping to hyperedges in H</span>
+    <span class="c"># - exactly one node must map to None (i.e., only one node</span>
+    <span class="c">#   without predecessor)</span>
+    <span class="n">nodes_without_predecessor</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">Pv</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">H</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="s">&quot;Node key </span><span class="si">%s</span><span class="s"> in predecessor is not in H&quot;</span> <span class="o">%</span> <span class="n">node</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hyperedge_id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">nodes_without_predecessor</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">H</span><span class="o">.</span><span class="n">has_hyperedge_id</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="s">&quot;Hyperedge key </span><span class="si">%s</span><span class="s"> in predecessor is not in H&quot;</span> <span class="o">%</span> <span class="n">hyperedge_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">nodes_without_predecessor</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s">&quot;Multiple nodes without predecessor. </span><span class="si">%s</span><span class="s"> received&quot;</span> <span class="o">%</span> <span class="n">Pv</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nodes_without_predecessor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s">&quot;Hypertree does not have source node. </span><span class="si">%s</span><span class="s"> received&quot;</span> <span class="o">%</span> <span class="n">Pv</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+
+    <span class="c"># keep track of which nodes are or have been processed</span>
+    <span class="n">processedOrInQueue</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="bp">False</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">Pv</span><span class="p">}</span>
+    <span class="n">nodesToProcess</span> <span class="o">=</span> <span class="p">[</span><span class="n">destination_node</span><span class="p">]</span>
+    <span class="n">processedOrInQueue</span><span class="p">[</span><span class="n">destination_node</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">while</span> <span class="n">nodesToProcess</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">nodesToProcess</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">hyperedge_id</span> <span class="o">=</span> <span class="n">Pv</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">hyperedge_id</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">processedOrInQueue</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+                    <span class="n">nodesToProcess</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                    <span class="n">processedOrInQueue</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">),</span>
+                               <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">),</span>
+                               <span class="n">weight</span><span class="o">=</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_weight</span><span class="p">(</span>
+                               <span class="n">hyperedge_id</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">path</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

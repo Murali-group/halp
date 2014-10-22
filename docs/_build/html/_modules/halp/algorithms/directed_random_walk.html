@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.algorithms.directed_random_walk &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.algorithms.directed_random_walk</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.algorithms.directed_random_walk</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: directed_random_walk</span>
+<span class="sd">   :synopsis: Defines several functions for performing a random walk on</span>
+<span class="sd">            a directed hypergraph and finding its corresponding stationary</span>
+<span class="sd">            distribution.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+<span class="kn">from</span> <span class="nn">halp.utilities</span> <span class="kn">import</span> <span class="n">directed_matrices</span> <span class="k">as</span> <span class="n">dmat</span>
+
+
+<div class="viewcode-block" id="stationary_distribution"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.directed_random_walk.stationary_distribution">[docs]</a><span class="k">def</span> <span class="nf">stationary_distribution</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">pi</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the stationary distribution of a random walk on the given</span>
+<span class="sd">    hypergraph using the iterative approach explained in the paper:</span>
+<span class="sd">    Aurelien Ducournau, Alain Bretto, Random walks in directed hypergraphs and</span>
+<span class="sd">    application to semi-supervised image segmentation,</span>
+<span class="sd">    Computer Vision and Image Understanding, Volume 120, March 2014,</span>
+<span class="sd">    Pages 91-102, ISSN 1077-3142, http://dx.doi.org/10.1016/j.cviu.2013.10.012.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/S1077314213002038)</span>
+
+<span class="sd">    :param H: the hypergraph to find the &#39;Stationary Distribution&#39;</span>
+<span class="sd">            algorithm on.</span>
+<span class="sd">    :param pi: the initial distribution over the nodes. If not provided,</span>
+<span class="sd">            it will be created with a random distribution.</span>
+<span class="sd">    :param P: the transition matrix for the hypergraph. If not provided,</span>
+<span class="sd">            it will be created.</span>
+<span class="sd">    :returns: list -- list of the stationary probabilities for all nodes</span>
+<span class="sd">            in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs</span>
+<span class="sd">    :raises: AssertionError -- Each node must have at least 1 outgoing</span>
+<span class="sd">             hyperedge (even if it&#39;s only a self-loop).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to undirected hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">node_iterator</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_forward_star</span><span class="p">(</span><span class="n">node</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s">&quot;Each node must have at least 1 outgoing </span><span class="se">\</span>
+<span class="s">                                  hyperedge (even if it&#39;s only a self-loop).&quot;</span><span class="p">)</span>
+
+    <span class="n">indices_to_nodes</span><span class="p">,</span> <span class="n">nodes_to_indices</span> <span class="o">=</span> \
+        <span class="n">dmat</span><span class="o">.</span><span class="n">get_node_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">indices_to_hyperedge_ids</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span> <span class="o">=</span> \
+        <span class="n">dmat</span><span class="o">.</span><span class="n">get_hyperedge_id_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">P</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">_compute_transition_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                       <span class="n">nodes_to_indices</span><span class="p">,</span>
+                                       <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+
+    <span class="n">node_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">pi</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">_create_random_starter</span><span class="p">(</span><span class="n">node_count</span><span class="p">)</span>
+    <span class="n">pi_star</span> <span class="o">=</span> <span class="n">_create_random_starter</span><span class="p">(</span><span class="n">node_count</span><span class="p">)</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">_has_converged</span><span class="p">(</span><span class="n">pi_star</span><span class="p">,</span> <span class="n">pi</span><span class="p">):</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">pi_star</span>
+        <span class="n">pi_star</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">P</span>
+
+    <span class="k">return</span> <span class="n">pi</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_compute_transition_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                               <span class="n">nodes_to_indices</span><span class="p">,</span>
+                               <span class="n">hyperedge_ids_to_indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the transition matrix for a random walk on the given</span>
+<span class="sd">    hypergraph as described in the paper:</span>
+<span class="sd">    Aurelien Ducournau, Alain Bretto, Random walks in directed hypergraphs and</span>
+<span class="sd">    application to semi-supervised image segmentation,</span>
+<span class="sd">    Computer Vision and Image Understanding, Volume 120, March 2014,</span>
+<span class="sd">    Pages 91-102, ISSN 1077-3142, http://dx.doi.org/10.1016/j.cviu.2013.10.012.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/S1077314213002038)</span>
+
+<span class="sd">    :param H: the hypergraph to find the transition matrix of.</span>
+<span class="sd">    :param nodes_to_indices: for each node, maps the node to its</span>
+<span class="sd">                            corresponding integer index.</span>
+<span class="sd">    :param hyperedge_ids_to_indices: for each hyperedge ID, maps the hyperedge</span>
+<span class="sd">                                    ID to its corresponding integer index.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the transition matrix as a sparse matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">M_out</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">get_tail_incidence_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                           <span class="n">nodes_to_indices</span><span class="p">,</span>
+                                           <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">M_in</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">get_head_incidence_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                          <span class="n">nodes_to_indices</span><span class="p">,</span>
+                                          <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">get_hyperedge_weight_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">D_v_out</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">get_vertex_degree_matrix</span><span class="p">(</span><span class="n">M_out</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+    <span class="n">D_e_in</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">get_hyperedge_degree_matrix</span><span class="p">(</span><span class="n">M_in</span><span class="p">)</span>
+
+    <span class="n">D_v_out_inv</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">fast_inverse</span><span class="p">(</span><span class="n">D_v_out</span><span class="p">)</span>
+    <span class="n">D_e_in_inv</span> <span class="o">=</span> <span class="n">dmat</span><span class="o">.</span><span class="n">fast_inverse</span><span class="p">(</span><span class="n">D_e_in</span><span class="p">)</span>
+    <span class="n">M_in_trans</span> <span class="o">=</span> <span class="n">M_in</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">D_v_out_inv</span> <span class="o">*</span> <span class="n">M_out</span> <span class="o">*</span> <span class="n">W</span> <span class="o">*</span> <span class="n">D_e_in_inv</span> <span class="o">*</span> <span class="n">M_in_trans</span>
+
+    <span class="k">return</span> <span class="n">P</span>
+
+
+<span class="k">def</span> <span class="nf">_create_random_starter</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the random starter for the random walk.</span>
+
+<span class="sd">    :param node_count: number of nodes to create the random vector.</span>
+<span class="sd">    :returns: list -- list of starting probabilities for each node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">node_count</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+        <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+    <span class="n">summation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+        <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">summation</span>
+
+    <span class="k">return</span> <span class="n">pi</span>
+
+
+<span class="k">def</span> <span class="nf">_has_converged</span><span class="p">(</span><span class="n">pi_star</span><span class="p">,</span> <span class="n">pi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if the random walk has converged.</span>
+
+<span class="sd">    :param pi_star: the new vector</span>
+<span class="sd">    :param pi: the old vector</span>
+<span class="sd">    :returns: bool-- True iff pi has converged.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">node_count</span> <span class="o">=</span> <span class="n">pi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">EPS</span> <span class="o">=</span> <span class="mf">10e-6</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pi_star</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">EPS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="bp">True</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

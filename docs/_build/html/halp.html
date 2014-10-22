@@ -1,0 +1,1613 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp package &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="index.html" />
+    <link rel="next" title="halp.algorithms package" href="halp.algorithms.html" />
+    <link rel="prev" title="Welcome to halp’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp package</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to halp&#8217;s documentation!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="halp.algorithms.html">halp.algorithms package</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="halp-package">
+<h1>halp package<a class="headerlink" href="#halp-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="halp.algorithms.html">halp.algorithms package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="halp.algorithms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.algorithms.html#module-halp.algorithms.directed_paths">halp.algorithms.directed_paths module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.algorithms.html#module-halp.algorithms.directed_random_walk">halp.algorithms.directed_random_walk module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.algorithms.html#module-halp.algorithms.k_shortest_hyperpaths">halp.algorithms.k_shortest_hyperpaths module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.algorithms.html#module-halp.algorithms.undirected_partitioning">halp.algorithms.undirected_partitioning module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.algorithms.html#module-halp.algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="halp.utilities.html">halp.utilities package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities.directed_graph_transformations">halp.utilities.directed_graph_transformations module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities.directed_matrices">halp.utilities.directed_matrices module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities.directed_statistics">halp.utilities.directed_statistics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities.priority_queue">halp.utilities.priority_queue module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities.undirected_graph_transformations">halp.utilities.undirected_graph_transformations module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities.undirected_matrices">halp.utilities.undirected_matrices module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="halp.utilities.html#module-halp.utilities">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-halp.directed_hypergraph">
+<span id="halp-directed-hypergraph-module"></span><h2>halp.directed_hypergraph module<a class="headerlink" href="#module-halp.directed_hypergraph" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-directed_hypergraph"></span><dl class="class">
+<dt id="halp.directed_hypergraph.DirectedHypergraph">
+<em class="property">class </em><tt class="descclassname">halp.directed_hypergraph.</tt><tt class="descname">DirectedHypergraph</tt><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>The DirectedHypergraph class provides a directed hypergraph object
+and associated functions for basic properties of directed hypergraphs.</p>
+<p>A directed hypergraph contains nodes and hyperedges. Each hyperedge
+connects a tail set of nodes to a head set of nodes. The tail and head
+cannot both be empty.</p>
+<p>A node is simply any hashable type. See &#8220;add_node&#8221; or &#8220;add_nodes&#8221; for
+more details.</p>
+<p>A directed hyperedge is a tuple of the tail nodes and the head nodes.
+This class assigns (upon adding) and refers to each hyperedge by an
+internal ID. See &#8220;add_hyperedge&#8221; or &#8220;add_hyperedges&#8221; for more details.</p>
+<p>Self-loops are allowed, but parallel (multi) hyperedges are not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">This class uses several data structures to store a directed
+hypergraph. Since these structures must stay in sync (see: __init__),
+we highly recommend that only the public methods be used for accessing
+and modifying the hypergraph.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:
+Create an empty directed hypergraph (no nodes or hyperedges):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Add nodes (with or without attributes) to the hypergraph
+one at a time (see: add_node) or several at a time (see: add_nodes):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">],</span> <span class="p">{</span><span class="n">color</span><span class="p">:</span> <span class="s">&quot;black&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Add hyperedges (with or without attributes) to the hypergraph one
+at a time (see: add_hyperedge) or several at a time (see: add_hyperedges):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(([</span><span class="s">&quot;A&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;B&quot;</span><span class="p">]),</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>Update attributes of existing nodes and hyperedges by simulating adding the
+node or hyperedge again, with the [potentially new] attribute appended:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;sink&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">]),</span> <span class="n">weight</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.add_hyperedge">
+<tt class="descname">add_hyperedge</tt><big>(</big><em>tail</em>, <em>head</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.add_hyperedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.add_hyperedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a hyperedge to the hypergraph, along with any related
+attributes of the hyperedge.
+This method will automatically add any node from the tail and
+head that was not in the hypergraph.
+A hyperedge without a &#8220;weight&#8221; attribute specified will be
+assigned the default value of 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tail</strong> &#8211; iterable container of references to nodes in the
+tail of the hyperedge to be added.</li>
+<li><strong>head</strong> &#8211; iterable container of references to nodes in the
+head of the hyperedge to be added.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes shared by all
+the hyperedges.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the hyperedge;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str &#8211; the ID of the hyperedge that was added.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; tail and head arguments cannot both be empty.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">((</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">),</span> <span class="s">&#39;weight&#39;</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s">&quot;D&quot;</span><span class="p">]),</span>
+<span class="go">                        set([&quot;A&quot;, &quot;C&quot;]),</span>
+<span class="go">                        {color: &quot;red&quot;})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.add_hyperedges">
+<tt class="descname">add_hyperedges</tt><big>(</big><em>hyperedges</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.add_hyperedges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.add_hyperedges" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds multiple hyperedges to the graph, along with any related</dt>
+<dd>attributes of the hyperedges.
+If any node in the tail or head of any hyperedge has not
+previously been added to the hypergraph, it will automatically
+be added here. Hyperedges without a &#8220;weight&#8221; attribute specified
+will be assigned the default value of 1.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hyperedges</strong> &#8211; iterable container to either tuples of
+(tail reference, head reference) OR tuples of
+(tail reference, head reference, attribute dictionary);
+if an attribute dictionary is provided in the tuple,
+its values will override both attr_dict&#8217;s and attr&#8217;s
+values.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes shared by all
+the hyperedges.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the hyperedges;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; the IDs of the hyperedges added in the order
+specified by the hyperedges container&#8217;s iterator.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+add_hyperedge</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xyz</span> <span class="o">=</span> <span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">(([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">]),</span>
+<span class="go">                            ((&quot;A&quot;, &quot;C&quot;), (&quot;B&quot;), {&#39;weight&#39;: 2}),</span>
+<span class="go">                            (set([&quot;D&quot;]), set([&quot;A&quot;, &quot;C&quot;])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.add_node">
+<tt class="descname">add_node</tt><big>(</big><em>node</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds a node to the graph, along with any related attributes</dt>
+<dd>of the node.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node</strong> &#8211; reference to the node being added.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes of the node.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the node;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="s">&quot;positive&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;negative&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.add_nodes">
+<tt class="descname">add_nodes</tt><big>(</big><em>nodes</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.add_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.add_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds multiple nodes to the graph, along with any related attributes</dt>
+<dd>of the nodes.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>nodes</strong> &#8211; iterable container to either references of the nodes
+OR tuples of (node reference, attribute dictionary);
+if an attribute dictionary is provided in the tuple,
+its values will override both attr_dict&#8217;s and attr&#8217;s
+values.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes shared by all the nodes.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the node;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+add_node</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="s">&quot;positive&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;A&quot;</span><span class="p">,</span>
+<span class="go">                 (&quot;B&quot;, {label=&quot;negative&quot;}),</span>
+<span class="go">                 (&quot;C&quot;, {root=True})]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">(</span><span class="n">node_list</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new DirectedHypergraph object with the same node and
+hyperedge structure.
+Copies of the nodes&#8217; and hyperedges&#8217; attributes are stored
+and used in the new hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">DirectedHypergraph &#8211; a new hypergraph that is a copy of
+the current hypergraph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_backward_star">
+<tt class="descname">get_backward_star</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_backward_star"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_backward_star" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node, get a copy of that node&#8217;s backward star.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; node to retrieve the backward-star of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; set of hyperedge_ids for the hyperedges
+in the node&#8217;s backward star.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_forward_star">
+<tt class="descname">get_forward_star</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_forward_star"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_forward_star" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node, get a copy of that node&#8217;s forward star.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; node to retrieve the forward-star of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; set of hyperedge_ids for the hyperedges
+in the node&#8217;s forward star.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_attribute">
+<tt class="descname">get_hyperedge_attribute</tt><big>(</big><em>hyperedge_id</em>, <em>attribute_name</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID and the name of an attribute, get a copy
+of that hyperedge&#8217;s attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to retrieve the attribute of.</li>
+<li><strong>attribute_name</strong> &#8211; name of the attribute to retrieve.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">attribute value of the attribute_name key for the
+specified hyperedge.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; No such hyperedge exists.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; No such attribute exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">]),</span>
+<span class="go">                      ((&quot;A&quot;, &quot;B&quot;), (&quot;C&quot;), {weight: 2}),</span>
+<span class="go">                      (set([&quot;B&quot;]), set([&quot;A&quot;, &quot;C&quot;])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attribute</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_attribute</span><span class="p">(</span><span class="n">hyperedge_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_attributes">
+<tt class="descname">get_hyperedge_attributes</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get a dictionary of copies of that hyperedge&#8217;s
+attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to retrieve the attributes of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; copy of each attribute of the specified hyperedge_id
+(except the private __frozen_tail and __frozen_head entries).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_head">
+<tt class="descname">get_hyperedge_head</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_head"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get a copy of that hyperedge&#8217;s head.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge</strong> &#8211; ID of the hyperedge to retrieve the head from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a copy of the container of nodes that the user provided
+as the head to the hyperedge referenced as hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_id">
+<tt class="descname">get_hyperedge_id</tt><big>(</big><em>tail</em>, <em>head</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>From a tail and head set of nodes, returns the ID of the hyperedge
+that these sets comprise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tail</strong> &#8211; iterable container of references to nodes in the
+tail of the hyperedge to be added</li>
+<li><strong>head</strong> &#8211; iterable container of references to nodes in the
+head of the hyperedge to be added</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str &#8211; ID of the hyperedge that has that the specified
+tail and head sets comprise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; No such hyperedge exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">]),</span>
+<span class="go">                      ((&quot;A&quot;, &quot;B&quot;), (&quot;C&quot;), {weight: 2}),</span>
+<span class="go">                      (set([&quot;B&quot;]), set([&quot;A&quot;, &quot;C&quot;])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_id_set">
+<tt class="descname">get_hyperedge_id_set</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_id_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_id_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the set of IDs of hyperedges that are currently
+in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; all IDs of hyperedges currently in the hypergraph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_tail">
+<tt class="descname">get_hyperedge_tail</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_tail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_tail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get a copy of that hyperedge&#8217;s tail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to retrieve the tail from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a copy of the container of nodes that the user provided
+as the tail to the hyperedge referenced as hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_weight">
+<tt class="descname">get_hyperedge_weight</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_hyperedge_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_hyperedge_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get that hyperedge&#8217;s weight.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge</strong> &#8211; ID of the hyperedge to retrieve the weight from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a the weight of the hyperedge referenced as hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_induced_subhypergraph">
+<tt class="descname">get_induced_subhypergraph</tt><big>(</big><em>nodes</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_induced_subhypergraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_induced_subhypergraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives a new hypergraph that is the subhypergraph of the current
+hypergraph induced by the provided set of nodes. That is, the induced
+subhypergraph&#8217;s node set corresponds precisely to the nodes provided,
+and the coressponding hyperedges in the subhypergraph are only those
+from the original graph consist of tail and head sets that are subsets
+of the provided nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; the set of nodes to find the induced subhypergraph of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DirectedHypergraph &#8211; the subhypergraph induced on the
+provided nodes.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_node_attribute">
+<tt class="descname">get_node_attribute</tt><big>(</big><em>node</em>, <em>attribute_name</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_node_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_node_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node and the name of an attribute, get a copy
+of that node&#8217;s attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>node</strong> &#8211; reference to the node to retrieve the attribute of.</li>
+<li><strong>attribute_name</strong> &#8211; name of the attribute to retrieve.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">attribute value of the attribute_name key for the
+specified node.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; No such node exists.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; No such attribute exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_node_attributes">
+<tt class="descname">get_node_attributes</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_node_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_node_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node, get a dictionary with copies of that node&#8217;s
+attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; reference to the node to retrieve the attributes of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; copy of each attribute of the specified node.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_node_set">
+<tt class="descname">get_node_set</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_node_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_node_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the set of nodes that are currently in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; all nodes currently in the hypergraph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_predecessors">
+<tt class="descname">get_predecessors</tt><big>(</big><em>head</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_predecessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_predecessors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a head set of nodes, get a list of edges of which the node set
+is the head of each edge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>head</strong> &#8211; set of nodes that correspond to the heads of some
+(possibly empty) set of edges.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; hyperedge_ids of the hyperedges that have head
+in the head.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_successors">
+<tt class="descname">get_successors</tt><big>(</big><em>tail</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_successors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_successors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a tail set of nodes, get a list of edges of which the node
+set is the tail of each edge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tail</strong> &#8211; set of nodes that correspond to the tails of some
+(possibly empty) set of edges.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; hyperedge_ids of the hyperedges that have tail
+in the tail.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.get_symmetric_image">
+<tt class="descname">get_symmetric_image</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.get_symmetric_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.get_symmetric_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new DirectedHypergraph object that is the symmetric
+image of this hypergraph (i.e., identical hypergraph with all
+edge directions reversed).
+Copies of each of the nodes&#8217; and hyperedges&#8217; attributes are stored
+and used in the new hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">DirectedHypergraph &#8211; a new hypergraph that is the symmetric
+image of the current hypergraph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.has_hyperedge">
+<tt class="descname">has_hyperedge</tt><big>(</big><em>tail</em>, <em>head</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.has_hyperedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.has_hyperedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a tail and head set of nodes, returns whether there
+is a hyperedge in the hypergraph that connects the tail set
+to the head set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tail</strong> &#8211; iterable container of references to nodes in the
+tail of the hyperedge being checked.</li>
+<li><strong>head</strong> &#8211; iterable container of references to nodes in the
+head of the hyperedge being checked.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool &#8211; true iff a hyperedge exists connecting the
+specified tail set to the specified head set.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.has_hyperedge_id">
+<tt class="descname">has_hyperedge_id</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.has_hyperedge_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.has_hyperedge_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a hyperedge referenced by hyperedge_id
+exists in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge whose existence is
+being checked.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; true iff a hyperedge exists that has id hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.has_node">
+<tt class="descname">has_node</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.has_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.has_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a specific node is present in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; reference to the node whose presence is being checked.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; true iff the node exists in the hypergraph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.hyperedge_id_iterator">
+<tt class="descname">hyperedge_id_iterator</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.hyperedge_id_iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.hyperedge_id_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an iterator over the list of hyperedge IDs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.is_BF_hypergraph">
+<tt class="descname">is_BF_hypergraph</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.is_BF_hypergraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.is_BF_hypergraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the hypergraph is a BF-hypergraph.
+A BF-hypergraph consists of only B-hyperedges and F-hyperedges.
+See &#8220;is_B_hypergraph&#8221; or &#8220;is_F_hypergraph&#8221; for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True iff the hypergraph is an F-hypergraph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.is_B_hypergraph">
+<tt class="descname">is_B_hypergraph</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.is_B_hypergraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.is_B_hypergraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the hypergraph is a B-hypergraph.
+In a B-hypergraph, all hyperedges are B-hyperedges &#8211; that is, every
+hyperedge has exactly one node in the head.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True iff the hypergraph is a B-hypergraph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.is_F_hypergraph">
+<tt class="descname">is_F_hypergraph</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.is_F_hypergraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.is_F_hypergraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the hypergraph is an F-hypergraph.
+In an F-hypergraph, all hyperedges are F-hyperedges &#8211; that is, every
+hyperedge has exactly one node in the tail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; True iff the hypergraph is an F-hypergraph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.node_iterator">
+<tt class="descname">node_iterator</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.node_iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.node_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an iterator over the nodes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.read">
+<tt class="descname">read</tt><big>(</big><em>file_name</em>, <em>delim='</em>, <em>'</em>, <em>sep='t'</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a directed hypergraph from a file, where nodes are
+represented as strings.
+Each column is separated by &#8220;sep&#8221;, and the individual
+tail nodes and head nodes are delimited by &#8220;delim&#8221;.
+The header line is currently ignored, but columns should be of
+the format:
+tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight</p>
+<p>As a concrete example, an arbitrary line with delim=&#8217;,&#8217; and
+sep=&#8217;    &#8216; (4 spaces) may look like:</p>
+<div class="highlight-python"><div class="highlight"><pre>x1,x2    x3,x4,x5    12
+</pre></div>
+</div>
+<p>which defines a hyperedge of weight 12 from a tail set containing
+nodes &#8220;x1&#8221; and &#8220;x2&#8221; to a head set containing nodes &#8220;x3&#8221;, &#8220;x4&#8221;, and &#8220;x5&#8221;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.remove_hyperedge">
+<tt class="descname">remove_hyperedge</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.remove_hyperedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.remove_hyperedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a hyperedge and its attributes from the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to be removed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xyz</span> <span class="o">=</span> <span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">(([</span><span class="s">&quot;A&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">]),</span>
+<span class="go">                            ((&quot;A&quot;, &quot;B&quot;), (&quot;C&quot;), {&#39;weight&#39;: 2}),</span>
+<span class="go">                            (set([&quot;B&quot;]), set([&quot;A&quot;, &quot;C&quot;])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_hyperedge</span><span class="p">(</span><span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.remove_hyperedges">
+<tt class="descname">remove_hyperedges</tt><big>(</big><em>hyperedge_ids</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.remove_hyperedges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.remove_hyperedges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a set of hyperedges and their attributes from
+the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_ids</strong> &#8211; iterable container of IDs of the hyperedges
+to be removed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+remove_hyperedge</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">(([</span><span class="s">&quot;A&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">]),</span>
+<span class="go">                      ((&quot;A&quot;, &quot;B&quot;), (&quot;C&quot;), {&#39;weight&#39;: 2}),</span>
+<span class="go">                      (set([&quot;B&quot;]), set([&quot;A&quot;, &quot;C&quot;])))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_hyperedges</span><span class="p">(</span><span class="n">hyperedge_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.remove_node">
+<tt class="descname">remove_node</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.remove_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.remove_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a node and its attributes from the hypergraph. Removes
+every hyperedge that contains this node in either the head or the tail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; reference to the node being added.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;positive&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.remove_nodes">
+<tt class="descname">remove_nodes</tt><big>(</big><em>nodes</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.remove_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.remove_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes multiple nodes and their attributes from the graph. If
+the nodes are part of any hyperedges, those hyperedges are removed
+as well.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; iterable container to either references of the nodes
+OR tuples of (node reference, attribute dictionary);
+if an attribute dictionary is provided in the tuple,
+its values will override both attr_dict&#8217;s and attr&#8217;s
+values.</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+remove_node</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="s">&quot;positive&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;A&quot;</span><span class="p">,</span>
+<span class="go">                 (&quot;B&quot;, {label=&quot;negative&quot;}),</span>
+<span class="go">                 (&quot;C&quot;, {root=True})]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">(</span><span class="n">node_list</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_nodes</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.directed_hypergraph.DirectedHypergraph.write">
+<tt class="descname">write</tt><big>(</big><em>file_name</em>, <em>delim='</em>, <em>'</em>, <em>sep='t'</em><big>)</big><a class="reference internal" href="_modules/halp/directed_hypergraph.html#DirectedHypergraph.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.directed_hypergraph.DirectedHypergraph.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a directed hypergraph to a file, where nodes are
+represented as strings.
+Each column is separated by &#8220;sep&#8221;, and the individual
+tail nodes and head nodes are delimited by &#8220;delim&#8221;.
+The header line is currently ignored, but columns should be of
+the format:
+tailnode1[delim]..tailnodeM[sep]headnode1[delim]..headnodeN[sep]weight</p>
+<p>As a concrete example, an arbitrary line with delim=&#8217;,&#8217; and
+sep=&#8217;    &#8216; (4 spaces) may look like:</p>
+<div class="highlight-python"><div class="highlight"><pre>x1,x2    x3,x4,x5    12
+</pre></div>
+</div>
+<p>which defines a hyperedge of weight 12 from a tail set containing
+nodes &#8220;x1&#8221; and &#8220;x2&#8221; to a head set containing nodes &#8220;x3&#8221;, &#8220;x4&#8221;, and &#8220;x5&#8221;</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.undirected_hypergraph">
+<span id="halp-undirected-hypergraph-module"></span><h2>halp.undirected_hypergraph module<a class="headerlink" href="#module-halp.undirected_hypergraph" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-undirected_hypergraph"></span><dl class="class">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph">
+<em class="property">class </em><tt class="descclassname">halp.undirected_hypergraph.</tt><tt class="descname">UndirectedHypergraph</tt><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>The UndirectedHypergraph class provides an undirected hypergraph object
+and associated functions for basic properties of undirected hypergraphs.</p>
+<p>An undirected hypergraph contains nodes and undirected hyperedges. Each
+undirected hyperedge simply connects a set of nodes. An undirected
+hypergraph is a special case of an undirected graph, where each edge
+connects exactly 2 nodes. The set of nodes cannot be empty.</p>
+<p>A node is simply any hashable type. See &#8220;add_node&#8221; or &#8220;add_nodes&#8221; for
+more details.</p>
+<p>An undirected hyperedge is any iterable container of nodes.
+This class assigns (upon adding) and refers to each hyperedge by an
+internal ID. See &#8220;add_hyperedge&#8221; or &#8220;add_hyperedges&#8221; for more details.</p>
+<p>Self-loops and parallel (multi-) hyperedges are not allowed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">This class uses several data structures to store a undirected
+hypergraph. Since these structures must stay in sync (see: __init__),
+we highly recommend that only the public methods be used for accessing
+and modifying the hypergraph.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:
+Create an empty undirected hypergraph (no nodes or hyperedges).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Add nodes (with or without attributes) to the hypergraph
+one at a time (see: add_node) or several at a time (see: add_nodes).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">],</span> <span class="p">{</span><span class="n">color</span><span class="p">:</span> <span class="s">&quot;black&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Add hyperedges to the hypergraph one at a time (see: add_hyperedge)
+or several at a time (see: add_hyperedges).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">],</span> <span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Update attributes of existing nodes and hyperedges by simulating adding the
+node or hyperedge again, with the [potentially new] attribute appended.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;sink&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">],</span> <span class="n">weight</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.add_hyperedge">
+<tt class="descname">add_hyperedge</tt><big>(</big><em>nodes</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.add_hyperedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.add_hyperedge" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds a hyperedge to the hypergraph, along with any related</dt>
+<dd>attributes of the hyperedge.
+This method will automatically add any node from the node set
+that was not in the hypergraph.
+A hyperedge without a &#8220;weight&#8221; attribute specified will be
+assigned the default value of 1.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nodes</strong> &#8211; iterable container of references to nodes in the
+hyperedge to be added.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes of the hyperedge being
+added.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the hyperedge;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str &#8211; the ID of the hyperedge that was added.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; nodes arguments cannot be empty.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">((</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">),</span> <span class="n">weight</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">]),</span> <span class="p">{</span><span class="n">color</span><span class="p">:</span> <span class="s">&quot;red&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.add_hyperedges">
+<tt class="descname">add_hyperedges</tt><big>(</big><em>hyperedges</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.add_hyperedges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.add_hyperedges" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds multiple hyperedges to the graph, along with any related</dt>
+<dd>attributes of the hyperedges.
+If any node of a hyperedge has not previously been added to the
+hypergraph, it will automatically be added here.
+Hyperedges without a &#8220;weight&#8221; attribute specified will be
+assigned the default value of 1.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hyperedges</strong> &#8211; iterable container to references of the node sets</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes shared by all
+the hyperedges being added.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the hyperedges;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list &#8211; the IDs of the hyperedges added in the order
+specified by the hyperedges container&#8217;s iterator.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+add_hyperedge</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">],</span>
+<span class="go">                      (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="go">                      set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.add_node">
+<tt class="descname">add_node</tt><big>(</big><em>node</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds a node to the graph, along with any related attributes</dt>
+<dd>of the node.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>node</strong> &#8211; reference to the node being added.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes of the node.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the node;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Note:</th><td class="field-body"><p class="first last">Following the NetworkX model, we allow both a dictionary
+of attributes to be passed in by the user as well as key-value
+pairs of attributes to be passed in by the user to provide
+greater flexibility. This pattern is followed in methods such
+as add_nodes, add_hyperedge, and add_hyperedges.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="s">&quot;positive&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;negative&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.add_nodes">
+<tt class="descname">add_nodes</tt><big>(</big><em>nodes</em>, <em>attr_dict=None</em>, <em>**attr</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.add_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.add_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Adds multiple nodes to the graph, along with any related attributes</dt>
+<dd>of the nodes.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>nodes</strong> &#8211; iterable container to either references of the nodes
+OR tuples of (node reference, attribute dictionary);
+if an attribute dictionary is provided in the tuple,
+its values will override both attr_dict&#8217;s and attr&#8217;s
+values.</li>
+<li><strong>attr_dict</strong> &#8211; dictionary of attributes shared by all the nodes.</li>
+<li><strong>attr</strong> &#8211; keyword arguments of attributes of the node;
+attr&#8217;s values will override attr_dict&#8217;s values
+if both are provided.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+add_node</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="s">&quot;positive&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;A&quot;</span><span class="p">,</span>
+<span class="go">                 (&quot;B&quot;, {label=&quot;negative&quot;}),</span>
+<span class="go">                 (&quot;C&quot;, {root=True})]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">(</span><span class="n">node_list</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new UndirectedHypergraph object with the same node and
+hyperedge structure.
+Copies of the nodes&#8217; and hyperedges&#8217; attributes are stored
+and used in the new hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">UndirectedHypergraph &#8211; a new hypergraph that is a copy of
+the current hypergraph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_attribute">
+<tt class="descname">get_hyperedge_attribute</tt><big>(</big><em>hyperedge_id</em>, <em>attribute_name</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_hyperedge_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID and the name of an attribute, get a copy
+of that hyperedge&#8217;s attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to retrieve the attribute of.</li>
+<li><strong>attribute_name</strong> &#8211; name of the attribute to retrieve.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">attribute value of the attribute_name key for the
+specified hyperedge.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; No such hyperedge exists.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; No such attribute exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">],</span>
+<span class="go">                      (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="go">                      set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attribute</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_attribute</span><span class="p">(</span><span class="n">hyperedge_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_attributes">
+<tt class="descname">get_hyperedge_attributes</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_hyperedge_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get a dictionary of copies of that hyperedge&#8217;s
+attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to retrieve the attributes of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; copy of each attribute of the specified hyperedge_id
+(except the private __frozen_nodes entry).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_id">
+<tt class="descname">get_hyperedge_id</tt><big>(</big><em>nodes</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_hyperedge_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>From a set of nodes, returns the ID of the hyperedge that this
+set comprises.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; iterable container of references to nodes in the
+the hyperedge to be added</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">str &#8211; ID of the hyperedge that has that the specified
+node set comprises.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">],</span>
+<span class="go">                      (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="go">                      set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_id_set">
+<tt class="descname">get_hyperedge_id_set</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_hyperedge_id_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_id_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the set of IDs of hyperedges that are currently
+in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; all IDs of hyperedges currently in the hypergraph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_nodes">
+<tt class="descname">get_hyperedge_nodes</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_hyperedge_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get a copy of that hyperedge&#8217;s nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to retrieve the nodes from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a copy of the container of nodes that the user provided
+for the hyperedge referenced as hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_weight">
+<tt class="descname">get_hyperedge_weight</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_hyperedge_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_hyperedge_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a hyperedge ID, get that hyperedge&#8217;s weight.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge</strong> &#8211; ID of the hyperedge to retrieve the weight from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int &#8211; the weight of the hyperedge referenced as
+hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_node_attribute">
+<tt class="descname">get_node_attribute</tt><big>(</big><em>node</em>, <em>attribute_name</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_node_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_node_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node and the name of an attribute, get a copy
+of that node&#8217;s attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>node</strong> &#8211; reference to the node to retrieve the attribute of.</li>
+<li><strong>attribute_name</strong> &#8211; name of the attribute to retrieve.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">attribute value of the attribute_name key for the
+specified node.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; No such node exists.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; No such attribute exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_node_attributes">
+<tt class="descname">get_node_attributes</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_node_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_node_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node, get a dictionary with copies of that node&#8217;s
+attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; reference to the node to retrieve the attributes of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict &#8211; copy of each attribute of the specified node.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_node_set">
+<tt class="descname">get_node_set</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_node_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_node_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the set of nodes that are currently in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; all nodes currently in the hypergraph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.get_star">
+<tt class="descname">get_star</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.get_star"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.get_star" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a node, get a copy of that node&#8217;s star, that is, the set of
+hyperedges that the node belongs to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; node to retrieve the star of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">set &#8211; set of hyperedge_ids for the hyperedges
+in the node&#8217;s star.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.has_hyperedge">
+<tt class="descname">has_hyperedge</tt><big>(</big><em>nodes</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.has_hyperedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.has_hyperedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of nodes, returns whether there is a hyperedge in the
+hypergraph that is precisely composed of those nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; iterable container of references to nodes in the
+hyperedge being checked.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; true iff a hyperedge exists composed of the
+specified nodes.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.has_hyperedge_id">
+<tt class="descname">has_hyperedge_id</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.has_hyperedge_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.has_hyperedge_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a hyperedge referenced by hyperedge_id
+exists in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge whose existence is
+being checked.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; true iff a hyperedge exists that has id hyperedge_id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.has_node">
+<tt class="descname">has_node</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.has_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.has_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a specific node is present in the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; reference to the node whose presence is being checked.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">bool &#8211; true iff the node exists in the hypergraph.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.hyperedge_id_iterator">
+<tt class="descname">hyperedge_id_iterator</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.hyperedge_id_iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.hyperedge_id_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an iterator over the list of hyperedge IDs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.node_iterator">
+<tt class="descname">node_iterator</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.node_iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.node_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an iterator over the nodes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.read">
+<tt class="descname">read</tt><big>(</big><em>file_name</em>, <em>delim='</em>, <em>'</em>, <em>sep='t'</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an undirected hypergraph from a file, where nodes are
+represented as strings.
+Each column is separated by &#8220;sep&#8221;, and the individual nodes are
+delimited by &#8220;delim&#8221;.
+The header line is currently ignored, but columns should be of
+the format:
+node1[delim]..nodeM[sep]weight</p>
+<p>As a concrete example, an arbitrary line with delim=&#8217;,&#8217; and
+sep=&#8217;    &#8216; (4 spaces) may look like:</p>
+<div class="highlight-python"><div class="highlight"><pre>x1,x2,x3,x5    12
+</pre></div>
+</div>
+<p>which defines a hyperedge of weight 12 from a node set containing
+nodes &#8220;x1&#8221;, &#8220;x2&#8221;, &#8220;x3&#8221;, and &#8220;x5&#8221;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.remove_hyperedge">
+<tt class="descname">remove_hyperedge</tt><big>(</big><em>hyperedge_id</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.remove_hyperedge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.remove_hyperedge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a hyperedge and its attributes from the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_id</strong> &#8211; ID of the hyperedge to be removed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">],</span>
+<span class="go">                      (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="go">                      set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_hyperedge</span><span class="p">(</span><span class="n">hyperedge_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BD_id</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;D&quot;</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_hyperedge</span><span class="p">(</span><span class="n">BD_id</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.remove_hyperedges">
+<tt class="descname">remove_hyperedges</tt><big>(</big><em>hyperedge_ids</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.remove_hyperedges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.remove_hyperedges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a set of hyperedges and their attributes from
+the hypergraph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hyperedge_ids</strong> &#8211; iterable container of IDs of the hyperedges
+to be removed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such hyperedge exists.</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+remove_hyperedge</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_list</span> <span class="o">=</span> <span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">],</span>
+<span class="go">                      (&quot;A&quot;, &quot;D&quot;),</span>
+<span class="go">                      set([&quot;B&quot;, &quot;D&quot;]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyperedge_ids</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedge_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_hyperedges</span><span class="p">(</span><span class="n">hyperedge_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.remove_node">
+<tt class="descname">remove_node</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.remove_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.remove_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a node and its attributes from the hypergraph. Removes
+every hyperedge that contains this node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> &#8211; reference to the node being added.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">ValueError &#8211; No such node exists.</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;positive&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.remove_nodes">
+<tt class="descname">remove_nodes</tt><big>(</big><em>nodes</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.remove_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.remove_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes multiple nodes and their attributes from the graph. If
+the nodes are part of any hyperedges, those hyperedges are removed
+as well.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nodes</strong> &#8211; iterable container to either references of the nodes
+OR tuples of (node reference, attribute dictionary);
+if an attribute dictionary is provided in the tuple,
+its values will override both attr_dict&#8217;s and attr&#8217;s
+values.</td>
+</tr>
+</tbody>
+</table>
+<p>See also:
+remove_node</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">UndirectedHypergraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="s">&quot;positive&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;A&quot;</span><span class="p">,</span>
+<span class="go">                 (&quot;B&quot;, {label=&quot;negative&quot;}),</span>
+<span class="go">                 (&quot;C&quot;, {root=True})]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">(</span><span class="n">node_list</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span><span class="o">.</span><span class="n">remove_nodes</span><span class="p">([</span><span class="s">&quot;A&quot;</span><span class="p">,</span> <span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="s">&quot;C&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="halp.undirected_hypergraph.UndirectedHypergraph.write">
+<tt class="descname">write</tt><big>(</big><em>file_name</em>, <em>delim='</em>, <em>'</em>, <em>sep='t'</em><big>)</big><a class="reference internal" href="_modules/halp/undirected_hypergraph.html#UndirectedHypergraph.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.undirected_hypergraph.UndirectedHypergraph.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes an undirected hypergraph from a file, where nodes are
+represented as strings.
+Each column is separated by &#8220;sep&#8221;, and the individual nodes are
+delimited by &#8220;delim&#8221;.
+The header line is currently ignored, but columns should be of
+the format:
+node1[delim]..nodeM[sep]node1[delim]..nodeN[sep]weight</p>
+<p>As a concrete example, an arbitrary line with delim=&#8217;,&#8217; and
+sep=&#8217;    &#8216; (4 spaces) may look like:</p>
+<div class="highlight-python"><div class="highlight"><pre>x1,x2,x3,x5    12
+</pre></div>
+</div>
+<p>which defines a hyperedge of weight 12 from a node set containing
+nodes &#8220;x1&#8221;, &#8220;x2&#8221;, &#8220;x3&#8221;, and &#8220;x5&#8221;.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-halp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to halp&#8217;s documentation!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="halp.algorithms.html">halp.algorithms package</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

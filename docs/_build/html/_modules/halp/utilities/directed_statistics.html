@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.utilities.directed_statistics &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.utilities.directed_statistics</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.utilities.directed_statistics</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: directed_statistics</span>
+<span class="sd">   :synopsis: Defines several functions for generating statistics of</span>
+<span class="sd">            the hypergraph and its properties.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+
+
+<div class="viewcode-block" id="number_of_nodes"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.number_of_nodes">[docs]</a><span class="k">def</span> <span class="nf">number_of_nodes</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of nodes in the given hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose nodes are to be counted.</span>
+<span class="sd">    :returns: int -- number of nodes in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">())</span>
+
+</div>
+<div class="viewcode-block" id="number_of_hyperedges"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.number_of_hyperedges">[docs]</a><span class="k">def</span> <span class="nf">number_of_hyperedges</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of hyperedges in the given hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose hyperedges are to be counted.</span>
+<span class="sd">    :returns: int -- number of hyperedges in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">())</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_F_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the result of a function F applied to the set of outdegrees in</span>
+<span class="sd">    in the hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose outdegrees will be operated on.</span>
+<span class="sd">    :param F: function to execute on the list of outdegrees in the hypergraph.</span>
+<span class="sd">    :returns: result of the given function F.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">F</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_forward_star</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+             <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()])</span>
+
+
+<div class="viewcode-block" id="outdegree_list"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.outdegree_list">[docs]</a><span class="k">def</span> <span class="nf">outdegree_list</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the hypergraph&#39;s nodes&#39; outdegrees.</span>
+<span class="sd">    Use this to manually perform statistics on the hypergraph&#39;s nodes&#39;</span>
+<span class="sd">    outdegrees or to avoid the performance cost of calling several</span>
+<span class="sd">    built-in statistics functions.</span>
+
+<span class="sd">    :param H: the hypergraph whose outdegrees are to be returned.</span>
+<span class="sd">    :returns: list -- outdegrees for each node in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="min_outdegree"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.min_outdegree">[docs]</a><span class="k">def</span> <span class="nf">min_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s smallest outdegree.</span>
+
+<span class="sd">    :param H: the hypergraph whose min outdegree is to be determined.</span>
+<span class="sd">    :returns: int -- the min outdegree in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">min</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="max_outdegree"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.max_outdegree">[docs]</a><span class="k">def</span> <span class="nf">max_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s largest outdegree.</span>
+
+<span class="sd">    :param H: the hypergraph whose max outdegree is to be determined.</span>
+<span class="sd">    :returns: int -- the max outdegree in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="mean_outdegree"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.mean_outdegree">[docs]</a><span class="k">def</span> <span class="nf">mean_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s mean outdegree.</span>
+
+<span class="sd">    :param H: the hypergraph whose mean outdegree is to be</span>
+<span class="sd">                    determined.</span>
+<span class="sd">    :returns: float -- the mean outdegree in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_outdegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_F_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the result of a function F applied to the list of indegrees in</span>
+<span class="sd">    in the hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose indegrees will be operated on.</span>
+<span class="sd">    :param F: function to execute on the list of indegrees in the hypergraph.</span>
+<span class="sd">    :returns: result of the given function F.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">F</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_backward_star</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+             <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()])</span>
+
+
+<div class="viewcode-block" id="indegree_list"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.indegree_list">[docs]</a><span class="k">def</span> <span class="nf">indegree_list</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the hypergraph&#39;s nodes&#39; indegrees.</span>
+<span class="sd">    Use this to manually perform statistics on the hypergraph&#39;s nodes&#39;</span>
+<span class="sd">    indegrees or to avoid the performance cost of calling several</span>
+<span class="sd">    built-in statistics functions.</span>
+
+<span class="sd">    :param H: the hypergraph whose indegrees are to be returned.</span>
+<span class="sd">    :returns: list -- indegrees for each node in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="min_indegree"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.min_indegree">[docs]</a><span class="k">def</span> <span class="nf">min_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s smallest indegree.</span>
+
+<span class="sd">    :param H: the hypergraph whose min indegree is to be determined.</span>
+<span class="sd">    :returns: int -- the min indegree in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">min</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="max_indegree"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.max_indegree">[docs]</a><span class="k">def</span> <span class="nf">max_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s largest indegree.</span>
+
+<span class="sd">    :param H: the hypergraph whose max indegree is to be determined.</span>
+<span class="sd">    :returns: int -- the max indegree in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="mean_indegree"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.mean_indegree">[docs]</a><span class="k">def</span> <span class="nf">mean_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s mean indegree.</span>
+
+<span class="sd">    :param H: the hypergraph whose mean indegree is to be</span>
+<span class="sd">                    determined.</span>
+<span class="sd">    :returns: float -- the mean indegree in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_indegree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_F_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the result of a function F applied to the set of cardinalities</span>
+<span class="sd">    of hyperedge tails in the hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose tail cardinalities will be</span>
+<span class="sd">                    operated on.</span>
+<span class="sd">    :param F: function to execute on the set of cardinalities in the</span>
+<span class="sd">            hypergraph.</span>
+<span class="sd">    :returns: result of the given function F.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">F</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">))</span>
+             <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">()])</span>
+
+
+<div class="viewcode-block" id="hyperedge_tail_cardinality_list"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.hyperedge_tail_cardinality_list">[docs]</a><span class="k">def</span> <span class="nf">hyperedge_tail_cardinality_list</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the hypergraph&#39;s hyperedges&#39; tail cardinalities.</span>
+<span class="sd">    Use this to manually perform statistics on the hypergraph&#39;s</span>
+<span class="sd">    hyperedges&#39; tail cardinalities or to avoid the performance cost of calling</span>
+<span class="sd">    several built-in statistics functions.</span>
+
+<span class="sd">    :param H: the hypergraph whose tail cardinalities are to</span>
+<span class="sd">                    be returned.</span>
+<span class="sd">    :returns: list -- tail cardinalities for each hyperedge in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="min_hyperedge_tail_cardinality"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.min_hyperedge_tail_cardinality">[docs]</a><span class="k">def</span> <span class="nf">min_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s smallest hyperedge tail cardinality.</span>
+
+<span class="sd">    :param H: the hypergraph whose min hyperedge tail cardinality</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the min hyperedge tail cardinality in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">min</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="max_hyperedge_tail_cardinality"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.max_hyperedge_tail_cardinality">[docs]</a><span class="k">def</span> <span class="nf">max_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s largest hyperedge tail cardinality.</span>
+
+<span class="sd">    :param H: the hypergraph whose max hyperedge tail cardinality</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the max hyperedge tail cardinality in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="mean_hyperedge_tail_cardinality"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.mean_hyperedge_tail_cardinality">[docs]</a><span class="k">def</span> <span class="nf">mean_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s mean hyperedge tail cardinality.</span>
+
+<span class="sd">    :param H: the hypergraph whose np.mean hyperedge tail cardinality</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: float -- the np.mean hyperedge tail cardinality in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_tail_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_F_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the result of a function F applied to the set of cardinalities</span>
+<span class="sd">    of hyperedge heads in the hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose head cardinalities will be</span>
+<span class="sd">                    operated on.</span>
+<span class="sd">    :param F: function to execute on the set of cardinalities in the</span>
+<span class="sd">            hypergraph.</span>
+<span class="sd">    :returns: result of the given function F.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">F</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">))</span>
+             <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">()])</span>
+
+
+<div class="viewcode-block" id="hyperedge_head_cardinality_list"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.hyperedge_head_cardinality_list">[docs]</a><span class="k">def</span> <span class="nf">hyperedge_head_cardinality_list</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the hypergraph&#39;s hyperedges&#39; head cardinalities.</span>
+<span class="sd">    Use this to manually perform statistics on the hypergraph&#39;s</span>
+<span class="sd">    hyperedges&#39; head cardinalities or to avoid the performance cost of calling</span>
+<span class="sd">    several built-in statistics functions.</span>
+
+<span class="sd">    :param H: the hypergraph whose head cardinalities are to</span>
+<span class="sd">                    be returned.</span>
+<span class="sd">    :returns: list -- head cardinalities for each hyperedge in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="max_hyperedge_head_cardinality"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.max_hyperedge_head_cardinality">[docs]</a><span class="k">def</span> <span class="nf">max_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s largest hyperedge head cardinality.</span>
+
+<span class="sd">    :param H: the hypergraph whose max hyperedge head cardinality</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the max hyperedge head cardinality in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="min_hyperedge_head_cardinality"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.min_hyperedge_head_cardinality">[docs]</a><span class="k">def</span> <span class="nf">min_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s smallest hyperedge head cardinality.</span>
+
+<span class="sd">    :param H: the hypergraph whose min hyperedge head cardinality</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the min hyperedge head cardinality in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">min</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="mean_hyperedge_head_cardinality"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.mean_hyperedge_head_cardinality">[docs]</a><span class="k">def</span> <span class="nf">mean_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s mean hyperedge head cardinality.</span>
+
+<span class="sd">    :param H: the hypergraph whose np.mean hyperedge head cardinality</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: float -- the np.mean hyperedge head cardinality in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_head_cardinality</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="hyperedge_cardinality_pairs_list"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.hyperedge_cardinality_pairs_list">[docs]</a><span class="k">def</span> <span class="nf">hyperedge_cardinality_pairs_list</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of 2-tuples of (\|tail\|, \|head\|) for each hyperedge</span>
+<span class="sd">    in the hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose cardinality ratios will be</span>
+<span class="sd">            operated on.</span>
+<span class="sd">    :returns: list -- list of 2-tuples for each hyperedge&#39;s cardinality.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_head</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">hyperedge_id_iterator</span><span class="p">()]</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_F_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the result of a function F applied to the set of cardinality</span>
+<span class="sd">    ratios between the tail and the head sets (specifically, |tail|/|head|) of</span>
+<span class="sd">    hyperedges in the hypergraph.</span>
+
+<span class="sd">    :param H: the hypergraph whose cardinality ratios will be</span>
+<span class="sd">                    operated on.</span>
+<span class="sd">    :param F: function to execute on the set of cardinality ratios in the</span>
+<span class="sd">            hypergraph.</span>
+<span class="sd">    :returns: result of the given function F.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">DirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="c"># Since |head| can potentially be 0 (causing a division by 0 exception),</span>
+    <span class="c"># we use numpy&#39;s float64 to have division by 0 result in inf, which is</span>
+    <span class="c"># then cast back to a float for our final result</span>
+    <span class="k">return</span> <span class="n">F</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">tail_card</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">head_card</span><span class="p">))</span>
+             <span class="k">for</span> <span class="n">tail_card</span><span class="p">,</span> <span class="n">head_card</span> <span class="ow">in</span> <span class="n">hyperedge_cardinality_pairs_list</span><span class="p">(</span><span class="n">H</span><span class="p">)])</span>
+
+
+<div class="viewcode-block" id="hyperedge_cardinality_ratio_list"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.hyperedge_cardinality_ratio_list">[docs]</a><span class="k">def</span> <span class="nf">hyperedge_cardinality_ratio_list</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the hypergraph&#39;s hyperedges&#39; cardinality ratios.</span>
+<span class="sd">    Use this to manually perform statistics on the hypergraph&#39;s</span>
+<span class="sd">    hyperedges&#39; cardinality ratios or to avoid the performance cost of calling</span>
+<span class="sd">    several built-in statistics functions.</span>
+
+<span class="sd">    :param H: the hypergraph whose cardinality ratios are to</span>
+<span class="sd">                    be returned.</span>
+<span class="sd">    :returns: list -- cardinality ratios for each hyperedge in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="min_hyperedge_cardinality_ratio"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.min_hyperedge_cardinality_ratio">[docs]</a><span class="k">def</span> <span class="nf">min_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s smallest hyperedge cardinality ratio.</span>
+
+<span class="sd">    :param H: the hypergraph whose min hyperedge cardinality ratio</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the min hyperedge cardinality ratio in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">min</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="max_hyperedge_cardinality_ratio"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.max_hyperedge_cardinality_ratio">[docs]</a><span class="k">def</span> <span class="nf">max_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s largest hyperedge cardinality ratio.</span>
+
+<span class="sd">    :param H: the hypergraph whose max hyperedge cardinality ratio</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the max hyperedge cardinality ratio in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="mean_hyperedge_cardinality_ratio"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.directed_statistics.mean_hyperedge_cardinality_ratio">[docs]</a><span class="k">def</span> <span class="nf">mean_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the hypergraph&#39;s mean hyperedge cardinality ratio.</span>
+
+<span class="sd">    :param H: the hypergraph whose mean hyperedge cardinality ratio</span>
+<span class="sd">                is to be determined.</span>
+<span class="sd">    :returns: int -- the mean hyperedge cardinality ratio in the graph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_F_hyperedge_cardinality_ratio</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

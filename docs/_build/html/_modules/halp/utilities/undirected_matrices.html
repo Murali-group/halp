@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.utilities.undirected_matrices &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.utilities.undirected_matrices</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.utilities.undirected_matrices</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: undirected_matrices</span>
+<span class="sd">   :synopsis: Provides various methods for tranforming a hypergraph</span>
+<span class="sd">            (or its components) into useful corresponding matrix</span>
+<span class="sd">            representations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+
+<span class="kn">from</span> <span class="nn">halp.undirected_hypergraph</span> <span class="kn">import</span> <span class="n">UndirectedHypergraph</span>
+
+
+<div class="viewcode-block" id="get_node_mapping"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.get_node_mapping">[docs]</a><span class="k">def</span> <span class="nf">get_node_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates mappings between the set of nodes and integer indices (where</span>
+<span class="sd">    every node corresponds to exactly 1 integer index).</span>
+
+<span class="sd">    :param H: the hypergraph to find the node mapping on.</span>
+<span class="sd">    :returns: dict -- for each integer index, maps the index to the node.</span>
+<span class="sd">              dict -- for each node, maps the node to the integer index.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">node_set</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()</span>
+    <span class="n">nodes_to_indices</span><span class="p">,</span> <span class="n">indices_to_nodes</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+
+    <span class="n">node_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_set</span><span class="p">:</span>
+        <span class="n">nodes_to_indices</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">node</span><span class="p">:</span> <span class="n">node_index</span><span class="p">})</span>
+        <span class="n">indices_to_nodes</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">node_index</span><span class="p">:</span> <span class="n">node</span><span class="p">})</span>
+        <span class="n">node_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">indices_to_nodes</span><span class="p">,</span> <span class="n">nodes_to_indices</span>
+
+</div>
+<div class="viewcode-block" id="get_hyperedge_id_mapping"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.get_hyperedge_id_mapping">[docs]</a><span class="k">def</span> <span class="nf">get_hyperedge_id_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates mappings between the set of hyperedge IDs and integer indices</span>
+<span class="sd">    (where every hyperedge ID corresponds to exactly 1 integer index).</span>
+
+<span class="sd">    :param H: the hypergraph to find the hyperedge ID mapping on.</span>
+<span class="sd">    :returns: dict -- for each integer index, maps the index to the hyperedge</span>
+<span class="sd">                ID.</span>
+<span class="sd">              dict -- for each hyperedge ID, maps the hyperedge ID to the</span>
+<span class="sd">                integer index.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">UndirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to undirected hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="n">indices_to_hyperedge_ids</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="n">hyperedge_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">hyperedge_id_iterator</span><span class="p">():</span>
+        <span class="n">hyperedge_ids_to_indices</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">hyperedge_id</span><span class="p">:</span> <span class="n">hyperedge_index</span><span class="p">})</span>
+        <span class="n">indices_to_hyperedge_ids</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">hyperedge_index</span><span class="p">:</span> <span class="n">hyperedge_id</span><span class="p">})</span>
+        <span class="n">hyperedge_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">indices_to_hyperedge_ids</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span>
+
+</div>
+<div class="viewcode-block" id="get_incidence_matrix"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.get_incidence_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_incidence_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">nodes_to_indices</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the incidence matrix of the given hypergraph as a sparse matrix.</span>
+
+<span class="sd">    :param H: the hypergraph for which to create the incidence matrix of.</span>
+<span class="sd">    :param nodes_to_indices: for each node, maps the node to its</span>
+<span class="sd">                            corresponding integer index.</span>
+<span class="sd">    :param hyperedge_ids_to_indices: for each hyperedge ID, maps the hyperedge</span>
+<span class="sd">                                    ID to its corresponding integer index.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the incidence matrix as a sparse matrix.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">UndirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to undirected hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">hyperedge_id</span><span class="p">,</span> <span class="n">hyperedge_index</span> <span class="ow">in</span> <span class="n">hyperedge_ids_to_indices</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_nodes</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">):</span>
+            <span class="c"># get the mapping between the node and its ID</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes_to_indices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+            <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hyperedge_index</span><span class="p">)</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">node_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">())</span>
+    <span class="n">hyperedge_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_id_set</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">((</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)),</span>
+                             <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">node_count</span><span class="p">,</span> <span class="n">hyperedge_count</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="get_vertex_degree_matrix"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.get_vertex_degree_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_vertex_degree_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the diagonal maxtrix D_v of vertex degrees as a sparse matrix,</span>
+<span class="sd">    where a vertex degree is the sum of the weights of all hyperedges</span>
+<span class="sd">    in the vertex&#39;s star.</span>
+
+<span class="sd">    :param M: the incidence matrix of the hypergraph to find the D_v matrix on.</span>
+<span class="sd">    :param W: the diagonal hyperedge weight matrix of the hypergraph.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the diagonal vertex degree matrix as a</span>
+<span class="sd">            sparse matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">([</span><span class="n">M</span> <span class="o">*</span> <span class="n">W</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="get_hyperedge_weight_matrix"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.get_hyperedge_weight_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_hyperedge_weight_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the diagonal matrix W of hyperedge weights as a sparse matrix.</span>
+
+<span class="sd">    :param H: the hypergraph to find the weights.</span>
+<span class="sd">    :param hyperedge_weights: the mapping from the indices of hyperedge IDs to</span>
+<span class="sd">                            the corresponding hyperedge weights.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the diagonal edge weight matrix as a</span>
+<span class="sd">            sparse matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Combined 2 methods into 1; this could be written better</span>
+    <span class="n">hyperedge_weights</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">hyperedge_id</span> <span class="ow">in</span> <span class="n">H</span><span class="o">.</span><span class="n">hyperedge_id_iterator</span><span class="p">():</span>
+        <span class="n">hyperedge_weights</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">hyperedge_ids_to_indices</span><span class="p">[</span><span class="n">hyperedge_id</span><span class="p">]:</span>
+                                 <span class="n">H</span><span class="o">.</span><span class="n">get_hyperedge_weight</span><span class="p">(</span><span class="n">hyperedge_id</span><span class="p">)})</span>
+
+    <span class="n">hyperedge_weight_vector</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hyperedge_weights</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+        <span class="n">hyperedge_weight_vector</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hyperedge_weights</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">([</span><span class="n">hyperedge_weight_vector</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="get_hyperedge_degree_matrix"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.get_hyperedge_degree_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_hyperedge_degree_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the diagonal matrix of hyperedge degrees D_e as a sparse matrix,</span>
+<span class="sd">    where a hyperedge degree is the cardinality of the hyperedge.</span>
+
+<span class="sd">    :param M: the incidence matrix of the hypergraph to find the D_e matrix on.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the diagonal hyperedge degree matrix as a</span>
+<span class="sd">            sparse matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">degrees</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">new_degree</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">degree</span> <span class="ow">in</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">new_degree</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">degree</span><span class="p">[</span><span class="mi">0</span><span class="p">:]))</span>
+
+    <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">([</span><span class="n">new_degree</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="fast_inverse"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.undirected_matrices.fast_inverse">[docs]</a><span class="k">def</span> <span class="nf">fast_inverse</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the inverse of a diagonal matrix.</span>
+
+<span class="sd">    :param H: the diagonal matrix to find the inverse of.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the inverse of the input matrix as a</span>
+<span class="sd">            sparse matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diags</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span>
+    <span class="n">new_diag</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">diags</span><span class="p">:</span>
+        <span class="n">new_diag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">([</span><span class="n">new_diag</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

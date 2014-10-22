@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.algorithms.undirected_partitioning &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.algorithms.undirected_partitioning</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.algorithms.undirected_partitioning</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: undirected_partitioning</span>
+<span class="sd">   :synopsis: Defines several functions for doing random walk, finding</span>
+<span class="sd">            the stationary distribution, and finding the min-cut for</span>
+<span class="sd">            an undirected hypergraph.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">halp.undirected_hypergraph</span> <span class="kn">import</span> <span class="n">UndirectedHypergraph</span>
+<span class="kn">from</span> <span class="nn">halp.utilities</span> <span class="kn">import</span> <span class="n">undirected_matrices</span> <span class="k">as</span> <span class="n">umat</span>
+
+
+<div class="viewcode-block" id="normalized_hypergraph_cut"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.undirected_partitioning.normalized_hypergraph_cut">[docs]</a><span class="k">def</span> <span class="nf">normalized_hypergraph_cut</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Executes the min-cut algorithm described in the paper:</span>
+<span class="sd">    Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.</span>
+<span class="sd">    &quot;Learning with hypergraphs: Clustering, classification, and embedding.&quot;</span>
+<span class="sd">    Advances in neural information processing systems. 2006.</span>
+<span class="sd">    (http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf)</span>
+
+<span class="sd">    This algorithm uses the normalized Laplacian to partition the hypergraph</span>
+<span class="sd">    into two disjoint components.</span>
+
+<span class="sd">    :param H: the hypergraph to perform the hypergraph-cut algorithm on.</span>
+<span class="sd">    :param threshold: The threshold value for the partitioning algorithm.</span>
+<span class="sd">                    Typically, the value zero is selected for this purpose.</span>
+<span class="sd">    :returns: set -- the S set of nodes in the S-T partition</span>
+<span class="sd">              set -- the T set of nodes in the S-T partition</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">UndirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to undirected hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="c"># TODO: make sure that the hypergraph is connected</span>
+
+    <span class="c"># Get index&lt;-&gt;node mappings and index&lt;-&gt;hyperedge_id mappings for matrices</span>
+    <span class="n">indices_to_nodes</span><span class="p">,</span> <span class="n">nodes_to_indices</span> <span class="o">=</span> \
+        <span class="n">umat</span><span class="o">.</span><span class="n">get_node_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">indices_to_hyperedge_ids</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span> <span class="o">=</span> \
+        <span class="n">umat</span><span class="o">.</span><span class="n">get_hyperedge_id_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">_compute_normalized_laplacian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                          <span class="n">nodes_to_indices</span><span class="p">,</span>
+                                          <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+
+    <span class="c"># Since the eigs method in sparse.linalg library doesn&#39;t find</span>
+    <span class="c"># all the eigenvalues and eigenvectors, it doesn&#39;t give us an</span>
+    <span class="c"># exact and correct solution. Therefore, we should use the</span>
+    <span class="c"># numpy library which works on dense graphs. This might be</span>
+    <span class="c"># problematic for large graphs.</span>
+    <span class="c"># New note: I think we only need the 2 smallest eigenvalues, which</span>
+    <span class="c"># can be found with the sparse solver. Look into this if run-time</span>
+    <span class="c"># becomes an issue.</span>
+
+    <span class="c"># eigenvalues,eigenvectors = linalg.eigs(delta,k=numberOfEigenValues)</span>
+    <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span>
+
+    <span class="n">second_min_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">second_eigenvector</span> <span class="o">=</span> <span class="n">eigenvectors</span><span class="p">[:,</span> <span class="n">second_min_index</span><span class="p">]</span>
+    <span class="n">partition_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">second_eigenvector</span><span class="p">))</span>
+                       <span class="k">if</span> <span class="n">second_eigenvector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">]</span>
+
+    <span class="n">S</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">nodes_to_indices</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">partition_index</span><span class="p">:</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">T</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_compute_normalized_laplacian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                  <span class="n">nodes_to_indices</span><span class="p">,</span>
+                                  <span class="n">hyperedge_ids_to_indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the normalized Laplacian as described in the paper:</span>
+<span class="sd">    Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.</span>
+<span class="sd">    &quot;Learning with hypergraphs: Clustering, classification, and embedding.&quot;</span>
+<span class="sd">    Advances in neural information processing systems. 2006.</span>
+<span class="sd">    (http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf)</span>
+
+<span class="sd">    :param H: the hypergraph to compute the normalized Laplacian</span>
+<span class="sd">                    matrix for.</span>
+<span class="sd">    :param nodes_to_indices: for each node, maps the node to its</span>
+<span class="sd">                            corresponding integer index.</span>
+<span class="sd">    :param hyperedge_ids_to_indices: for each hyperedge ID, maps the hyperedge</span>
+<span class="sd">                                    ID to its corresponding integer index.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the normalized Laplacian matrix as a sparse</span>
+<span class="sd">            matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_incidence_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                  <span class="n">nodes_to_indices</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_hyperedge_weight_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">D_v</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_vertex_degree_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+    <span class="n">D_e</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_hyperedge_degree_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="n">D_v_sqrt</span> <span class="o">=</span> <span class="n">D_v</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+    <span class="n">D_v_sqrt_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">umat</span><span class="o">.</span><span class="n">fast_inverse</span><span class="p">(</span><span class="n">D_v_sqrt</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span>
+    <span class="n">D_v_sqrt_inv</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">D_v_sqrt_inv</span><span class="p">)</span>
+    <span class="n">D_e_inv</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">fast_inverse</span><span class="p">(</span><span class="n">D_e</span><span class="p">)</span>
+    <span class="n">M_trans</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">D_v_sqrt_inv</span> <span class="o">*</span> <span class="n">M</span> <span class="o">*</span> <span class="n">W</span> <span class="o">*</span> <span class="n">D_e_inv</span> <span class="o">*</span> <span class="n">M_trans</span> <span class="o">*</span> <span class="n">D_v_sqrt_inv</span>
+
+    <span class="n">node_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">())</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">node_count</span><span class="p">)</span>
+
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">I</span> <span class="o">-</span> <span class="n">theta</span>
+    <span class="k">return</span> <span class="n">delta</span>
+
+
+<div class="viewcode-block" id="stationary_distribution"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.undirected_partitioning.stationary_distribution">[docs]</a><span class="k">def</span> <span class="nf">stationary_distribution</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">pi</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the stationary distribution of a random walk on the given</span>
+<span class="sd">    hypergraph using the iterative approach explained in the paper:</span>
+<span class="sd">    (http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf)</span>
+
+<span class="sd">    :param H: the hypergraph to find the stationary distribution on.</span>
+<span class="sd">    :param pi: the initial distribution over the nodes. If not provided,</span>
+<span class="sd">            it will be created with a random distribution.</span>
+<span class="sd">    :param P: the transition matrix for the hypergraph. If not provided,</span>
+<span class="sd">            it will be created.</span>
+<span class="sd">    :returns: list -- list of the stationary probabilities for all nodes</span>
+<span class="sd">            in the hypergraph.</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to undirected hypergraphs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">UndirectedHypergraph</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to undirected hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="n">indices_to_nodes</span><span class="p">,</span> <span class="n">nodes_to_indices</span> <span class="o">=</span> \
+        <span class="n">umat</span><span class="o">.</span><span class="n">get_node_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">indices_to_hyperedge_ids</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span> <span class="o">=</span> \
+        <span class="n">umat</span><span class="o">.</span><span class="n">get_hyperedge_id_mapping</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">P</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">_compute_transition_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                       <span class="n">nodes_to_indices</span><span class="p">,</span>
+                                       <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+
+    <span class="n">node_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">pi</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">_create_random_starter</span><span class="p">(</span><span class="n">node_count</span><span class="p">)</span>
+    <span class="n">pi_star</span> <span class="o">=</span> <span class="n">_create_random_starter</span><span class="p">(</span><span class="n">node_count</span><span class="p">)</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">_has_converged</span><span class="p">(</span><span class="n">pi_star</span><span class="p">,</span> <span class="n">pi</span><span class="p">):</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">pi_star</span>
+        <span class="n">pi_star</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">P</span>
+
+    <span class="k">return</span> <span class="n">pi</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_compute_transition_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                               <span class="n">nodes_to_indices</span><span class="p">,</span>
+                               <span class="n">hyperedge_ids_to_indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the transition matrix for a random walk on the given</span>
+<span class="sd">    hypergraph as described in the paper:</span>
+<span class="sd">    Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.</span>
+<span class="sd">    &quot;Learning with hypergraphs: Clustering, classification, and embedding.&quot;</span>
+<span class="sd">    Advances in neural information processing systems. 2006.</span>
+<span class="sd">    (http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf)</span>
+
+<span class="sd">    :param H: the hypergraph to find the transition matrix of.</span>
+<span class="sd">    :param nodes_to_indices: for each node, maps the node to its</span>
+<span class="sd">                            corresponding integer index.</span>
+<span class="sd">    :param hyperedge_ids_to_indices: for each hyperedge ID, maps the hyperedge</span>
+<span class="sd">                                    ID to its corresponding integer index.</span>
+<span class="sd">    :returns: sparse.csc_matrix -- the transition matrix as a sparse matrix.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_incidence_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                  <span class="n">nodes_to_indices</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_hyperedge_weight_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">hyperedge_ids_to_indices</span><span class="p">)</span>
+    <span class="n">D_v</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_vertex_degree_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+    <span class="n">D_e</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">get_hyperedge_degree_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="n">D_v_inv</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">fast_inverse</span><span class="p">(</span><span class="n">D_v</span><span class="p">)</span>
+    <span class="n">D_e_inv</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">fast_inverse</span><span class="p">(</span><span class="n">D_e</span><span class="p">)</span>
+    <span class="n">M_trans</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">D_v_inv</span> <span class="o">*</span> <span class="n">M</span> <span class="o">*</span> <span class="n">W</span> <span class="o">*</span> <span class="n">D_e_inv</span> <span class="o">*</span> <span class="n">M_trans</span>
+
+    <span class="k">return</span> <span class="n">P</span>
+
+
+<span class="k">def</span> <span class="nf">_create_random_starter</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the random starter for the random walk.</span>
+
+<span class="sd">    :param node_count: number of nodes to create the random vector.</span>
+<span class="sd">    :returns: list -- list of starting probabilities for each node.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">node_count</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+        <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+    <span class="n">summation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+        <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">summation</span>
+
+    <span class="k">return</span> <span class="n">pi</span>
+
+
+<span class="k">def</span> <span class="nf">_has_converged</span><span class="p">(</span><span class="n">pi_star</span><span class="p">,</span> <span class="n">pi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if the random walk has converged.</span>
+
+<span class="sd">    :param pi_star: the new vector</span>
+<span class="sd">    :param pi: the old vector</span>
+<span class="sd">    :returns: bool-- True iff pi has converged.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">node_count</span> <span class="o">=</span> <span class="n">pi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">EPS</span> <span class="o">=</span> <span class="mf">10e-6</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">node_count</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pi_star</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">EPS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="bp">True</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

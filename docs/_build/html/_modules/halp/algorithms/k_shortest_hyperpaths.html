@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.algorithms.k_shortest_hyperpaths &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.algorithms.k_shortest_hyperpaths</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.algorithms.k_shortest_hyperpaths</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module k_shortest_hyperpaths</span>
+<span class="sd">  :synopsis: Algorithm to compute the k-shortest hyperpaths in a B-hypergraph.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;0.1.0&#39;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;Jose Cadena&#39;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s">&#39;jcadena@vbi.vt.edu&#39;</span>
+
+<span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+<span class="kn">from</span> <span class="nn">halp.algorithms.directed_paths</span> <span class="kn">import</span> <span class="n">sum_function</span><span class="p">,</span> <span class="n">shortest_b_tree</span>
+<span class="kn">from</span> <span class="nn">halp.algorithms.directed_paths</span> <span class="kn">import</span> <span class="n">get_hyperpath_from_predecessors</span>
+
+
+<div class="viewcode-block" id="k_shortest_hyperpaths"><a class="viewcode-back" href="../../../halp.algorithms.html#halp.algorithms.k_shortest_hyperpaths.k_shortest_hyperpaths">[docs]</a><span class="k">def</span> <span class="nf">k_shortest_hyperpaths</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">destination_node</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">F</span><span class="o">=</span><span class="n">sum_function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the k shortest hyperpaths from a source node to every other</span>
+<span class="sd">    node in the hypergraph.</span>
+<span class="sd">    This algorithm is only applicable to directed B-hypergraphs.</span>
+<span class="sd">    The algorithm is described in the paper:</span>
+<span class="sd">    Lars Relund Nielsen, Kim Allan Andersen, Daniele Pretolani,</span>
+<span class="sd">    Finding the K shortest hyperpaths, Computers &amp; Operations Research,</span>
+<span class="sd">    Volume 32, Issue 6, June 2005, Pages 1477-1497, ISSN 0305-0548,</span>
+<span class="sd">    http://dx.doi.org/10.1016/j.cor.2003.11.014.</span>
+<span class="sd">    (http://www.sciencedirect.com/science/article/pii/S0305054803003459)</span>
+
+<span class="sd">    :param H: the hypergraph for which the function will compute the shortest</span>
+<span class="sd">              hyperpaths.</span>
+<span class="sd">    :param source_node: the source node in H for the path computation.</span>
+<span class="sd">    :param destination_node: the destination node in H for the path</span>
+<span class="sd">                        computation.</span>
+<span class="sd">    :param k: a positive integer indicating how many paths to compute.</span>
+<span class="sd">    :param F: [optional] function used for the shortest path computation.</span>
+<span class="sd">              See algorithms.directed_paths module for expected format of</span>
+<span class="sd">              function.</span>
+<span class="sd">    :returns: a list containing at most k hyperpaths (DirectedHypergraph) from</span>
+<span class="sd">              source to destination in ascending order of path length.</span>
+<span class="sd">    :raises: TypeError -- Input hypergraph must be a B-hypergraph</span>
+<span class="sd">    :raises: TypeError -- Algorithm only applicable to directed hypergraphs</span>
+<span class="sd">    :raises: ValueError -- source_node must be a node in H</span>
+<span class="sd">    :raises: ValueError -- destination_node must be a node in H</span>
+<span class="sd">    :raises: TypeError -- k must be an integer</span>
+<span class="sd">    :raises: ValueError -- k must be a positive integer</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">H</span><span class="o">.</span><span class="n">is_B_hypergraph</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Input graph must be a B-hypergraph&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Algorithm only applicable to directed hypergraphs&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">H</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">source_node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;source_node must be a node in H. </span><span class="se">\</span>
+<span class="s">                         </span><span class="si">%s</span><span class="s"> received&quot;</span> <span class="o">%</span> <span class="n">source_node</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">H</span><span class="o">.</span><span class="n">has_node</span><span class="p">(</span><span class="n">destination_node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;destination_node must be a node in H. </span><span class="se">\</span>
+<span class="s">                         </span><span class="si">%s</span><span class="s"> received&quot;</span> <span class="o">%</span> <span class="n">destination_node</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;k must be an integer. </span><span class="si">%s</span><span class="s"> received&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;k must be a positive integer. </span><span class="si">%s</span><span class="s"> received&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="c"># Container for the k-shortest hyperpaths</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c"># Container for the candidate paths. Every item is a 4-tuple:</span>
+    <span class="c"># 1) subgraph H&#39;</span>
+    <span class="c"># 2) lower bound on shortest hyperpath weight</span>
+    <span class="c"># 3) predecessor function of shortest hypertree rootes at s on H&#39;</span>
+    <span class="c"># 4) valid ordering of the nodes in H&#39;</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">shortest_hypertree</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">ordering</span> <span class="o">=</span> \
+        <span class="n">shortest_b_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">F</span><span class="o">=</span><span class="n">F</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c"># Check if there is source-destination hyperpath</span>
+    <span class="c"># if there isn&#39;t the for loop below</span>
+    <span class="c"># will break immediately and the function returns an empty list</span>
+    <span class="k">if</span> <span class="n">W</span><span class="p">[</span><span class="n">destination_node</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;inf&#39;</span><span class="p">):</span>
+        <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">shortest_hypertree</span><span class="p">,</span> <span class="n">ordering</span><span class="p">))</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="ow">and</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+            <span class="nb">min</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">destination_node</span><span class="p">]))</span>
+        <span class="n">kShortest</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+            <span class="n">candidates</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> \
+                <span class="n">get_hyperpath_from_predecessors</span><span class="p">(</span><span class="n">kShortest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                                <span class="n">source_node</span><span class="p">,</span> <span class="n">destination_node</span><span class="p">)</span>
+            <span class="n">pathPredecessor</span> <span class="o">=</span> \
+                <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="n">edge</span> <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                 <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">get_node_set</span><span class="p">()}</span>
+            <span class="n">pathOrdering</span> <span class="o">=</span> \
+                <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">pathPredecessor</span><span class="p">]</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="c"># check if we are done</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="n">k</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">branches</span> <span class="o">=</span> <span class="n">_branching_step</span><span class="p">(</span><span class="n">kShortest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pathPredecessor</span><span class="p">,</span>
+                                       <span class="n">pathOrdering</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">branch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">branches</span><span class="p">):</span>
+                <span class="n">lb</span> <span class="o">=</span> <span class="n">_compute_lower_bound</span><span class="p">(</span><span class="n">branch</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                          <span class="n">pathOrdering</span><span class="p">,</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                          <span class="n">destination_node</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lb</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;inf&#39;</span><span class="p">):</span>
+                    <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">branch</span><span class="p">,</span>
+                                      <span class="p">{</span><span class="n">destination_node</span><span class="p">:</span> <span class="n">lb</span><span class="p">},</span>
+                                      <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Compute shortest hypertree for kShortest[0] and exact bound</span>
+            <span class="c"># reinsert into candidates</span>
+            <span class="n">H_sub</span> <span class="o">=</span> <span class="n">kShortest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">tree_sub</span><span class="p">,</span> <span class="n">W_sub</span><span class="p">,</span> <span class="n">ordering_sub</span> <span class="o">=</span> \
+                <span class="n">shortest_b_tree</span><span class="p">(</span><span class="n">H_sub</span><span class="p">,</span> <span class="n">source_node</span><span class="p">,</span> <span class="n">valid_ordering</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">candidates</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">H_sub</span><span class="p">,</span> <span class="n">W_sub</span><span class="p">,</span> <span class="n">tree_sub</span><span class="p">,</span> <span class="n">ordering_sub</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">paths</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_branching_step</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">predecessor</span><span class="p">,</span> <span class="n">ordering</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performs the branching step of the k-shortest hyperpaths</span>
+<span class="sd">    algorithm.</span>
+
+<span class="sd">    :param H: the hypergraph on which to do the branching step.</span>
+<span class="sd">    :param predecessor: predecessor function of s-t hyperpath in H.</span>
+<span class="sd">    :param ordering: a valid ordering of the nodes in the s-t hyperpath.</span>
+<span class="sd">    :returns: list -- list of q-1 hypergraphs, where q is the size</span>
+<span class="sd">            of the ordering in the subproblem.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">branches</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ordering</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">branch</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ordering</span><span class="p">)):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">ordering</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">hyperedge</span> <span class="ow">in</span> <span class="n">branch</span><span class="o">.</span><span class="n">get_backward_star</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">hyperedge</span> <span class="o">!=</span> <span class="n">predecessor</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+                    <span class="n">branch</span><span class="o">.</span><span class="n">remove_hyperedge</span><span class="p">(</span><span class="n">hyperedge</span><span class="p">)</span>
+        <span class="n">branch</span><span class="o">.</span><span class="n">remove_hyperedge</span><span class="p">(</span><span class="n">predecessor</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="n">branches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">branch</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">branches</span>
+
+
+<span class="k">def</span> <span class="nf">_compute_lower_bound</span><span class="p">(</span><span class="n">H_i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">predecessor</span><span class="p">,</span> <span class="n">ordering</span><span class="p">,</span>
+                         <span class="n">W</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">F</span><span class="o">=</span><span class="n">sum_function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes a lower bound on the weight of the</span>
+<span class="sd">    shortest s-t hyperpath as described in Section 3.2 of</span>
+<span class="sd">    Nielsen et al.</span>
+
+<span class="sd">    :param H_i: the branch of the subproblem for which we&#39;ll compute the bound.</span>
+<span class="sd">    :param i: the [zero-based] index of the branch relative to the ordering.</span>
+<span class="sd">    :param predecessor: predecessor function of the unbranched hypergraph.</span>
+<span class="sd">    :param ordering: a valid ordering of the nodes in the shortest s-t</span>
+<span class="sd">                hyperpath of the unbranched hypergraph.</span>
+<span class="sd">    :param W: the weight vector of the shortest s-t hyperpath for which the</span>
+<span class="sd">            k-shortest hyperpaths procedure was called.</span>
+<span class="sd">    :param t: the destination node in the unbranched graph.</span>
+<span class="sd">    :param F: [optional] a weight function.</span>
+<span class="sd">    :returns: float -- a positive real number that is the lower bound of the</span>
+<span class="sd">            weight of the shortest s-t hyperpath in H.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Initialize the weight vector for the nodes in the branched graph</span>
+    <span class="n">W_bar</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="n">weight</span> <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">W</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">backstar</span> <span class="o">=</span> <span class="n">H_i</span><span class="o">.</span><span class="n">get_backward_star</span><span class="p">(</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c"># There is no s-t path left in this branch</span>
+    <span class="c"># return infinity</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">backstar</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;inf&#39;</span><span class="p">)</span>
+
+    <span class="n">W_bar</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">F</span><span class="p">(</span><span class="n">H_i</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">W</span><span class="p">)</span> <span class="o">+</span>
+                                  <span class="n">H_i</span><span class="o">.</span><span class="n">get_hyperedge_weight</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                                  <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">backstar</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ordering</span><span class="p">)):</span>
+        <span class="n">p_j</span> <span class="o">=</span> <span class="n">predecessor</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+        <span class="n">W_bar</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">H_i</span><span class="o">.</span><span class="n">get_hyperedge_tail</span><span class="p">(</span><span class="n">p_j</span><span class="p">),</span> <span class="n">W_bar</span><span class="p">)</span> <span class="o">+</span>
+                              <span class="n">H_i</span><span class="o">.</span><span class="n">get_hyperedge_weight</span><span class="p">(</span><span class="n">p_j</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">W_bar</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

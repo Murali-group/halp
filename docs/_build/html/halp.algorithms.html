@@ -1,0 +1,672 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.algorithms package &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="index.html" />
+    <link rel="up" title="halp package" href="halp.html" />
+    <link rel="next" title="halp.utilities package" href="halp.utilities.html" />
+    <link rel="prev" title="halp package" href="halp.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.algorithms package</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="halp.html">halp package</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="halp.utilities.html">halp.utilities package</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="halp-algorithms-package">
+<h1>halp.algorithms package<a class="headerlink" href="#halp-algorithms-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-halp.algorithms.directed_paths">
+<span id="halp-algorithms-directed-paths-module"></span><h2>halp.algorithms.directed_paths module<a class="headerlink" href="#module-halp.algorithms.directed_paths" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-directed_paths"></span><dl class="function">
+<dt id="halp.algorithms.directed_paths.b_visit">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">b_visit</tt><big>(</big><em>H</em>, <em>source_node</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#b_visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.b_visit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the &#8216;B-Visit&#8217; algorithm described in the paper:
+Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
+Directed hypergraphs and applications, Discrete Applied Mathematics,
+Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
+<a class="reference external" href="http://dx.doi.org/10.1016/0166-218X(93)90045-P">http://dx.doi.org/10.1016/0166-218X(93)90045-P</a>.
+(<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/0166218X9390045P">http://www.sciencedirect.com/science/article/pii/0166218X9390045P</a>)</p>
+<p>The B-Visit algorithm begins from a source node and traverses a hyperedge
+after all nodes in the hyperedge&#8217;s tail have been reached.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to perform the &#8216;B-Visit&#8217; algorithm on.</li>
+<li><strong>source_node</strong> &#8211; the initial node to begin traversal from.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">set &#8211; nodes that were B-visited in this traversal.
+dict &#8211; mapping from each node visited to the ID of the hyperedge
+that preceeded it in this traversal.
+dict &#8211; mapping from each hyperedge ID to the node that preceeded
+it in this traversal.
+dict &#8211; mapping from each node to an integer representing the
+cardinality of the path from the source node to that node.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.distance_function">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">distance_function</tt><big>(</big><em>tail_nodes</em>, <em>W</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#distance_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.distance_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Additive distance (max) function for nodes in the tail of a hyperedge.
+Also commonly referred to as the &#8216;rank&#8217; function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tail_nodes</strong> &#8211; nodes in the tail of a hyperedge that, in conjunction
+with the weight of the hyperedge, will additively
+constitute the weight of the head node.</li>
+<li><strong>W</strong> &#8211; node weighting function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; max of the weights of tail_nodes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.f_visit">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">f_visit</tt><big>(</big><em>H</em>, <em>source_node</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#f_visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.f_visit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the &#8216;F-Visit&#8217; algorithm alluded to in the paper:
+Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
+Directed hypergraphs and applications, Discrete Applied Mathematics,
+Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
+<a class="reference external" href="http://dx.doi.org/10.1016/0166-218X(93)90045-P">http://dx.doi.org/10.1016/0166-218X(93)90045-P</a>.
+(<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/0166218X9390045P">http://www.sciencedirect.com/science/article/pii/0166218X9390045P</a>)</p>
+<p>The F-Visit algorithm performs a B-Visit on the hypergraph&#8217;s symmetric
+image, beginning at the source node. Refer to &#8216;b_visit&#8217;s documentation
+for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to perform the &#8216;F-Visit&#8217; algorithm on.</li>
+<li><strong>source_node</strong> &#8211; the initial node to begin traversal from.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">set &#8211; nodes that were F-visited in this traversal.
+dict &#8211; mapping from each node to the ID of the hyperedge that
+preceeded it in this traversal.
+dict &#8211; mapping from each hyperedge ID to the node that preceeded
+it in this traversal.
+dict &#8211; mapping from each node to an integer representing the
+cardinality of the path from the source node to that node.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.gap_function">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">gap_function</tt><big>(</big><em>tail_nodes</em>, <em>W</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#gap_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.gap_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Additive min function for nodes in the tail of a hyperedge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tail_nodes</strong> &#8211; nodes in the tail of a hyperedge that, in conjunction
+with the weight of the hyperedge, will additively
+constitute the weight of the head node</li>
+<li><strong>W</strong> &#8211; node weighting function</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; max of the weights of tail_nodes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.get_hyperpath_from_predecessors">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">get_hyperpath_from_predecessors</tt><big>(</big><em>H</em>, <em>Pv</em>, <em>source_node</em>, <em>destination_node</em>, <em>node_weights=None</em>, <em>attr_name='weight'</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#get_hyperpath_from_predecessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.get_hyperpath_from_predecessors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives the hyperpath (DirectedHypergraph) representing the shortest
+B-hyperpath from the source to the destination, given a predecessor
+function and source and destination nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body"><p class="first">The IDs of the hyperedges in the subhypergraph returned may be
+different than those in the original hypergraph (even though the
+tail and head sets are identical).</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph which the path algorithm was executed on.</li>
+<li><strong>Pv</strong> &#8211; dictionary mapping each node to the ID of the hyperedge that
+preceeded it in the path.</li>
+<li><strong>source_node</strong> &#8211; the source node of the path.</li>
+<li><strong>destination_node</strong> &#8211; the destination node of the path.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DirectedHypergraph &#8211; shortest B-hyperpath from source_node to
+destination_node.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">TypeError &#8211; Algorithm only applicable to directed hypergraphs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">KeyError &#8211; Node key in predecessor is not in H</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">KeyError &#8211; Hyperedge key in predecessor is not in H</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; Multiple nodes without predecessor</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; Hypertree does not have source node</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.get_hypertree_from_predecessors">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">get_hypertree_from_predecessors</tt><big>(</big><em>H</em>, <em>Pv</em>, <em>source_node</em>, <em>node_weights=None</em>, <em>attr_name='weight'</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#get_hypertree_from_predecessors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.get_hypertree_from_predecessors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives the hypertree (i.e., the subhypergraph formed from the union of
+the set of paths from an execution of, e.g., the SBT algorithm) defined by
+Pv beginning at a source node. Returns a dictionary mapping each node to
+the ID of the hyperedge that preceeded it in the path (i.e., a Pv vector).
+Assigns the node weights (if provided) as attributes of the nodes (e.g.,
+the rank of that node in a specific instance of the SBT algorithm, or the
+cardinality of that node in a B-Visit traversal, etc.).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body"><p class="first">The IDs of the hyperedges in the subhypergraph returned may be
+different than those in the original hypergraph (even though the
+tail and head sets are identical).</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph which the path algorithm was executed on.</li>
+<li><strong>Pv</strong> &#8211; dictionary mapping each node to the ID of the hyperedge that
+preceeded it in the path.</li>
+<li><strong>source_node</strong> &#8211; the root of the executed path algorithm.</li>
+<li><strong>node_weights</strong> &#8211; [optional] dictionary mapping each node to some weight
+measure.</li>
+<li><strong>attr_name</strong> &#8211; key into the nodes&#8217; attribute dictionaries for their
+weight values (if node_weights is provided).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DirectedHypergraph &#8211; subhypergraph induced by the path
+algorithm specified by the predecessor vector (Pv) from a
+source node.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to directed hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.is_b_connected">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">is_b_connected</tt><big>(</big><em>H</em>, <em>source_node</em>, <em>target_node</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#is_b_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.is_b_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a target node is B-connected to a source node.</p>
+<dl class="docutils">
+<dt>A node t is B-connected to a node s iff:</dt>
+<dd><ul class="first last">
+<li><p class="first">t is s, or</p>
+</li>
+<li><dl class="first docutils">
+<dt>there exists an edge in the backward star of t such that all nodes in</dt>
+<dd><p class="first last">the tail of that edge are B-connected to s</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>In other words, this method determines if a target node can be B-visited
+from the source node in the sense of the &#8216;B-Visit&#8217; algorithm. Refer to
+&#8216;b_visit&#8217;s documentation for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to check B-connectedness on.</li>
+<li><strong>source_node</strong> &#8211; the node to check B-connectedness to.</li>
+<li><strong>target_node</strong> &#8211; the node to check B-connectedness of.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool &#8211; whether target_node can be visited from source_node.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.is_connected">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">is_connected</tt><big>(</big><em>H</em>, <em>source_node</em>, <em>target_node</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#is_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a target node is connected to a source node. That is,
+this method determines if a target node can be visited from the source
+node in the sense of the &#8216;Visit&#8217; algorithm.</p>
+<p>Refer to &#8216;visit&#8217;s documentation for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to check connectedness on.</li>
+<li><strong>source_node</strong> &#8211; the node to check connectedness to.</li>
+<li><strong>target_node</strong> &#8211; the node to check connectedness of.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool &#8211; whether target_node can be visited from source_node.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.is_f_connected">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">is_f_connected</tt><big>(</big><em>H</em>, <em>source_node</em>, <em>target_node</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#is_f_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.is_f_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a target node is F-connected to a source node.</p>
+<p>A node t is F-connected to a node s iff s if B-connected to t.
+Refer to &#8216;f_visit&#8217;s or &#8216;is_b_connected&#8217;s documentation for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to check F-connectedness on.</li>
+<li><strong>source_node</strong> &#8211; the node to check F-connectedness to.</li>
+<li><strong>target_node</strong> &#8211; the node to check F-connectedness of.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">bool &#8211; whether target_node can be visited from source_node.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.shortest_b_tree">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">shortest_b_tree</tt><big>(</big><em>H</em>, <em>source_node</em>, <em>F=&lt;function sum_function at 0x0000000004DA8128&gt;</em>, <em>valid_ordering=False</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#shortest_b_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.shortest_b_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the Shortest B-Tree (SBT) algorithm described in the paper:
+Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
+Directed hypergraphs and applications, Discrete Applied Mathematics,
+Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
+<a class="reference external" href="http://dx.doi.org/10.1016/0166-218X(93)90045-P">http://dx.doi.org/10.1016/0166-218X(93)90045-P</a>.
+(<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/0166218X9390045P">http://www.sciencedirect.com/science/article/pii/0166218X9390045P</a>)</p>
+<p>SBT finds a set of minimum weight B-paths from a source node to all
+the nodes y which are B-connected to it (when additive weight functions
+are used). Refer to &#8216;is_b_connected&#8217;s documentation for more details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to perform the &#8216;SBT&#8217; algorithm on.</li>
+<li><strong>source_node</strong> &#8211; the root of the tree to be found.</li>
+<li><strong>F</strong> &#8211; function pointer to any additive weight function; that is,
+any function that is only a function of the weights of the
+nodes in the tail of a hyperedge.</li>
+<li><strong>valid_ordering</strong> &#8211; a boolean flag to signal whether or not a valid
+ordering of the nodes should be returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict &#8211; mapping from each node to the ID of the hyperedge that
+preceeded it in this traversal.
+dict &#8211; mapping from each node to the node&#8217;s weight.
+list &#8211; [only if valid_ordering argument is passed] a valid
+ordering of the nodes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.shortest_f_tree">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">shortest_f_tree</tt><big>(</big><em>H</em>, <em>source_node</em>, <em>F=&lt;function sum_function at 0x0000000004DA8128&gt;</em>, <em>valid_ordering=False</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#shortest_f_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.shortest_f_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the Shortest F-Tree algorithm, which is simply an execution
+of the Shorest B-Tree procedure from the source node on the hypergraph&#8217;s
+symmetric image. Refer to &#8216;shortest_b_tree&#8217;s documentation for more
+details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hypergraph</strong> &#8211; the hypergraph to perform the &#8216;SFT&#8217; algorithm on.</li>
+<li><strong>source_node</strong> &#8211; the root of the tree to be found.</li>
+<li><strong>F</strong> &#8211; function pointer to any additive weight function; that is,
+any function that is only a function of the weights of the
+nodes in the tail of a hyperedge.</li>
+<li><strong>valid_ordering</strong> &#8211; a boolean flag to signal whether or not a valid
+ordering of the nodes should be returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dict &#8211; mapping from each node to the ID of the hyperedge that
+preceeded it in this traversal.
+dict &#8211; mapping from each node to the node&#8217;s weight.
+list &#8211; [only if valid_ordering argument is passed] a valid
+ordering of the nodes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.sum_function">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">sum_function</tt><big>(</big><em>tail_nodes</em>, <em>W</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#sum_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.sum_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Additive sum function for nodes in the tail of a hyperedge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tail_nodes</strong> &#8211; nodes in the tail of a hyperedge that, in conjunction
+with the weight of the hyperedge, will additively
+constitute the weight of the head node</li>
+<li><strong>W</strong> &#8211; node weighting function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">int &#8211; sum of the weights of tail_nodes.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.directed_paths.visit">
+<tt class="descclassname">halp.algorithms.directed_paths.</tt><tt class="descname">visit</tt><big>(</big><em>H</em>, <em>source_node</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_paths.html#visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_paths.visit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the &#8216;Visit&#8217; algorithm described in the paper:
+Giorgio Gallo, Giustino Longo, Stefano Pallottino, Sang Nguyen,
+Directed hypergraphs and applications, Discrete Applied Mathematics,
+Volume 42, Issues 2-3, 27 April 1993, Pages 177-201, ISSN 0166-218X,
+<a class="reference external" href="http://dx.doi.org/10.1016/0166-218X(93)90045-P">http://dx.doi.org/10.1016/0166-218X(93)90045-P</a>.
+(<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/0166218X9390045P">http://www.sciencedirect.com/science/article/pii/0166218X9390045P</a>)</p>
+<p>The Visit algorithm begins from a source node and traverses a hyperedge
+after any node in the hyperedge&#8217;s tail has been reached.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to perform the &#8216;Visit&#8217; algorithm on.</li>
+<li><strong>source_node</strong> &#8211; the initial node to begin traversal from.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">set &#8211; nodes that were visited in this traversal.
+dict &#8211; mapping from each node to the ID of the hyperedge that
+preceeded it in this traversal; will map a node to None
+if that node wasn&#8217;t visited or if that node is the source
+node.
+dict &#8211; mapping from each hyperedge ID to the node that preceeded
+it in this traversal.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to directed hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.algorithms.directed_random_walk">
+<span id="halp-algorithms-directed-random-walk-module"></span><h2>halp.algorithms.directed_random_walk module<a class="headerlink" href="#module-halp.algorithms.directed_random_walk" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-directed_random_walk"></span><dl class="function">
+<dt id="halp.algorithms.directed_random_walk.stationary_distribution">
+<tt class="descclassname">halp.algorithms.directed_random_walk.</tt><tt class="descname">stationary_distribution</tt><big>(</big><em>H</em>, <em>pi=None</em>, <em>P=None</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/directed_random_walk.html#stationary_distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.directed_random_walk.stationary_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the stationary distribution of a random walk on the given
+hypergraph using the iterative approach explained in the paper:
+Aurelien Ducournau, Alain Bretto, Random walks in directed hypergraphs and
+application to semi-supervised image segmentation,
+Computer Vision and Image Understanding, Volume 120, March 2014,
+Pages 91-102, ISSN 1077-3142, <a class="reference external" href="http://dx.doi.org/10.1016/j.cviu.2013.10.012">http://dx.doi.org/10.1016/j.cviu.2013.10.012</a>.
+(<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S1077314213002038">http://www.sciencedirect.com/science/article/pii/S1077314213002038</a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to find the &#8216;Stationary Distribution&#8217;
+algorithm on.</li>
+<li><strong>pi</strong> &#8211; the initial distribution over the nodes. If not provided,
+it will be created with a random distribution.</li>
+<li><strong>P</strong> &#8211; the transition matrix for the hypergraph. If not provided,
+it will be created.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list &#8211; list of the stationary probabilities for all nodes
+in the hypergraph.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">TypeError &#8211; Algorithm only applicable to undirected hypergraphs</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">AssertionError &#8211; Each node must have at least 1 outgoing
+hyperedge (even if it&#8217;s only a self-loop).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.algorithms.k_shortest_hyperpaths">
+<span id="halp-algorithms-k-shortest-hyperpaths-module"></span><h2>halp.algorithms.k_shortest_hyperpaths module<a class="headerlink" href="#module-halp.algorithms.k_shortest_hyperpaths" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="halp.algorithms.k_shortest_hyperpaths.k_shortest_hyperpaths">
+<tt class="descclassname">halp.algorithms.k_shortest_hyperpaths.</tt><tt class="descname">k_shortest_hyperpaths</tt><big>(</big><em>H</em>, <em>source_node</em>, <em>destination_node</em>, <em>k</em>, <em>F=&lt;function sum_function at 0x0000000004DA8128&gt;</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/k_shortest_hyperpaths.html#k_shortest_hyperpaths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.k_shortest_hyperpaths.k_shortest_hyperpaths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the k shortest hyperpaths from a source node to every other
+node in the hypergraph.
+This algorithm is only applicable to directed B-hypergraphs.
+The algorithm is described in the paper:
+Lars Relund Nielsen, Kim Allan Andersen, Daniele Pretolani,
+Finding the K shortest hyperpaths, Computers &amp; Operations Research,
+Volume 32, Issue 6, June 2005, Pages 1477-1497, ISSN 0305-0548,
+<a class="reference external" href="http://dx.doi.org/10.1016/j.cor.2003.11.014">http://dx.doi.org/10.1016/j.cor.2003.11.014</a>.
+(<a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0305054803003459">http://www.sciencedirect.com/science/article/pii/S0305054803003459</a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph for which the function will compute the shortest
+hyperpaths.</li>
+<li><strong>source_node</strong> &#8211; the source node in H for the path computation.</li>
+<li><strong>destination_node</strong> &#8211; the destination node in H for the path
+computation.</li>
+<li><strong>k</strong> &#8211; a positive integer indicating how many paths to compute.</li>
+<li><strong>F</strong> &#8211; [optional] function used for the shortest path computation.
+See algorithms.directed_paths module for expected format of
+function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a list containing at most k hyperpaths (DirectedHypergraph) from
+source to destination in ascending order of path length.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">TypeError &#8211; Input hypergraph must be a B-hypergraph</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">TypeError &#8211; Algorithm only applicable to directed hypergraphs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; source_node must be a node in H</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">ValueError &#8211; destination_node must be a node in H</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first">TypeError &#8211; k must be an integer</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">ValueError &#8211; k must be a positive integer</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.algorithms.undirected_partitioning">
+<span id="halp-algorithms-undirected-partitioning-module"></span><h2>halp.algorithms.undirected_partitioning module<a class="headerlink" href="#module-halp.algorithms.undirected_partitioning" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-undirected_partitioning"></span><dl class="function">
+<dt id="halp.algorithms.undirected_partitioning.normalized_hypergraph_cut">
+<tt class="descclassname">halp.algorithms.undirected_partitioning.</tt><tt class="descname">normalized_hypergraph_cut</tt><big>(</big><em>H</em>, <em>threshold=0</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/undirected_partitioning.html#normalized_hypergraph_cut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.undirected_partitioning.normalized_hypergraph_cut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the min-cut algorithm described in the paper:
+Zhou, Dengyong, Jiayuan Huang, and Bernhard Scholkopf.
+&#8220;Learning with hypergraphs: Clustering, classification, and embedding.&#8221;
+Advances in neural information processing systems. 2006.
+(<a class="reference external" href="http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf">http://machinelearning.wustl.edu/mlpapers/paper_files/NIPS2006_630.pdf</a>)</p>
+<p>This algorithm uses the normalized Laplacian to partition the hypergraph
+into two disjoint components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to perform the hypergraph-cut algorithm on.</li>
+<li><strong>threshold</strong> &#8211; The threshold value for the partitioning algorithm.
+Typically, the value zero is selected for this purpose.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">set &#8211; the S set of nodes in the S-T partition
+set &#8211; the T set of nodes in the S-T partition</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to undirected hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="halp.algorithms.undirected_partitioning.stationary_distribution">
+<tt class="descclassname">halp.algorithms.undirected_partitioning.</tt><tt class="descname">stationary_distribution</tt><big>(</big><em>H</em>, <em>pi=None</em>, <em>P=None</em><big>)</big><a class="reference internal" href="_modules/halp/algorithms/undirected_partitioning.html#stationary_distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#halp.algorithms.undirected_partitioning.stationary_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the stationary distribution of a random walk on the given
+hypergraph using the iterative approach explained in the paper:
+(<a class="reference external" href="http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf">http://pages.cs.wisc.edu/~shuchi/courses/787-F09/scribe-notes/lec15.pdf</a>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>H</strong> &#8211; the hypergraph to find the stationary distribution on.</li>
+<li><strong>pi</strong> &#8211; the initial distribution over the nodes. If not provided,
+it will be created with a random distribution.</li>
+<li><strong>P</strong> &#8211; the transition matrix for the hypergraph. If not provided,
+it will be created.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list &#8211; list of the stationary probabilities for all nodes
+in the hypergraph.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">TypeError &#8211; Algorithm only applicable to undirected hypergraphs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-halp.algorithms">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-halp.algorithms" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="halp.html">halp package</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="halp.utilities.html">halp.utilities package</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

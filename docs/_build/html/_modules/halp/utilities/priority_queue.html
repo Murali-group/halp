@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>halp.utilities.priority_queue &mdash; halp 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="halp 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="../../../index.html">
+          <span>halp 1.0 documentation</span></a></h1>
+        <h2 class="heading"><span>halp.utilities.priority_queue</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for halp.utilities.priority_queue</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: priority_queue</span>
+<span class="sd">   :synopsis: Wrapper for python&#39;s heapq to provide some standard</span>
+<span class="sd">            operations expected a priority queue.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">heapq</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+
+<div class="viewcode-block" id="PriorityQueue"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue">[docs]</a><span class="k">class</span> <span class="nc">PriorityQueue</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Priority queue implementation based on the suggested &quot;mark-as-invalid&quot;</span>
+<span class="sd">    technique by Python&#39;s heapq documentation:</span>
+<span class="sd">    https://docs.python.org/3.4/library/heapq.html#priority-queue-implementation-notes</span>
+
+<span class="sd">    :note: This implementation only allows unique elements.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the PriorityQueue class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># pq: the priority queue list; heapq ensures that pq maintains</span>
+        <span class="c"># the heap invariant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pq</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c"># counter: unique sequence count (to resolve element orderings in the</span>
+        <span class="c"># case of equal priorities)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c"># element_finder: mapping of elements to entries (allows element</span>
+        <span class="c"># priority modification or deletion)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># INVALID: mark an entry as deleted (via assigning count of 0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="PriorityQueue.add_element"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds an element with a specific priority.</span>
+
+<span class="sd">        :param priority: priority of the element.</span>
+<span class="sd">        :param element: element to add.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="p">[</span><span class="n">priority</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">element</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
+        <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pq</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PriorityQueue.get_top_priority"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.get_top_priority">[docs]</a>    <span class="k">def</span> <span class="nf">get_top_priority</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pops the element that has the top (smallest) priority.</span>
+
+<span class="sd">        :returns: element with the top (smallest) priority.</span>
+<span class="sd">        :raises: IndexError -- Priority queue is empty.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&quot;Priority queue is empty.&quot;</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">element</span> <span class="o">=</span> <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pq</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">element</span>
+</div>
+<div class="viewcode-block" id="PriorityQueue.delete_element"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.delete_element">[docs]</a>    <span class="k">def</span> <span class="nf">delete_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deletes an element (lazily).</span>
+
+<span class="sd">        :raises: ValueError -- No such element in the priority queue.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such element in the priority queue.&quot;</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+        <span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span>
+</div>
+<div class="viewcode-block" id="PriorityQueue.reprioritize"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.reprioritize">[docs]</a>    <span class="k">def</span> <span class="nf">reprioritize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the priority of an element.</span>
+
+<span class="sd">        :raises: ValueError -- No such element in the priority queue.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;No such element in the priority queue.&quot;</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">priority</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span>
+</div>
+<div class="viewcode-block" id="PriorityQueue.peek"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.peek">[docs]</a>    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the element with top (lowest) priority without popping it.</span>
+
+<span class="sd">        :returns: element with top (lowest) priority.</span>
+<span class="sd">        :raises: IndexError -- Priority queue is empty.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&quot;Priority queue is empty.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pq</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="PriorityQueue.contains_element"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.contains_element">[docs]</a>    <span class="k">def</span> <span class="nf">contains_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines if an element is contained in the priority queue.&quot;</span>
+
+<span class="sd">        :returns: bool -- true iff element is in the priority queue.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">)</span> <span class="ow">and</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PriorityQueue.is_empty"><a class="viewcode-back" href="../../../halp.utilities.html#halp.utilities.priority_queue.PriorityQueue.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determines if the priority queue has any elements.</span>
+<span class="sd">        Performs removal of any elements that were &quot;marked-as-invalid&quot;.</span>
+
+<span class="sd">        :returns: true iff the priority queue has no elements.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">pq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pq</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">element</span> <span class="o">=</span> <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pq</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_finder</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">True</span></div></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2014, Brendan Avent - Anna Ritz - T. M. Murali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

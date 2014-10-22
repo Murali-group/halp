@@ -1,5 +1,5 @@
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 from distutils.core import setup
 
@@ -18,7 +18,7 @@ class PyTest(TestCommand):
 
 setup(
     name="halp",
-    packages=["halp", "tests"],
+    packages=find_packages(),
     version="1.0.0",
     description = "Hypergraph Algorithms Package",
     author = "Brendan Avent",

@@ -40,8 +40,7 @@ setup(
         "Topic :: Scientific/Engineering :: Mathematics"
         ],
     license = "GNU GPLv3",
-    long_description=open("README.md").read(),
-    
+    long_description="halp is a Python software package that provides both a directed and an undirected hypergraph implementation, as well as several important and canonical algorithms that operate on these hypergraphs.",
     tests_require=["pytest"],
     cmdclass={"test": PyTest}
 )

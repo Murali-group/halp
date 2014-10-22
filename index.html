@@ -16,14 +16,14 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/tmmurali/hypergraph">View on GitHub</a>
+          <a id="forkme_banner" href="https://github.com/tmmurali/halp">View on GitHub</a>
 
           <h1 id="project_title">Hypergraph</h1>
           <h2 id="project_tagline">A library of algorithms for hypergraphs</h2>
 
             <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/tmmurali/hypergraph/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/tmmurali/hypergraph/tarball/master">Download this project as a tar.gz file</a>
+              <a class="zip_download_link" href="https://github.com/tmmurali/halp/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/tmmurali/halp/tarball/master">Download this project as a tar.gz file</a>
             </section>
         </header>
     </div>
@@ -31,37 +31,134 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+        <p><a href="https://travis-ci.org/tmmurali/halp"><img src="https://travis-ci.org/tmmurali/halp.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/r/tmmurali/halp?branch=master"><img src="https://coveralls.io/repos/tmmurali/halp/badge.png?branch=master" alt="Coverage Status"></a></p>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p><em>halp</em> is a Python software package that provides both a directed and an undirected hypergraph implementation, as well as several important and canonical algorithms that operate on these hypergraphs.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p><em>Use pip to install the latest stable release with: <code>pip install halp</code></em></p>
+
+<p>Latest Stable Release: 1.0 - October 8, 2014</p>
+
+<h3>
+<a name="halp-v10-api-documentation" class="anchor" href="#halp-v10-api-documentation"><span class="octicon octicon-link"></span></a><a href="docs/_build/html/index.html">halp v1.0 API Documentation</a>
+</h3>
+
+<hr>
+
+<h1>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h1>
+
+<p><em>What are directed and undirected hypergraphs?</em></p>
+
+<p>Simply put, hypergraphs are a generalization of graphs.</p>
+
+<p>A <strong>directed hypergraph</strong> contains nodes and hyperedges. Each hyperedge connects a tail set of nodes to a head set of nodes (where the tail and head cannot both be empty). A directed edge in a traditional directed graph, where an edge connects from exactly one node to exactly one other node, is a special case of a directed hyperedge.</p>
+
+<p>Similarly, an <strong>undirected hypergraph</strong> contains nodes and hyperedges. The difference here is that each hyperedge connects a single set of nodes together. An undirected edge in a traditional undirected graph, where two edges are connected to each other, is a special case of an undirected hyperedge.</p>
+
+<h3>
+<a name="using-directed-hypergraphs" class="anchor" href="#using-directed-hypergraphs"><span class="octicon octicon-link"></span></a>Using Directed Hypergraphs</h3>
+
+<p>The following examples for directed hypergraphs will use the following hypergraph:
+<img src="images/example_directed_hypergraph.png" alt="Directed hypergraph for the following examples"></p>
+
+<p>We can create a hypergraph explicitly:</p>
+
+<div class="highlight highlight-python"><pre><span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+
+<span class="c"># Initialize an empty hypergraph</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+
+<span class="c"># Add nodes 's' and 't' individually with arbitrary attributes</span>
+<span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">'s'</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">H</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s">'t'</span><span class="p">,</span> <span class="n">sink</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># Add several nodes simultaneously, having the same arbitrary attributes </span>
+<span class="n">H</span><span class="o">.</span><span class="n">add_nodes</span><span class="p">([</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">,</span> <span class="s">'z'</span><span class="p">,</span> <span class="s">'u'</span><span class="p">,</span> <span class="s">'a'</span><span class="p">,</span> <span class="s">'b'</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">'grey'</span><span class="p">)</span>
+
+<span class="c"># Add hyperedge from {'s'} to {'x'} with a weight of 1</span>
+<span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s">'s'</span><span class="p">]),</span> <span class="nb">set</span><span class="p">([</span><span class="s">'x'</span><span class="p">]),</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c"># Add hyperedge from {'s'} to {'x', 'y'} with some arbitrary attributes and weight of 2</span>
+<span class="n">H</span><span class="o">.</span><span class="n">add_hyperedge</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s">'s'</span><span class="p">]),</span> <span class="nb">set</span><span class="p">([</span><span class="s">'x'</span><span class="p">]),</span> <span class="p">{</span><span class="s">'color'</span><span class="p">:</span> <span class="s">'red'</span><span class="p">,</span> <span class="s">'active'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span> <span class="n">weight</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c"># Add several hyperedges simultaneously, having individual weights</span>
+<span class="n">hyperedges</span> <span class="o">=</span> <span class="p">[([</span><span class="s">'s'</span><span class="p">],</span> <span class="p">[</span><span class="s">'z'</span><span class="p">],</span> <span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+              <span class="p">([</span><span class="s">'s'</span><span class="p">],</span> <span class="p">[</span><span class="s">'t'</span><span class="p">],</span> <span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="mi">100</span><span class="p">}),</span>
+              <span class="p">([</span><span class="s">'x'</span><span class="p">],</span> <span class="p">[</span><span class="s">'s'</span><span class="p">],</span> <span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>
+              <span class="p">([</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">,</span> <span class="s">'z'</span><span class="p">],</span> <span class="p">[</span><span class="s">'u'</span><span class="p">,</span> <span class="s">'t'</span><span class="p">],</span> <span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}),</span>
+              <span class="p">((</span><span class="s">'t'</span><span class="p">,</span> <span class="s">'b'</span><span class="p">),</span> <span class="p">(</span><span class="s">'a'</span><span class="p">),</span> <span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>
+              <span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="s">'a'</span><span class="p">]),</span> <span class="nb">set</span><span class="p">([</span><span class="s">'u'</span><span class="p">,</span> <span class="s">'t'</span><span class="p">]),</span> <span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="mi">1</span><span class="p">})]</span>
+<span class="n">H</span><span class="o">.</span><span class="n">add_hyperedges</span><span class="p">(</span><span class="n">hyperedges</span><span class="p">)</span>
+
+<span class="c"># Note: a hyperedge can be added even if it contains nodes that haven't</span>
+<span class="c"># previously been put into the graph; the library will automatically add them!</span>
+</pre></div>
+
+<p>If a hypergraph is stored in a file similar to:</p>
+
+<pre><code>tail;head;weight
+s;x;1
+s;y,x;2
+s;z;2
+s;t;100
+x;s;1
+z,y,x;u,t;3
+a;u,t;1
+b,t;a;1
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>then we can read the hypergraph from the file with:</p>
+
+<div class="highlight highlight-python"><pre><span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+
+<span class="c"># Initialize an empty hypergraph</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+
+<span class="n">node_delimiter</span> <span class="o">=</span> <span class="s">','</span>
+<span class="n">column_separator</span> <span class="o">=</span> <span class="s">';'</span>
+
+<span class="n">H</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">"hypergraph_filename.txt"</span><span class="p">,</span> <span class="n">node_delimiter</span><span class="p">,</span> <span class="n">column_separator</span><span class="p">)</span>
+</pre></div>
+
+<p>Finally, we can execute an algorithm on an initialized hypergraph:</p>
+
+<div class="highlight highlight-python"><pre><span class="kn">from</span> <span class="nn">halp.directed_hypergraph</span> <span class="kn">import</span> <span class="n">DirectedHypergraph</span>
+<span class="kn">from</span> <span class="nn">halp.algorithms</span> <span class="kn">import</span> <span class="n">directed_paths</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">DirectedHypergraph</span><span class="p">()</span>
+<span class="n">H</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">"hypergraph_filename.txt"</span><span class="p">,</span> <span class="s">','</span><span class="p">,</span> <span class="s">';'</span><span class="p">)</span>
+
+<span class="c"># Execute the "Shortest Sum B-Tree" algorithm with root 's'</span>
+<span class="n">Pv</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">ordering</span> <span class="o">=</span> \
+    <span class="n">directed_paths</span><span class="o">.</span><span class="n">shortest_b_tree</span><span class="p">(</span><span class="n">H</span><span class="p">,</span>
+                                   <span class="s">'s'</span><span class="p">,</span>
+                                   <span class="n">directed_paths</span><span class="o">.</span><span class="n">sum_function</span><span class="p">,</span>
+                                   <span class="bp">True</span><span class="p">)</span>
+<span class="c"># Use the returned result to retrieve the hypertree (a subhypergraph)</span>
+<span class="n">sub_H</span> <span class="o">=</span> <span class="n">directed_paths</span><span class="o">.</span><span class="n">get_hypertree_from_predecessors</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Pv</span><span class="p">,</span> <span class="s">'s'</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+</pre></div>
+
+<hr>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Unit tests for the package are located in <code>tests/</code>, and can be run with <code>python setup.py test</code>.</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<p>The test runner depends on <a href="http://pytest.org/latest/getting-started.html">pytest</a>.</p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Travis CI checks for pep8 compliance on all code. If the code doesn't meet pep8 compliance, the test suite will report a failure.</p>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<hr>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a name="authors" class="anchor" href="#authors"><span class="octicon octicon-link"></span></a>Authors</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<ul>
+<li><a href="https://github.com/bavent">Brendan Avent</a></li>
+<li><a href="https://github.com/annaritz">Anna Ritz</a></li>
+<li><a href="https://github.com/tmmurali/">T. M. Murali</a></li>
+<li><a href="https://github.com/joseduc10">Jose Cadena</a></li>
+<li><a href="https://github.com/yaserkl">Yaser Keneshloo</a></li>
+</ul>
       </section>
     </div>
 
@@ -73,7 +170,17 @@ $ git checkout gh-pages
       </footer>
     </div>
 
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-55979920-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
 
   </body>
 </html>

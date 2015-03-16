@@ -69,15 +69,22 @@ class SignalingHypergraph(object):
         #
         self._hypernode_attributes = {}
 
-        # _hyperedge_attributes: a dictionary mapping a hyperedge ID
-        # (initially created by the call to add_hyperedge or add_hyperedges)
-        # to a dictionary of attributes of that hyperedge.
-        # Given a hyperedge ID, _hyperedge_attributes[hyperedge_id] stores
+        # _hyperedge_attributes: a 2-dimensional dictionary mapping a
+        # hyperedge ID (initially created by the call to add_hyperedge
+        # or add_hyperedges) (first) as (tail, head) tuple identifier to
+        # a dictionary of all signaling hyperedges that share this tuple,
+        # and (second) to the attributes of that specific signaling hyperedge.
+        #
+        # Given a hyperedge ID in the form hyperedge_id="x$y",
+        # _hyperedge_attributes[x][y] stores:
         # the tail of the hyperedge as specified by the user (as "tail"),
         # the head of the hyperedge as specified by the user (as "head"),
         # the positive regulators as specified by the user (as "pos_regs"),
         # the negative regulators as specified by the user (as "neg_regs"),
         # and the weight of the hyperedge (as "weight").
+        # Here, x refers to the hyperedge identified by the (tail,head) tuple,
+        # and y refers to the specific signaling hyperedge identified by the
+        # (tail, head, pos_regs, neg_regs) tuple.
         # For internal purposes, it also stores the frozenset versions of
         # the tail, head, and regulators (as "__frozen_tail", "__frozen_head",
         # "__pos_regs", "__neg_regs").
@@ -168,4 +175,3 @@ class SignalingHypergraph(object):
         # the same ID as it was issued when it was originally added.
         #
         self._current_hyperedge_id = 0
-

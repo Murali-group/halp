@@ -79,7 +79,7 @@ class DirectedHypergraph(object):
         # the head of the hyperedge as specified by the user (as "head"),
         # and the weight of the hyperedge (as "weight").
         # For internal purposes, it also stores the frozenset versions of
-        # the tail and head (as "_frozen_tail" and "_frozen_head").
+        # the tail and head (as "__frozen_tail" and "__frozen_head").
         #
         # Provides O(1) time access to the attributes of a hyperedge.
         #

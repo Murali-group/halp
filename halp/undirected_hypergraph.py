@@ -80,7 +80,7 @@ class UndirectedHypergraph(object):
         # the nodes of the hyperedge as specified by the user (as "nodes")
         # and the weight of the hyperedge (as "weight").
         # For internal purposes, it also stores the frozenset version of
-        # the nodes (as "_frozen_nodes").
+        # the nodes (as "__frozen_nodes").
         #
         # Provides O(1) time access to the attributes of a hyperedge.
         #

@@ -69,25 +69,15 @@ class SignalingHypergraph(object):
         #
         self._hypernode_attributes = {}
 
-        # _hyperedge_attributes: a 2-dimensional dictionary mapping a
-        # hyperedge ID (initially created by the call to add_hyperedge
-        # or add_hyperedges) (first) as (tail, head) tuple identifier to
-        # a dictionary of all signaling hyperedges that share this tuple,
-        # and (second) to the attributes of that specific signaling hyperedge.
-        #
-        # Given a hyperedge ID in the form hyperedge_id="x$y",
-        # _hyperedge_attributes[x][y] stores:
+        # _hyperedge_attributes: a dictionary mapping a hyperedge ID
+        # (initially created by the call to add_hyperedge or add_hyperedges)
+        # to a dictionary of attributes of that hyperedge.
+        # Given a hyperedge ID, _hyperedge_attributes[hyperedge_id] stores
         # the tail of the hyperedge as specified by the user (as "tail"),
         # the head of the hyperedge as specified by the user (as "head"),
-        # the positive regulators as specified by the user (as "pos_regs"),
-        # the negative regulators as specified by the user (as "neg_regs"),
         # and the weight of the hyperedge (as "weight").
-        # Here, x refers to the hyperedge identified by the (tail,head) tuple,
-        # and y refers to the specific signaling hyperedge identified by the
-        # (tail, head, pos_regs, neg_regs) tuple.
         # For internal purposes, it also stores the frozenset versions of
-        # the tail, head, and regulators (as "__frozen_tail", "__frozen_head",
-        # "__pos_regs", "__neg_regs").
+        # the tail and head (as "__frozen_tail" and "__frozen_head").
         #
         # Provides O(1) time access to the attributes of a hyperedge.
         #
@@ -175,3 +165,288 @@ class SignalingHypergraph(object):
         # the same ID as it was issued when it was originally added.
         #
         self._current_hyperedge_id = 0
+    
+    def _combine_attribute_arguments(self, attr_dict, attr):
+        """Combines attr_dict and attr dictionaries, by updating attr_dict
+            with attr.
+
+        :param attr_dict: dictionary of attributes of the node.
+        :param attr: keyword arguments of attributes of the node;
+                    attr's values will override attr_dict's values
+                    if both are provided.
+        :returns: dict -- single dictionary of [combined] attributes.
+        :raises: AttributeError -- attr_dict argument must be a dictionary.
+
+        """
+        # If no attribute dict was passed, treat the keyword
+        # arguments as the dict
+        if attr_dict is None:
+            attr_dict = attr
+        # Otherwise, combine the passed attribute dict with
+        # the keyword arguments
+        else:
+            try:
+                attr_dict.update(attr)
+            except AttributeError:
+                raise AttributeError("attr_dict argument \
+                                     must be a dictionary.")
+        return attr_dict
+
+    def has_node(self, node):
+        """Determines if a specific node is present in the hypergraph.
+
+        :param node: reference to the node whose presence is being checked.
+        :returns: bool -- true iff the node exists in the hypergraph.
+
+        """
+        return node in self._node_attributes
+
+    def add_node(self, node, attr_dict=None, **attr):
+        """Adds a node to the graph, along with any related attributes
+           of the node.
+
+        :param node: reference to the node being added.
+        :param attr_dict: dictionary of attributes of the node.
+        :param attr: keyword arguments of attributes of the node;
+                    attr's values will override attr_dict's values
+                    if both are provided.
+
+        Examples:
+        ::
+
+            >>> H = SignalingHypergraph()
+            >>> attributes = {label: "positive"}
+            >>> H.add_node("A", attributes)
+            >>> H.add_node("B", label="negative")
+            >>> H.add_node("C", attributes, root=True)
+
+        """
+        attr_dict = self._combine_attribute_arguments(attr_dict, attr)
+
+        # If the node hasn't previously been added, add it along
+        # with its attributes
+        if not self.has_node(node):
+        	attr_dict["__in_hypernodes"] = set()
+            self._node_attributes[node] = attr_dict
+        # Otherwise, just update the node's attributes
+        else:
+            self._node_attributes[node].update(attr_dict)
+
+    def get_node_set(self):
+        """Returns the set of nodes that are currently in the hypergraph.
+
+        :returns: set -- all nodes currently in the hypergraph
+
+        """
+        return set(self._node_attributes.keys())
+
+    def node_iterator(self):
+        """Provides an iterator over the nodes.
+
+        """
+        return iter(self._node_attributes)
+
+	def has_hypernode(self, hypernode):
+        """Determines if a specific hypernode is present in the hypergraph.
+
+        :param node: reference to hypernode whose presence is being checked.
+        :returns: bool -- true iff the node exists in the hypergraph.
+
+        """
+        return hypernode in self._hypernode_attributes
+
+    def map_hypernode_to_nodes(self, hypernode, nodes):
+    	"""Informs the library of the hypernode<-->nodes mapping.
+
+    	:param hypernode: the hypernode to map to a group of nodes
+    	:param nodes: the group of nodes to map to the hypernode
+
+    	"""
+    	pass
+
+    def _add_hypernode_membership(self, node, hypernode):
+		"""Adds the given hypernode into the node's "membership" structure,
+		indicating that this node is a member of the given hypernode.
+
+        :param node: reference to the node whose hypernode membership is
+        			being modified.
+		:param hypernode: reference to the hypernode that the given node is
+						a member of.
+        :raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such hypernode exists.
+
+        """
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+        if not self.has_hypernode(hypernode)
+            raise ValueError("No such hypernode exists.")
+
+        self._node_attributes[node]["__in_hypernodes"].add(hypernode)
+
+    def _remove_hypernode_membership(self, node, hypernode):
+		"""Removes the given hypernode into the node's "membership" structure,
+		indicating that this node is no longer a member of the given hypernode.
+
+        :param node: reference to the node whose hypernode membership is
+        			being modified.
+		:param hypernode: reference to the hypernode that the given node is
+						no longer a member of.
+        :raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such hypernode exists.
+
+        """
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+        if not self.has_hypernode(hypernode)
+            raise ValueError("No such hypernode exists.")
+
+        self._node_attributes[node]["__in_hypernodes"].remove(hypernode)
+
+    def add_hypernode(self, hypernode, composing_nodes=set(), attr_dict=None, **attr):
+        """Adds a hypernode to the graph, along with any related attributes
+           of the hypernode.
+
+        :param hypernode: reference to the hypernode being added.
+        :param nodes: reference to the set of nodes that compose
+        			the hypernode.
+        :param in_hypernodes: set of references to the hypernodes that the
+        			node being added is a member of.
+        :param attr_dict: dictionary of attributes of the node.
+        :param attr: keyword arguments of attributes of the node;
+                    attr's values will override attr_dict's values
+                    if both are provided.
+
+        """
+        attr_dict = self._combine_attribute_arguments(attr_dict, attr)
+
+        # If the hypernode hasn't previously been added, add it along
+        # with its attributes
+        if not self.has_hypernode(hypernode):
+        	attr_dict["__composing_nodes"] = composing_nodes
+        	added_nodes = composing_nodes
+        	removed_nodes = set()
+            self._hypernode_attributes[hypernode] = attr_dict
+        # Otherwise, just update the hypernode's attributes
+        else:
+            self._hypernode_attributes[hypernode].update(attr_dict)
+            added_nodes = composing_nodes - self._hypernode_attributes\
+            			  [hypernode]["__composing_nodes"]
+			removed_nodes = self._hypernode_attributes\
+            			  	[hypernode]["__composing_nodes"] - composing_nodes
+        
+        # For every "composing node" added to this hypernode, update
+        # those nodes attributes to be members of this hypernode
+		for node in added_nodes:
+			_add_hypernode_membership(node, hypernode)
+		# For every "composing node" added to this hypernode, update
+        # those nodes attributes to no longer be members of this hypernode
+        for node in remove_nodes:
+			_remove_hypernode_membership(node, hypernode)
+
+    def get_hypernode_set(self):
+        """Returns the set of hypernodes that are currently in the hypergraph.
+
+        :returns: set -- all hypernodes currently in the hypergraph
+
+        """
+        return set(self._hypernode_attributes.keys())
+
+    def hypernode_iterator(self):
+        """Provides an iterator over the hypernodes.
+
+        """
+        return iter(self._hypernode_attributes)
+
+    def _assign_next_hyperedge_id(self):
+        """Returns the next [consecutive] ID to be assigned
+            to a hyperedge.
+        :returns: str -- hyperedge ID to be assigned.
+
+        """
+        self._current_hyperedge_id += 1
+        return "e" + str(self._current_hyperedge_id)
+
+    def add_hyperedge(self, tail, head,
+    				  pos_regs=set(), neg_regs=set(),
+    				  attr_dict=None, **attr):
+        """Adds a hyperedge to the hypergraph, along with any related
+        attributes of the hyperedge.
+        This method will automatically add any hypernode from the tail, head,
+        positive regulator, or negative regulator sets that was not already
+        in the hypergraph.
+        A hyperedge without a "weight" attribute specified will be
+        assigned the default value of 1.
+
+        :param tail: iterable container of references to hypernodes in the
+                    tail of the hyperedge to be added.
+        :param head: iterable container of references to hypernodes in the
+                    head of the hyperedge to be added.
+		:param pos_regs: iterable container of references to hypernodes that
+                    are positive regulators for the hyperedge.
+		:param neg_regs: iterable container of references to hypernodes that
+                    are negative regulators for the hyperedge.
+        :param attr_dict: dictionary of attributes shared by all
+                    the hyperedges.
+        :param attr: keyword arguments of attributes of the hyperedge;
+                    attr's values will override attr_dict's values
+                    if both are provided.
+        :returns: str -- the ID of the hyperedge that was added.
+        :raises: ValueError -- tail and head arguments cannot both be empty.
+
+        """
+        attr_dict = self._combine_attribute_arguments(attr_dict, attr)
+
+        # Don't allow both empty tail and head containers (invalid hyperedge)
+        if not tail and not head:
+            raise ValueError("tail and head arguments \
+                             cannot both be empty.")
+
+        # Use frozensets for tail and head sets to allow for hashable keys
+        frozen_tail = frozenset(tail)
+        frozen_head = frozenset(head)
+        frozen_pos_regs = frozenset(pos_regs)
+        frozen_neg_regs = frozenset(neg_regs)
+
+        # Initialize a successor dictionary for the tail and head, respectively
+        if frozen_tail not in self._successors:
+            self._successors[frozen_tail] = {}
+        if frozen_head not in self._predecessors:
+            self._predecessors[frozen_head] = {}
+
+        is_new_diedge = not self.has_hyperedge(frozen_tail, frozen_head)
+        if is_new_diedge:
+            # Add tail and head nodes to graph (if not already present)
+            self.add_hypernodes(frozen_head)
+            self.add_hypernodes(frozen_tail)
+
+            # Create new hyperedge name to use as reference for that hyperedge
+            hyperedge_id = self._assign_next_hyperedge_id()
+
+            # Add hyperedge to the forward-star and to the backward-star
+            # for each hypernode in the tail and head sets, respectively
+            for hypernode in frozen_tail:
+                self._forward_star[hypernode].add(hyperedge_id)
+            for hypernode in frozen_head:
+                self._backward_star[hypernode].add(hyperedge_id)
+
+            # Add the hyperedge as the successors and predecessors
+            # of the tail set and head set, respectively
+            self._successors[frozen_tail][frozen_head] = hyperedge_id
+            self._predecessors[frozen_head][frozen_tail] = hyperedge_id
+
+            # Assign some special attributes to this hyperedge. We assign
+            # a default weight of 1 to the hyperedge. We also store the
+            # original tail and head sets in order to return them exactly
+            # as the user passed them into add_hyperedge.
+            self._hyperedge_attributes[hyperedge_id] = \
+                {"tail": tail, "__frozen_tail": frozen_tail,
+                 "head": head, "__frozen_head": frozen_head,
+                 "_signaling_id": 1
+                 "weight": 1}
+        else:
+            # If its not a new hyperedge, just get its ID to update attributes
+            hyperedge_id = self._successors[frozen_tail][frozen_head]
+
+        # Set attributes and return hyperedge ID
+        self._hyperedge_attributes[hyperedge_id].update(attr_dict)
+        return hyperedge_id

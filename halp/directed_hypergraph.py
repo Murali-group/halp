@@ -666,9 +666,9 @@ class DirectedHypergraph(object):
         that these sets comprise.
 
         :param tail: iterable container of references to nodes in the
-                    tail of the hyperedge to be added
+                    tail of the hyperedge
         :param head: iterable container of references to nodes in the
-                    head of the hyperedge to be added
+                    head of the hyperedge
         :returns: str -- ID of the hyperedge that has that the specified
                 tail and head sets comprise.
         :raises: ValueError -- No such hyperedge exists.

@@ -1111,3 +1111,182 @@ class SignalingHypergraph(object):
             return set()
 
         return set(self._negative_regulations[frozen_neg_regs].values())
+
+    def read(self, hyperedge_filename, node_mapping_filename,
+             delim=',', sep='\t'):
+        """Read a signaling hypergraph from a file, where nodes and
+        hypernodes are represented as strings.
+        Each column is separated by "sep", and the individual
+        tail, head, positive regulator, and negative regulator hypernodes
+        are delimited by "delim".
+        The header line is currently ignored, but columns (in a single row)
+        should be of the format:
+        tailhypernode1[delim]..tailhypernodeM[sep]
+        headhypernode1[delim]..headhypernodeM[sep]
+        posreghypernode1[delim]..posreghypernodeM[sep]
+        negreghypernode1[delim]..negreghypernodeM[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+        ::
+
+            x1,x2    x3,x4,x5    x6    x7,x8    12
+
+        which defines a hyperedge of weight 12 from a tail set containing
+        hypernodes "x1" and "x2" to a head set containing hypernodes
+        "x3", "x4", and "x5" with a positive regulator set containing
+        hypernode "x6" and a negative regulator set containing hypernodes
+        "x7" and "x8".
+
+        """
+        node_mapping_file = open(node_mapping_filename, 'r')
+        node_mapping = {}
+
+        # Skip the header line
+        node_mapping_file.readline()
+
+        line_number = 2
+        for line in node_mapping_file.readlines():
+            line = line.strip()
+            # Skip empty lines
+            if not line:
+                continue
+
+            words = line.split(sep)
+            if len(words) != 2:
+                raise \
+                    IOError("Line {} ".format(line_number) +
+                            "contains {} ".format(len(words)) +
+                            "columns -- must contain only 2.")
+
+            hypernode = words[0]
+            composing_nodes = set(words[1].split(delim))
+            node_mapping[hypernode] = composing_nodes
+
+            line_number += 1
+
+        hyperedge_file = open(hyperedge_filename, 'r')
+
+        # Skip the header line
+        hyperedge_file.readline()
+
+        line_number = 2
+        for line in hyperedge_file.readlines():
+            line = line.strip()
+            # Skip empty lines
+            if not line:
+                continue
+
+            words = line.split(sep)
+            if not (4 <= len(words) <= 5):
+                raise \
+                    IOError("Line {} ".format(line_number) +
+                            "contains {} ".format(len(words)) +
+                            "columns -- must contain only 4 or 5.")
+
+            tail = set(words[0].split(delim))
+            head = set(words[1].split(delim))
+            pos_regs = set(words[2].split(delim))
+            neg_regs = set(words[3].split(delim))
+            if len(words) == 5:
+                weight = float(words[4].split(delim)[0])
+            else:
+                weight = 1
+            self.add_hyperedge(tail, head,
+                               pos_regs, neg_regs,
+                               node_mapping,
+                               weight=weight)
+
+            line_number += 1
+
+        hyperedge_file.close()
+
+    def write(self, hyperedge_filename, node_mapping_filename,
+              delim=',', sep='\t'):
+        """Write a signaling hypergraph from a file, where nodes and
+        hypernodes are represented as strings.
+        Each column is separated by "sep", and the individual
+        tail, head, positive regulator, and negative regulator hypernodes
+        are delimited by "delim".
+        The header line is currently ignored, but columns (in a single row)
+        should be of the format:
+        tailhypernode1[delim]..tailhypernodeM[sep]
+        headhypernode1[delim]..headhypernodeM[sep]
+        posreghypernode1[delim]..posreghypernodeM[sep]
+        negreghypernode1[delim]..negreghypernodeM[sep]weight
+
+        As a concrete example, an arbitrary line with delim=',' and
+        sep='    ' (4 spaces) may look like:
+        ::
+
+            x1,x2    x3,x4,x5    x6    x7,x8    12
+
+        which defines a hyperedge of weight 12 from a tail set containing
+        hypernodes "x1" and "x2" to a head set containing hypernodes
+        "x3", "x4", and "x5" with a positive regulator set containing
+        hypernode "x6" and a negative regulator set containing hypernodes
+        "x7" and "x8".
+
+        """
+        # Write node mapping to file
+        node_mapping_file = open(node_mapping_filename, 'w')
+
+        # write first header line
+        node_mapping_file.write("hypernode" + sep + "composing_nodes\n")
+
+        for hypernode in self.get_hypernode_set():
+            # Write hypernode into the first column followed by seperator
+            line = "hypernode" + sep
+
+            # Write the nodes into the second column, separated by delim
+            for node in self.get_nodes_in_hypernode(hypernode):
+                line += node + delim
+            # Remove last (extra) delim and end the line
+            line = line[:-1] + "\n"
+
+            node_mapping_file.write(line)
+
+        node_mapping_file.close()
+
+        # Write hyperedge mapping to file
+        hyperedge_file = open(hyperedge_filename, 'w')
+
+        # write first header line
+        node_mapping_file.write("tail" + sep + "head" + sep +
+                                "pos_regs" + sep + "neg_regs" + sep +
+                                "weight\n")
+
+        for hyperedge_id in self.get_hyperedge_id_set():
+            line = ""
+            # Write each tail hypernode to the line, separated by delim
+            for tail_hypernode in self.get_hyperedge_tail(hyperedge_id):
+                line += tail_hypernode + delim
+            # Remove last (extra) delim and add sep between columns
+            line = line[:-1] + sep
+
+            # Write each head hypernode to the line, separated by delim
+            for head_hypernode in self.get_hyperedge_head(hyperedge_id):
+                line += head_hypernode + delim
+            # Remove last (extra) delim and add sep between columns
+            line = line[:-1] + sep
+
+            # Write each positive regulator to the line, separated by delim
+            pos_regs = self.get_hyperedge_positive_regulators(hyperedge_id)
+            for pos_reg in pos_regs:
+                line += pos_reg + delim
+            # Remove last (extra) delim and add sep between columns
+            line = line[:-1] + sep
+
+            # Write each negative regulator to the line, separated by delim
+            neg_regs = self.get_hyperedge_negative_regulators(hyperedge_id)
+            for neg_reg in neg_regs:
+                line += neg_reg + delim
+            # Remove last (extra) delim and add sep between columns
+            line = line[:-1] + sep
+
+            # Write the weight to the line and end the line
+            line += sep + str(self.get_hyperedge_weight(hyperedge_id)) + "\n"
+
+            hyperedge_file.write(line)
+
+        hyperedge_file.close()

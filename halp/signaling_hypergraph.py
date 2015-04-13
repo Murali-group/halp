@@ -33,8 +33,8 @@ class SignalingHypergraph(object):
     This class assigns (upon adding) and refers to each signaling hyperedge by
     an internal ID. See "add_hyperedge" or "add_hyperedges" for more details.
 
-    Self-loops are allowed, and parallel (multi-) hyperedges are allowed if they
-    have different regulator sets.
+    Self-loops are allowed, and parallel (multi-) hyperedges are allowed if
+    they have different regulator sets.
 
     :note: This class uses several data structures to store a signaling
         hypergraph. Since these structures must stay in sync (see: __init__),
@@ -130,8 +130,9 @@ class SignalingHypergraph(object):
         # such that the hypernode is a positive regulator of each hyperedge in
         # that set.
         #
-        # _positive_regulation_star: a dictionary mapping a hypernode to the set
-        # of hyperedges that are in that hypernode's positive regulation star.
+        # _positive_regulation_star: a dictionary mapping a hypernode
+        # to the set of hyperedges that are in that hypernode's
+        # positive regulation star.
         #
         # Provides O(1) time access to a reference to the set of positively
         # regulated hyperedges by a hypernode.
@@ -145,8 +146,9 @@ class SignalingHypergraph(object):
         # such that the hypernode is a negative regulator of each hyperedge in
         # that set.
         #
-        # _negative_regulation_star: a dictionary mapping a hypernode to the set
-        # of hyperedges that are in that hypernode's negative regulation star.
+        # _negative_regulation_star: a dictionary mapping a hypernode
+        # to the set of hyperedges that are in that hypernode's
+        # negative regulation star.
         #
         # Provides O(1) time access to a reference to the set of negatively
         # regulated hyperedges by a hypernode.
@@ -429,8 +431,8 @@ class SignalingHypergraph(object):
         else:
             self._hypernode_attributes[hypernode].update(attr_dict)
             hyp_attrs = self._hypernode_attributes[hypernode]
-            if composing_nodes is not None and \
-                composing_nodes != hyp_attrs["__composing_nodes"]:
+            if composing_nodes is not None and composing_nodes != \
+               hyp_attrs["__composing_nodes"]:
                 raise ValueError("Cannot alter a hypernode's composing nodes.")
 
         # For every "composing node" added to this hypernode, update

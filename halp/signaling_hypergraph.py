@@ -308,6 +308,43 @@ class SignalingHypergraph(object):
         """
         return iter(self._node_attributes)
 
+    def get_node_attribute(self, node, attribute_name):
+        """Given a node and the name of an attribute, get a copy
+        of that node's attribute.
+
+        :param node: reference to the node to retrieve the attribute of.
+        :param attribute_name: name of the attribute to retrieve.
+        :returns: attribute value of the attribute_name key for the
+                specified node.
+        :raises: ValueError -- No such node exists.
+        :raises: ValueError -- No such attribute exists.
+
+        """
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+        elif attribute_name not in self._node_attributes[node]:
+            raise ValueError("No such attribute exists.")
+        else:
+            return copy.\
+                copy(self._node_attributes[node][attribute_name])
+
+    def get_node_attributes(self, node):
+        """Given a node, get a dictionary with copies of that node's
+        attributes.
+
+        :param node: reference to the node to retrieve the attributes of.
+        :returns: dict -- copy of each attribute of the specified node.
+        :raises: ValueError -- No such node exists.
+
+        """
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+        attributes = {}
+        for attr_name, attr_value in self._node_attributes[node].items():
+            if attr_name != "__in_hypernodes":
+                attributes[attr_name] = copy.copy(attr_value)
+        return attributes
+
     def has_hypernode(self, hypernode):
         """Determines if a specific hypernode is present in the hypergraph.
 
@@ -426,7 +463,7 @@ class SignalingHypergraph(object):
     def get_hypernode_set(self):
         """Returns the set of hypernodes that are currently in the hypergraph.
 
-        :returns: set -- all hypernodes currently in the hypergraph
+        :returns: set -- all hypernodes currently in the hypergraph.
 
         """
         return set(self._hypernode_attributes.keys())
@@ -437,9 +474,50 @@ class SignalingHypergraph(object):
         """
         return iter(self._hypernode_attributes)
 
+    def get_hypernode_attribute(self, hypernode, attribute_name):
+        """Given a hypernode and the name of an attribute, get a copy
+        of that hypernode's attribute.
+
+        :param hypernode: reference to the hypernode to retrieve
+                        the attribute of.
+        :param attribute_name: name of the attribute to retrieve.
+        :returns: attribute value of the attribute_name key for the
+                specified hypernode.
+        :raises: ValueError -- No such hypernode exists.
+        :raises: ValueError -- No such attribute exists.
+
+        """
+        if not self.has_hypernode(hypernode):
+            raise ValueError("No such hypernode exists.")
+        elif attribute_name not in self._hypernode_attributes[node]:
+            raise ValueError("No such attribute exists.")
+        else:
+            return copy.\
+                copy(self._hypernode_attributes[hypernode][attribute_name])
+
+    def get_hypernode_attributes(self, hypernode):
+        """Given a hypernode, get a dictionary with copies of that
+        hypernode's attributes.
+
+        :param hypernode: reference to the hypernode to retrieve
+                        the attributes of.
+        :returns: dict -- copy of each attribute of the specified hypernode.
+        :raises: ValueError -- No such hypernode exists.
+
+        """
+        if not self.has_hypernode(hypernode):
+            raise ValueError("No such hypernode exists.")
+        attributes = {}
+        attr_items = self._hypernode_attributes[hypernode].items()
+        for attr_name, attr_value in attr_items:
+            if attr_name != "__composing_nodes":
+                attributes[attr_name] = copy.copy(attr_value)
+        return attributes
+
     def _assign_next_hyperedge_id(self):
         """Returns the next [consecutive] ID to be assigned
             to a hyperedge.
+
         :returns: str -- hyperedge ID to be assigned.
 
         """
@@ -458,7 +536,10 @@ class SignalingHypergraph(object):
 
         """
         tail, head, pos_regs, neg_regs = hyperedge_tuple
-        if not tail and not head:
+        # A hyperedge is valid iff the following hold:
+        #   - the union of the tail and regulator sets is non-empty
+        #   - the head is non-empty
+        if not tail.union(pos_regs).union(neg_regs) and not head:
             return False
 
     def add_hyperedge(self, tail, head,
@@ -596,17 +677,16 @@ class SignalingHypergraph(object):
 
         return self._hyperedge_id_map[h_edge]
 
-    def has_hyperedge(self, hyperedge_tuple):
-        """From the hyperedge tuple of tail, head, positive regulator,
-        and negative regulator sets of hypernodes, returns whether the
-        hyperedge that these sets comprise exists in the hypergraph.
+    def get_hyperedge_tuple(self, hyperedge_id):
+        """From the hyperedge id, returns a tuple of the tail, head,
+        positive regulator, and negative regulator sets of hypernodes.
 
-        :param hyperedge_tuple: tuple of four iterable containers,
-                            representing the tail, head, positive
-                            regulator, and negative regulator sets,
-                            repsectively.
-        :returns: str -- ID of the hyperedge that has that the specified
-                tail and head sets comprise.
+        :returns: tuple -- tuple of four iterable containers,
+                    representing the tail, head, positive
+                    regulator, and negative regulator sets,
+                    repsectively.
+        :param hyperedge_tuple: ID of the hyperedge that has that the
+                specified tail and head sets comprise.
         :raises: ValueError -- No such hyperedge exists.
 
         """
@@ -617,4 +697,298 @@ class SignalingHypergraph(object):
         frozen_neg_regs = frozenset(neg_regs)
         h_edge = (frozen_tail, frozen_head, frozen_pos_regs, frozen_neg_regs)
 
-        return h_edge in _hyperedge_id_map
+        if not self.has_hyperedge(h_edge):
+            raise ValueError("No such hyperedge exists.")
+
+        return self._hyperedge_id_map[h_edge]
+
+    def has_hyperedge(self, hyperedge_tuple):
+        """From the hyperedge tuple of tail, head, positive regulator,
+        and negative regulator sets of hypernodes, returns whether the
+        hyperedge that these sets comprise exists in the hypergraph.
+
+        :param hyperedge_tuple: tuple of four iterable containers (as
+                            they were passed in to the library),
+                            representing the tail, head, positive
+                            regulator, and negative regulator sets,
+                            repsectively.
+        :returns: str -- ID of the hyperedge that has that the specified
+                tail and head sets comprise.
+        :raises: ValueError -- No such hyperedge exists.
+
+        """
+        # Ensure hyperedge exists in the hypergraph
+        if not self._hyperedge_attributes(hyperedge_id):
+            raise ValueError("No such hyperedge exists.")
+
+        h_attrs = self._hyperedge_attributes[hyperedge_id]
+        frozen_tail = h_attrs["tail"]
+        frozen_head = h_attrs["head"]
+        frozen_pos_regs = h_attrs["pos_regs"]
+        frozen_neg_regs = h_attrs["neg_regs"]
+        h_edge = (frozen_tail, frozen_head, frozen_pos_regs, frozen_neg_regs)
+
+    def get_hyperedge_id_set(self):
+        """Returns the set of IDs of hyperedges that are currently
+        in the hypergraph.
+
+        :returns: set -- all IDs of hyperedges currently in the hypergraph.
+
+        """
+        return set(self._hypernode_attributes.keys())
+
+    def hypernode_iterator(self):
+        """Provides an iterator over the hyperedge IDs.
+
+        """
+        return iter(self._hypernode_attributes)
+
+    def remove_hyperedge(self, hyperedge_id):
+        """Removes a hyperedge and its attributes from the hypergraph.
+
+        :param hyperedge_id: ID of the hyperedge to be removed.
+        :raises: ValueError -- No such hyperedge exists.
+
+        """
+        # Ensure hyperedge exists in the hypergraph
+        if not self.has_hyperedge(hyperedge_id):
+            raise ValueError("No such hyperedge exists.")
+
+        h_attrs = self._hyperedge_attributes[hyperedge_id]
+        frozen_tail = h_attrs["__frozen_tail"]
+        frozen_head = h_attrs["__frozen_head"]
+        frozen_pos_regs = h_attrs["__frozen_pos_regs"]
+        frozen_neg_regs = h_attrs["__frozen_neg_regs"]
+        h_edge = (frozen_tail, frozen_head, frozen_pos_regs, frozen_neg_regs)
+
+        # Remove hyperedge from hyperedge->id map
+        del self._hyperedge_id_map[h_edge]
+
+        # Remove hyperedge ID from forward and backward stars for every
+        # hypernode in the tail and head sets, respectively
+        for hypernode in frozen_tail:
+            self._forward_star[hypernode].remove(hyperedge_id)
+        for hypernode in frozen_head:
+            self._backward_star[hypernode].remove(hyperedge_id)
+        # Remove hyperedge ID from forward and backward stars for every
+        # hypernode in the tail and head sets, respectively
+        for hypernode in frozen_pos_regs:
+            self._positive_regulation_star[hypernode].remove(hyperedge_id)
+        for hypernode in frozen_neg_regs:
+            self._negative_regulation_star[hypernode].remove(hyperedge_id)
+
+        # Remove the hyperedge as the successors and predecessors
+        # of the tail set and head set, respectively
+        self._successors[frozen_tail].remove(hyperedge_id)
+        self._predecessors[frozen_head].remove(hyperedge_id)
+        # Remove the hyperedge as a regulation of the positive regulator
+        # set and negative regulator set, respectively
+        self._positive_regulations[frozen_pos_regs].remove(hyperedge_id)
+        self._negative_regulations[frozen_neg_regs].remove(hyperedge_id)
+
+        # Remove hyperedge id from the attributes dictionary
+        del self._hyperedge_attributes[hyperedge_id]
+
+    def get_hyperedge_attribute(self, hyperedge_id, attribute_name):
+        """Given a hyperedge_id and the name of an attribute, get a copy
+        of that hyperedge's attribute.
+
+        :param hyperedge_id: reference to the ID of the hyperedge to
+                        retrieve the attribute of.
+        :param attribute_name: name of the attribute to retrieve.
+        :returns: attribute value of the attribute_name key for the
+                specified hypernode.
+        :raises: ValueError -- No such hyperedge exists.
+        :raises: ValueError -- No such attribute exists.
+
+        """
+        if not self.has_hyperedge(hyperedge_id):
+            raise ValueError("No such hyperedge exists.")
+        elif attribute_name not in self._hypernode_attributes[node]:
+            raise ValueError("No such attribute exists.")
+        else:
+            return copy.\
+                copy(self._hyperedge_attributes[hyperedge_id][attribute_name])
+
+    def get_hypernode_attributes(self, hyperedge_id):
+        """Given a hyperedge ID, get a dictionary with copies of that
+        hyperedge's attributes.
+
+        :param hyperedge: reference to the ID of the hyperedge to retrieve
+                        the attributes of.
+        :returns: dict -- copy of each attribute of the specified hyperedge.
+        :raises: ValueError -- No such hyperedge exists.
+
+        """
+        if not self.has_hyperedge(hyperedge_id):
+            raise ValueError("No such hyperedge exists.")
+        attributes = {}
+        attr_items = self._hyperedge_attributes[hyperedge_id].items()
+        internal_names = ("__frozen_tail", "__frozen_head",
+                          "__frozen_pos_regs", "__frozen_neg_regs")
+        for attr_name, attr_value in attr_items:
+            if attr_name not in internal_names:
+                attributes[attr_name] = copy.copy(attr_value)
+        return attributes
+
+    def remove_hypernode(self, hypernode):
+        """Removes a hypernode and its attributes from the hypergraph. Removes
+        every hyperedge that contains this hypernode in either the tail,
+        head, positive regulator, or negative regulator sets.
+
+        :param hypernode: reference to the hypernode being removed.
+        :raises: ValueError -- No such hypernode exists.
+
+        """
+        # Ensure hypernode exists in the hypergraph
+        if not self.has_hypernode(hypernode):
+            raise ValueError("No such hypernode exists.")
+
+        # Remove all hyperedges which contains this hypernode
+        forward_star = self.get_forward_star(hypernode)
+        backward_star = self.get_backward_star(hypernode)
+        positive_regulator_star = self.get_positive_regulator_star(hypernode)
+        negative_regulator_star = self.get_negative_regulator_star(hypernode)
+        hyperedge_ids = forward_star.\
+            union(backward_star).\
+            union(positive_regulator_star).\
+            union(negative_regulator_star)
+        for hyperedge_id in hyperedge_ids:
+            self.remove_hyperedge(hyperedge_id)
+
+        # Remove hypernode's forward and backward star
+        del self._forward_star[hypernode]
+        del self._backward_star[hypernode]
+        # Remove hypernode's positive and negative regulator star
+        del self._positive_regulator_star[hypernode]
+        del self._negative_regulator_star[hypernode]
+
+        # Disassociate this hypernode from the nodes that compose it
+        nodes = self._hypernode_attributes[hypernode][__composing_nodes]
+        for node in nodes:
+            _remove_hypernode_membership(node, hypernode)
+
+        # Remove hypernode's attributes dictionary
+        del self._hypernode_attributes[hypernode]
+
+    def remove_node(self, node):
+        """Removes a node and its attributes from the hypergraph. Removes
+        every hypernode that contains this hypernode, and in turn removes
+        every hyperedge that contains the removed hypernodes in either the
+        tail, head, positive regulator, or negative regulator sets.
+
+        :param node: reference to the node being removed.
+        :raises: ValueError -- No such node exists.
+
+        """
+        # Ensure node exists in the hypergraph
+        if not self.has_node(node):
+            raise ValueError("No such node exists.")
+
+        for hypernode in self._node_attributes["__in_hypernodes"]:
+            self.remove_hypernode(hypernode)
+
+        # Remove node's attributes dictionary
+        del self._node_attributes[node]
+
+    def get_forward_star(self, hypernode):
+        """Given a hypernode, get a copy of that hypernode's forward star.
+
+        :param hypernode: hypernode to retrieve the forward-star of.
+        :returns: set -- set of hyperedge_ids for the hyperedges
+                        in the hypernode's forward star.
+        :raises: ValueError -- No such hypernode exists.
+
+        """
+        if hypernode not in self._hypernode_attributes:
+            raise ValueError("No such hypernode exists.")
+        return self._forward_star[hypernode].copy()
+
+    def get_backward_star(self, hypernode):
+        """Given a hypernode, get a copy of that hypernode's backward star.
+
+        :param hypernode: hypernode to retrieve the backward-star of.
+        :returns: set -- set of hyperedge_ids for the hyperedges
+                in the hypernode's backward star.
+        :raises: ValueError -- No such hypernode exists.
+
+        """
+        if hypernode not in self._hypernode_attributes:
+            raise ValueError("No such hypernode exists.")
+        return self._backward_star[hypernode].copy()
+
+    def get_successors(self, tail):
+        """Given a tail set of hypernodes, get a list of hyperedge IDs of
+        which the hypernode set is the tail of each hyperedge.
+
+        :param tail: set of hypernodes that correspond to the tails of some
+                        (possibly empty) set of hyperedges.
+        :returns: set -- hyperedge_ids of the hyperedges that have tail
+                in the tail.
+
+        """
+        frozen_tail = frozenset(tail)
+        # If this hypernode set isn't any tail in the hypergraph, then it has
+        # no successors; thus, return an empty list
+        if frozen_tail not in self._successors:
+            return set()
+
+        return set(self._successors[frozen_tail].values())
+
+    def get_predecessors(self, head):
+        """Given a head set of hypernodes, get a list of hyperedge IDs of
+        which the hypernode set is the head of each hyperedge.
+
+        :param head: set of hypernodes that correspond to the heads of some
+                        (possibly empty) set of hyperedges.
+        :returns: set -- hyperedge_ids of the hyperedges that have head
+                in the head.
+
+        """
+        frozen_head = frozenset(head)
+        # If this hypernode set isn't any head in the hypergraph, then it has
+        # no predecessors; thus, return an empty list
+        if frozen_head not in self._predecessors:
+            return set()
+
+        return set(self._predecessors[frozen_head].values())
+
+    def get_positive_regulations(self, pos_regs):
+        """Given a positive regulator set of hypernodes, get a list
+        of hyperedge IDs of which the hypernode set positively
+        regulates each hyperedge.
+
+        :param pos_regs: set of hypernodes that correspond to the positive
+                        regulators of some (possibly empty) set of hyperedges.
+        :returns: set -- hyperedge_ids of the hyperedges that have pos_regs
+                as the positive regulators.
+
+        """
+        frozen_pos_regs = frozenset(pos_regs)
+        # If this hypernode set isn't any positive regulator set in the
+        # hypergraph, then it has no positive regulations;
+        # thus, return an empty list
+        if frozen_pos_regs not in self._positive_regulations:
+            return set()
+
+        return set(self._positive_regulations[frozen_pos_regs].values())
+
+    def get_negative_regulations(self, neg_regs):
+        """Given a negative regulator set of hypernodes, get a list
+        of hyperedge IDs of which the hypernode set negatively
+        regulates each hyperedge.
+
+        :param neg_regs: set of hypernodes that correspond to the negative
+                        regulators of some (possibly empty) set of hyperedges.
+        :returns: set -- hyperedge_ids of the hyperedges that have neg_regs
+                as the negative regulators.
+
+        """
+        frozen_neg_regs = frozenset(neg_regs)
+        # If this hypernode set isn't any negative regulator set in the
+        # hypergraph, then it has no negative regulations;
+        # thus, return an empty list
+        if frozen_neg_regs not in self._negative_regulations:
+            return set()
+
+        return set(self._negative_regulations[frozen_neg_regs].values())

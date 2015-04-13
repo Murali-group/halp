@@ -281,7 +281,7 @@ class DirectedHypergraph(object):
         """Removes a node and its attributes from the hypergraph. Removes
         every hyperedge that contains this node in either the head or the tail.
 
-        :param node: reference to the node being added.
+        :param node: reference to the node being removed.
         :raises: ValueError -- No such node exists.
 
         Examples:

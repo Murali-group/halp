@@ -257,7 +257,7 @@ class UndirectedHypergraph(object):
         """Removes a node and its attributes from the hypergraph. Removes
         every hyperedge that contains this node.
 
-        :param node: reference to the node being added.
+        :param node: reference to the node being removed.
         :raises: ValueError -- No such node exists.
 
         Examples:
@@ -594,7 +594,7 @@ class UndirectedHypergraph(object):
         set comprises.
 
         :param nodes: iterable container of references to nodes in the
-                    the hyperedge to be added
+                    the hyperedge.
         :returns: str -- ID of the hyperedge that has that the specified
                 node set comprises.
         :raises: ValueError -- No such hyperedge exists.

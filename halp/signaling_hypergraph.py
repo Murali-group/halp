@@ -19,12 +19,13 @@ class SignalingHypergraph(object):
     connects a tail set of hypernodes to a head set of hypernodes, and has an
     associated set of positive regulators (a set of hypernodes) and an
     associated set of negative regulators (a set of hypernodes).
-    The tail and head cannot both be empty.
+    The head set cannot be empty, and the union of the tail set, the positive
+    regulator set, and the negative regulator set cannot be empty.
 
     A node is simply any hashable type. See "add_node" or "add_nodes" for
     more details.
 
-    A hypernode is also any hashable type, which can be associated with a set
+    A hypernode is also any hashable type, which is associated with a set
     of nodes. See "add_hypernode" or "add_hypernodes" for more details.
 
     A signaling hyperedge is a tuple of the tail hypernodes, the head
@@ -435,8 +436,6 @@ class SignalingHypergraph(object):
                 raise ValueError(
                     "Hypernode must be composed of at least one node.")
             attr_dict["__composing_nodes"] = composing_nodes
-            added_nodes = composing_nodes
-            removed_nodes = set()
             self._hypernode_attributes[hypernode] = attr_dict
             self._forward_star[hypernode] = set()
             self._backward_star[hypernode] = set()

@@ -28,14 +28,17 @@ class SignalingHypergraph(object):
     A hypernode is also any hashable type, which is associated with a set
     of nodes. See "add_hypernode" or "add_hypernodes" for more details.
 
-    A signaling hyperedge is a tuple of the tail hypernodes, the head
+    A signaling hyperedge is defined by a four-tuple: the tail hypernodes, the head
     hypernodes, the positive regulator hypernodes, and the negative regulator
-    hypernodes.
-    This class assigns (upon adding) and refers to each signaling hyperedge by
+    hypernodes. Upon the addition of each hyperedge, the class assigns and refers to
+    each signaling hyperedge by
     an internal ID. See "add_hyperedge" or "add_hyperedges" for more details.
 
-    Self-loops are allowed, and parallel (multi-) hyperedges are allowed if
-    they have different regulator sets.
+    When adding a hyperedge, the class allows hypernodes to appear in any of
+    the four sets.
+    
+    The class allows adding multiple hyperedges with the same tail and head sets
+    to be added if they have different regulator sets.
 
     :note: This class uses several data structures to store a signaling
         hypergraph. Since these structures must stay in sync (see: __init__),
@@ -216,9 +219,9 @@ class SignalingHypergraph(object):
         #
         # Since the class takes responsibility for giving hyperedges
         # their IDs (i.e. a unique identifier; could be alternatively viewed
-        # as a unique name, label, etc.), the issued IDs need to be kept
-        # track of. A consecutive issuing of integer IDs to the hyperedges is a
-        # simple strategy to ensure their uniqueness and allow for
+        # as a unique name, label, etc.), it needs to keep track of the issued
+        # IDs need to be kept. Issuing consecutive of integer IDs to the
+        # hyperedges is a simple strategy to ensure their uniqueness and allow for
         # intuitive readability.
         #
         # e.g., _current_hyperedge_id = 4  implies that 4 hyperedges have
@@ -260,7 +263,7 @@ class SignalingHypergraph(object):
     def has_node(self, node):
         """Determines if a specific node is present in the hypergraph.
 
-        :param node: reference to the node whose presence is being checked.
+        :param node: reference to the node.
         :returns: bool -- true iff the node exists in the hypergraph.
 
         """
@@ -270,7 +273,7 @@ class SignalingHypergraph(object):
         """Adds a node to the graph, along with any related attributes
            of the node.
 
-        :param node: reference to the node being added.
+        :param node: reference to the node.
         :param attr_dict: dictionary of attributes of the node.
         :param attr: keyword arguments of attributes of the node;
                     attr's values will override attr_dict's values
@@ -315,7 +318,7 @@ class SignalingHypergraph(object):
         """Given a node and the name of an attribute, get a copy
         of that node's attribute.
 
-        :param node: reference to the node to retrieve the attribute of.
+        :param node: reference to the node.
         :param attribute_name: name of the attribute to retrieve.
         :returns: attribute value of the attribute_name key for the
                 specified node.
@@ -335,7 +338,7 @@ class SignalingHypergraph(object):
         """Given a node, get a dictionary with copies of that node's
         attributes.
 
-        :param node: reference to the node to retrieve the attributes of.
+        :param node: reference to the node.
         :returns: dict -- copy of each attribute of the specified node.
         :raises: ValueError -- No such node exists.
 
@@ -351,8 +354,7 @@ class SignalingHypergraph(object):
     def get_hypernodes_containing_node(self, node):
         """Given a node, get the set of the hypernodes that contain it.
 
-        :param node: reference to the node to retrieve it member
-                    hypernodes from.
+        :param node: reference to the node.
         :returns: set -- set of hypernodes that contain the node.
         :raises: ValueError -- No such node exists.
 
@@ -366,8 +368,8 @@ class SignalingHypergraph(object):
     def has_hypernode(self, hypernode):
         """Determines if a specific hypernode is present in the hypergraph.
 
-        :param node: reference to hypernode whose presence is being checked.
-        :returns: bool -- true iff the node exists in the hypergraph.
+        :param hypernode: reference to hypernode.
+        :returns: bool -- true iff the hypernode exists in the hypergraph.
 
         """
         return hypernode in self._hypernode_attributes
@@ -376,8 +378,7 @@ class SignalingHypergraph(object):
         """Adds the given hypernode into the node's "membership" structure,
         indicating that this node is a member of the given hypernode.
 
-        :param node: reference to the node whose hypernode membership is
-                    being modified.
+        :param node: reference to the node.
         :param hypernode: reference to the hypernode that the given node is
                         a member of.
         :raises: ValueError -- No such node exists.
@@ -395,8 +396,7 @@ class SignalingHypergraph(object):
         """Removes the given hypernode from the node's "membership" structure,
         indicating that this node is no longer a member of the given hypernode.
 
-        :param node: reference to the node whose hypernode membership is
-                    being modified.
+        :param node: reference to the node.
         :param hypernode: reference to the hypernode that the given node is
                         no longer a member of.
         :raises: ValueError -- No such node exists.

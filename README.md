@@ -1,5 +1,5 @@
-[![Build
-Status](https://travis-ci.org/tmmurali/halp.svg?branch=master)](https://travis-ci.org/tmmurali/halp)
+<!---[![Build
+Status](https://travis-ci.org/tmmurali/halp.svg?branch=master)](https://travis-ci.org/tmmurali/halp)-->
 [![Coverage
 Status](https://coveralls.io/repos/tmmurali/halp/badge.png?branch=master)](https://coveralls.io/r/tmmurali/halp?branch=master)
 

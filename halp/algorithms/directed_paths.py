@@ -46,15 +46,15 @@ def visit(H, source_node):
     if not isinstance(H, DirectedHypergraph):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
-    node_set = H.get_node_set()
-    # Pv keeps track of the ID of the hyperedge that directely
+    node_set = H.get_node_id_set()
+    # Pv keeps track of the ID of the hyperedge that directly
     # preceeded each node in the traversal
     Pv = {node: None for node in node_set}
 
-    hyperedge_id_set = H.get_hyperedge_id_set()
+    hyperedge_set = H.get_hyperedges()
     # Pe keeps track of the node that directedly preceeded
     # each hyperedge in the traversal
-    Pe = {hyperedge_id: None for hyperedge_id in hyperedge_id_set}
+    Pe = {hyperedge: None for hyperedge in hyperedge_set}
 
     # Explicitly tracks the set of visited nodes
     visited_nodes = set([source_node])
@@ -65,16 +65,16 @@ def visit(H, source_node):
     while not Q.empty():
         current_node = Q.get()
         # At current_node, we can traverse each hyperedge in its forward star
-        for hyperedge_id in H.get_forward_star(current_node):
-            if Pe[hyperedge_id] is not None:
+        for hyperedge in H.get_forward_star(current_node):
+            if Pe[hyperedge] is not None:
                 continue
-            Pe[hyperedge_id] = current_node
+            Pe[hyperedge] = current_node
             # Traversing a hyperedge in current_node's forward star yields
             # the set of head nodes of the hyperedge; visit each head node
-            for head_node in H.get_hyperedge_head(hyperedge_id):
+            for head_node in hyperedge.get_head():
                 if head_node in visited_nodes:
                     continue
-                Pv[head_node] = hyperedge_id
+                Pv[head_node] = hyperedge
                 Q.put(head_node)
                 visited_nodes.add(head_node)
 
@@ -123,20 +123,7 @@ def _x_visit(H, source_node, b_visit):
     if not isinstance(H, DirectedHypergraph):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
-    # If the b_visit flag is set, perform a traditional B-Visit
-    if b_visit:
-        forward_star = H.get_forward_star
-        hyperedge_tail = H.get_hyperedge_tail
-        hyperedge_head = H.get_hyperedge_head
-    # If the b_visit flag is not set, implicitly perform an F-Visit by
-    # implicitly taking the symmetric image (what the 'else' statement
-    # is for) and then performing a traditional B-Visit
-    else:
-        forward_star = H.get_backward_star
-        hyperedge_tail = H.get_hyperedge_head
-        hyperedge_head = H.get_hyperedge_tail
-
-    node_set = H.get_node_set()
+    node_set = H.get_node_id_set()
     # Pv keeps track of the ID of the hyperedge that directely
     # preceeded each node in the traversal
     Pv = {node: None for node in node_set}
@@ -146,15 +133,15 @@ def _x_visit(H, source_node, b_visit):
     v = {node: float("inf") for node in node_set}
     v[source_node] = 0
 
-    hyperedge_id_set = H.get_hyperedge_id_set()
+    hyperedge_set = H.get_hyperedges()
     # Pe keeps track of the node that directedly preceeded
     # each hyperedge in the traversal
-    Pe = {hyperedge_id: None for hyperedge_id in hyperedge_id_set}
+    Pe = {hyperedge: None for hyperedge in hyperedge_set}
 
     # k keeps track of how many nodes in the tail of each hyperedge are
     # B-connected (when all nodes in a tail are B-connected, that hyperedge
     # can then be traversed)
-    k = {hyperedge_id: 0 for hyperedge_id in hyperedge_id_set}
+    k = {hyperedge: 0 for hyperedge in hyperedge_set}
 
     # Explicitly tracks the set of B-visited nodes
     x_visited_nodes = set([source_node])
@@ -164,25 +151,50 @@ def _x_visit(H, source_node, b_visit):
 
     while not Q.empty():
         current_node = Q.get()
-        # At current_node, we can traverse each hyperedge in its forward star
-        for hyperedge_id in forward_star(current_node):
-            # Since we're arrived at a new node, we increment
-            # k[hyperedge_id] to indicate that we've reached 1 new
-            # node in this hyperedge's tail
-            k[hyperedge_id] += 1
-            # Traverse this hyperedge only when we have reached all the nodes
-            # in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)
-            if k[hyperedge_id] == len(hyperedge_tail(hyperedge_id)):
-                Pe[hyperedge_id] = current_node
-                # Traversing the hyperedge yields the set of head nodes of
-                # the hyperedge; B-visit each head node
-                for head_node in hyperedge_head(hyperedge_id):
-                    if head_node in x_visited_nodes:
-                        continue
-                    Pv[head_node] = hyperedge_id
-                    Q.put(head_node)
-                    v[head_node] = v[Pe[hyperedge_id]] + 1
-                    x_visited_nodes.add(head_node)
+        # If the b_visit flag is set, perform a traditional B-Visit
+	if b_visit:
+            # At current_node, we can traverse each hyperedge in its forward star
+	    for hyperedge in H.get_forward_star(current_node):
+                # Since we're arrived at a new node, we increment
+                # k[hyperedge_id] to indicate that we've reached 1 new
+                # node in this hyperedge's tail
+                k[hyperedge] += 1
+                # Traverse this hyperedge only when we have reached all the nodes
+                # in its tail (i.e., when k[hyperedge] == |T(hyperedge)|)
+                if k[hyperedge] == len(hyperedge.get_tail()):
+                    Pe[hyperedge] = current_node
+                    # Traversing the hyperedge yields the set of head nodes of
+                    # the hyperedge; B-visit each head node
+                    for head_node in hyperedge.get_head():
+                        if head_node in x_visited_nodes:
+                            continue
+                        Pv[head_node] = hyperedge
+                        Q.put(head_node)
+                        v[head_node] = v[Pe[hyperedge]] + 1
+                        x_visited_nodes.add(head_node)
+        # If the b_visit flag is not set, implicitly perform an F-Visit by
+        # implicitly taking the symmetric image (what the 'else' statement
+        # is for) and then performing a traditional B-Visit
+	else:
+            # At current_node, we can traverse each hyperedge in its backward star
+	    for hyperedge in H.get_backward_star(current_node):
+                # Since we're arrived at a new node, we increment
+                # k[hyperedge_id] to indicate that we've reached 1 new
+                # node in this hyperedge's head
+                k[hyperedge] += 1
+                # Traverse this hyperedge only when we have reached all the nodes
+                # in its head (i.e., when k[hyperedge] == |T(hyperedge)|)
+                if k[hyperedge] == len(hyperedge.get_head()):
+                    Pe[hyperedge] = current_node
+                    # Traversing the hyperedge yields the set of tail nodes of
+                    # the hyperedge; F-visit each head node
+                    for tail_node in hyperedge.get_tail():
+                        if tail_node in x_visited_nodes:
+                            continue
+                        Pv[tail_node] = hyperedge
+                        Q.put(tail_node)
+                        v[tail_node] = v[Pe[hyperedge]] + 1
+                        x_visited_nodes.add(tail_node)
 
     return x_visited_nodes, Pv, Pe, v
 
@@ -348,22 +360,12 @@ def _shortest_x_tree(H, source_node, b_tree,
     if not isinstance(H, DirectedHypergraph):
         raise TypeError("Algorithm only applicable to directed hypergraphs")
 
-    if b_tree:
-        forward_star = H.get_forward_star
-        hyperedge_tail = H.get_hyperedge_tail
-        hyperedge_head = H.get_hyperedge_head
-    else:
-        forward_star = H.get_backward_star
-        hyperedge_tail = H.get_hyperedge_head
-        hyperedge_head = H.get_hyperedge_tail
-    hyperedge_weight = H.get_hyperedge_weight
-
-    node_set = H.get_node_set()
+    node_set = H.get_node_id_set()
     # Pv keeps track of the ID of the hyperedge that directely
     # preceeded each node in the traversal
     Pv = {node: None for node in node_set}
 
-    hyperedge_ids = H.get_hyperedge_id_set()
+    hyperedges = H.get_hyperedges()
     # W keeps track of the smallest weight path from the source node
     # to each node
     W = {node: float("inf") for node in node_set}
@@ -372,7 +374,7 @@ def _shortest_x_tree(H, source_node, b_tree,
     # k keeps track of how many nodes in the tail of each hyperedge are
     # B-connected (when all nodes in a tail are B-connected, that hyperedge
     # can then be traversed)
-    k = {hyperedge_id: 0 for hyperedge_id in hyperedge_ids}
+    k = {hyperedge: 0 for hyperedge in hyperedges}
 
     # List of nodes removed from the priority queue in the order that
     # they were removed
@@ -385,31 +387,59 @@ def _shortest_x_tree(H, source_node, b_tree,
         # At current_node, we can traverse each hyperedge in its forward star
         current_node = Q.get_top_priority()
         ordering.append(current_node)
-        for hyperedge_id in forward_star(current_node):
-            # Since we're arrived at a new node, we increment
-            # k[hyperedge_id] to indicate that we've reached 1 new
-            # node in this hyperedge's tail
-            k[hyperedge_id] += 1
-            # Traverse this hyperedge only when we have reached all the nodes
-            # in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)
-            if k[hyperedge_id] == len(hyperedge_tail(hyperedge_id)):
-                f = F(hyperedge_tail(hyperedge_id), W)
-                # For each node in the head of the newly-traversed hyperedge,
-                # if the previous weight of the node is more than the new
-                # weight...
-                for head_node in \
-                    [node for node in hyperedge_head(hyperedge_id) if
-                     W[node] > hyperedge_weight(hyperedge_id) + f]:
-                    # Update its weight to the new, smaller weight
-                    W[head_node] = hyperedge_weight(hyperedge_id) + f
-                    Pv[head_node] = hyperedge_id
-                    # If it's not already in the priority queue...
-                    if not Q.contains_element(head_node):
-                        # Add it to the priority queue
-                        Q.add_element(W[head_node], head_node)
-                    else:
-                        # Otherwise, decrease it's key in the priority queue
-                        Q.reprioritize(W[head_node], head_node)
+
+	if b_tree:
+            for hyperedge in H.get_forward_star(current_node):
+                # Since we're arrived at a new node, we increment
+                # k[hyperedge] to indicate that we've reached 1 new
+                # node in this hyperedge's tail
+                k[hyperedge] += 1
+                # Traverse this hyperedge only when we have reached all the nodes
+                # in its tail (i.e., when k[hyperedge] == |T(hyperedge)|)
+                if k[hyperedge] == len(hyperedge.get_tail()):
+                    f = F(hyperedge.get_tail(), W)
+                    # For each node in the head of the newly-traversed hyperedge,
+                    # if the previous weight of the node is more than the new
+                    # weight...
+                    for head_node in \
+                        [node for node in hyperedge.get_head() if
+                         W[node] > hyperedge.get_weight() + f]:
+                        # Update its weight to the new, smaller weight
+                        W[head_node] = hyperedge.get_weight() + f
+                        Pv[head_node] = hyperedge
+                        # If it's not already in the priority queue...
+                        if not Q.contains_element(head_node):
+                            # Add it to the priority queue
+                            Q.add_element(W[head_node], head_node)
+                        else:
+                            # Otherwise, decrease it's key in the priority queue
+                            Q.reprioritize(W[head_node], head_node)
+	else:
+            for hyperedge in H.get_backward_star(current_node):
+                # Since we're arrived at a new node, we increment
+                # k[hyperedge] to indicate that we've reached 1 new
+                # node in this hyperedge's tail
+                k[hyperedge] += 1
+                # Traverse this hyperedge only when we have reached all the nodes
+                # in its head (i.e., when k[hyperedge] == |T(hyperedge)|)
+                if k[hyperedge] == len(hyperedge.get_head()):
+                    f = F(hyperedge.get_head(), W)
+                    # For each node in the head of the newly-traversed hyperedge,
+                    # if the previous weight of the node is more than the new
+                    # weight...
+                    for tail_node in \
+                        [node for node in hyperedge.get_tail() if
+                         W[node] > hyperedge.get_weight() + f]:
+                        # Update its weight to the new, smaller weight
+                        W[tail_node] = hyperedge.get_weight() + f
+                        Pv[tail_node] = hyperedge
+                        # If it's not already in the priority queue...
+                        if not Q.contains_element(tail_node):
+                            # Add it to the priority queue
+                            Q.add_element(W[tail_node], tail_node)
+                        else:
+                            # Otherwise, decrease it's key in the priority queue
+                            Q.reprioritize(W[tail_node], tail_node)
 
     if valid_ordering:
         return Pv, W, ordering
@@ -519,15 +549,14 @@ def get_hypertree_from_predecessors(H, Pv, source_node,
     sub_H.add_nodes(nodes)
 
     # Add all hyperedges, specified by Pv, to the hypergraph
-    hyperedges = [(H.get_hyperedge_tail(hyperedge_id),
-                   H.get_hyperedge_head(hyperedge_id),
-                   H.get_hyperedge_attributes(hyperedge_id))
-                  for hyperedge_id in Pv.values() if hyperedge_id is not None]
+    hyperedges = [(hyperedge.get_tail(), hyperedge.get_head(), hyperedge.get_attributes())
+                  for hyperedge in Pv.values() if hyperedge is not None]
     sub_H.add_hyperedges(hyperedges)
 
     return sub_H
 
 
+# TODO:
 def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
                                     node_weights=None, attr_name="weight"):
     """Gives the hyperpath (DirectedHypergraph) representing the shortest
@@ -560,16 +589,16 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
     # - exactly one node must map to None (i.e., only one node
     #   without predecessor)
     nodes_without_predecessor = 0
-    for node, hyperedge_id in Pv.items():
+    for node, hyperedge in Pv.items():
         if not H.has_node(node):
             raise KeyError(
                 "Node key %s in predecessor is not in H" % node)
 
-        if hyperedge_id is None:
+        if hyperedge is None:
             nodes_without_predecessor += 1
-        elif not H.has_hyperedge_id(hyperedge_id):
+        elif not H.has_hyperedge(hyperedge):
             raise KeyError(
-                "Hyperedge key %s in predecessor is not in H" % hyperedge_id)
+                "Hyperedge key %s in predecessor is not in H" % hyperedge)
 
     if nodes_without_predecessor > 1:
         raise ValueError(
@@ -586,17 +615,17 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
     processedOrInQueue[destination_node] = True
     while nodesToProcess:
         node = nodesToProcess.pop(0)
-        hyperedge_id = Pv[node]
-        if hyperedge_id:
-            for n in H.get_hyperedge_tail(hyperedge_id):
+        hyperedge = Pv[node]
+        if hyperedge:
+            for n in hyperedge.get_tail():
                 if not processedOrInQueue[n]:
                     nodesToProcess.append(n)
                     processedOrInQueue[n] = True
-            path.add_hyperedge(H.get_hyperedge_tail(hyperedge_id),
-                               H.get_hyperedge_head(hyperedge_id),
-                               weight=H.get_hyperedge_weight(
-                               hyperedge_id))
+            path.add_hyperedge(hyperedge.get_tail(),
+                               hyperedge.get_head(),
+                               weight=hyperedge.get_weight())
         elif not path.has_node(node):
             path.add_node(node)
 
     return path
+

@@ -371,7 +371,7 @@ class DirectedHypergraph(object):
         This method will automatically add any node from the tail and
         head that was not in the hypergraph.
         A hyperedge without a "weight" attribute specified will be
-        assigned the default value of 1.
+        assigned the default value of 1 in the hyperedge constructor.
 
         :param tail: iterable container of references to nodes in the
                     tail of the hyperedge to be added.
@@ -424,10 +424,6 @@ class DirectedHypergraph(object):
             # Add tail and head nodes to graph (if not already present)
             self.add_nodes(frozen_head)
             self.add_nodes(frozen_tail)
-
-	    # If weight attribute is not defined, assign it a default value of 1.
-	    if not "weight" in attr_dict:
-		attr_dict["weight"] = 1	    
 
             # Create new hyperedge object.
             hyperedge = DirectedHyperedge(None, tail, head, attr_dict)
@@ -1353,16 +1349,3 @@ class DirectedHypergraph(object):
         self._check_hyperedge_id_consistency()
         self._check_node_consistency()
 
-# TEMP - for testing
-def main():
-    H = DirectedHypergraph()
-    H.add_node("A")
-    H.add_node("B")
-    H.add_node("C")
-    H.add_node("D")
-    H.add_node("E")
-    edge = H.add_hyperedge(set(["A", "B"]), set(["C", "D", "E"]), {'color': 'red'})
-    print(edge.get_attributes())
-    print(H.has_hyperedge(("A", "B"), ("C", "D", "E")))
-
-main()

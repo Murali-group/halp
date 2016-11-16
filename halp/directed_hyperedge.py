@@ -24,6 +24,10 @@ class DirectedHyperedge(object):
         self._head = head
         self._attributes = attributes
 
+	# If weight attribute is not defined, assign it a default value of 1.
+	if not "weight" in self._attributes:
+	    self._attributes["weight"] = 1	    
+
         self.__frozen_tail = frozenset(tail)
         self.__frozen_head = frozenset(head)
 
@@ -105,4 +109,11 @@ class DirectedHyperedge(object):
             as the head to this hyperedge.
         """
         return self._tail
+
+    def get_weight(self):
+	"""Gets the weight of this hyperedge.
+
+	:returns: the weight of this hyperedge
+	"""
+	return self.get_attribute("weight")
 

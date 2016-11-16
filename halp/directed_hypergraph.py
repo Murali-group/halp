@@ -8,6 +8,8 @@
 
 import copy
 
+from directed_hyperedge import DirectedHyperedge
+
 
 class DirectedHypergraph(object):
     """
@@ -21,9 +23,9 @@ class DirectedHypergraph(object):
     A node is simply any hashable type. See "add_node" or "add_nodes" for
     more details.
 
-    A directed hyperedge is a tuple of the tail nodes and the head nodes.
-    This class assigns (upon adding) and refers to each hyperedge by an
-    internal ID. See "add_hyperedge" or "add_hyperedges" for more details.
+    A directed hyperedge is a class containing a tuple of the tail nodes
+    and the head nodes. See "add_hyperedge" or "add_hyperedges" and the
+    external class DirectedHyperedge in directed_hyperedge.py for more details.
 
     Self-loops are allowed, but parallel (multi) hyperedges are not.
 
@@ -61,8 +63,11 @@ class DirectedHypergraph(object):
         execution of most of the fundamental hypergraph queries.
 
         """
-        # _node_attributes: a dictionary mapping a node (any hashable type)
-        # to a dictionary of attributes of that node.
+	# In these comments, the word "hyperedge" refers to an instance of
+	# the directed_hyperedge class.
+
+        # _nodes: a dictionary mapping a node ID to a dictionary of
+        # attributes for that node.
         #
         # Provides O(1) time access to the attributes of a node.
         #
@@ -70,23 +75,6 @@ class DirectedHypergraph(object):
         # get_node_attributes.
         #
         self._node_attributes = {}
-
-        # _hyperedge_attributes: a dictionary mapping a hyperedge ID
-        # (initially created by the call to add_hyperedge or add_hyperedges)
-        # to a dictionary of attributes of that hyperedge.
-        # Given a hyperedge ID, _hyperedge_attributes[hyperedge_id] stores
-        # the tail of the hyperedge as specified by the user (as "tail"),
-        # the head of the hyperedge as specified by the user (as "head"),
-        # and the weight of the hyperedge (as "weight").
-        # For internal purposes, it also stores the frozenset versions of
-        # the tail and head (as "__frozen_tail" and "__frozen_head").
-        #
-        # Provides O(1) time access to the attributes of a hyperedge.
-        #
-        # Used in the implementation of methods such as add_hyperedge and
-        # get_hyperedge_attributes.
-        #
-        self._hyperedge_attributes = {}
 
         # The forward star of a node is the set of hyperedges such that the
         # node is in the tail of each hyperedge in that set.
@@ -116,55 +104,39 @@ class DirectedHypergraph(object):
         #
         self._backward_star = {}
 
-        # _successors: a 2-dimensional dictionary mapping (first) a tail set
-        # and (second) a head set of a hyperedge to the ID of the corresponding
-        # hyperedge. We represent each tail set and each head set by a
-        # frozenset, so that the structure is hashable.
+        # _hyperedges: a set containing all the hyperedges in the hypergraph.
+        # Strictly speaking, we do not need this attribute since _forward_star
+	# and _backward_star effectively store all the hyperedges. The main
+	# reason for keeping this attribute is to efficiently check whether a
+	# hyperedge exists in the hypergraph or not.
         #
-        # Provides O(1) time access to the ID of the of the hyperedge
-        # connecting a specific tail frozenset to a specific head frozenset.
-        # Given a tail frozenset, it also provides O(1) time access to a
-        # reference to the dictionary mapping head frozensets to hyperedge IDs;
-        # these hyperedges are precisely those in the forward star of this
-        # tail frozenset.
+        self._hyperedges = set()
+
+        # _successors: a 2-dimensional dictionary mapping (first) a tail set
+        # and (second) a head set of a hyperedge to the corresponding hyperedge
+        # object. We represent each tail set and each head set by a frozenset,
+        # so that the structure is hashable.
+        #
+        # Provides O(1) time access to the hyperedge connecting a specific tail
+        # frozenset to a specific head frozenset. Given a tail frozenset, it
+        # also provides O(1) time access to a reference to the dictionary
+        # mapping head frozensets to hyperedges. These hyperedges are precisely
+        # those in the forward star of this tail frozenset.
         #
         self._successors = {}
 
         # _predecessors: a 2-dimensional dictionary mapping (first) a head set
-        # and (second) a tail set of a hyperedge to the ID of the corresponding
-        # hyperedge. We represent each tail set and each head set by a
-        # frozenset, so that the structure is hashable.
+        # and (second) a tail set of a hyperedge to the corresponding hyperedge
+        # object. We represent each tail set and each head set by a frozenset,
+        # so that the structure is hashable.
         #
-        # Provides O(1) time access to the ID of the of the hyperedge
-        # connecting a specific head frozenset to a specific tail frozenset.
-        # Given a head frozenset, it also provides O(1) time access to a
-        # reference to the dictionary mapping tail frozensets to hyperedge IDs;
-        # these hyperedges are precisely those in the backward star of this
-        # head frozenset.
+        # Provides O(1) time access to the hyperedge connecting a specific head
+        # frozenset to a specific tail frozenset. Given a head frozenset, it
+        # also provides O(1) time access to a reference to the dictionary
+        # mapping tail frozensets to hyperedges. These hyperedges are precisely
+        # those in the backward star of this head frozenset.
         #
         self._predecessors = {}
-
-        # _current_hyperedge_id: an int representing the hyperedge ID that
-        # was most recently assigned by the class (since users don't
-        # name/ID their own hyperedges); hyperedges being added are issued
-        # ID "e"+_current_hyperedge_id.
-        #
-        # Since the class takes responsibility for giving hyperedges
-        # their IDs (i.e. a unique identifier; could be alternatively viewed
-        # as a unique name, label, etc.), the issued IDs need to be kept
-        # track of. A consecutive issuing of integer IDs to the hyperedges is a
-        # simple strategy to ensure their uniqueness and allow for
-        # intuitive readability.
-        #
-        # e.g., _current_hyperedge_id = 4  implies that 4 hyperedges have
-        # been added to the hypergraph, and that "e4" was the most recently
-        # assigned hyperedge.
-        #
-        # Note: An hyperedge, once added, will receive a unique ID. If this
-        # hyperedge is removed and subsequently re-added, it will not receive
-        # the same ID as it was issued when it was originally added.
-        #
-        self._current_hyperedge_id = 0
 
     def _combine_attribute_arguments(self, attr_dict, attr):
         """Combines attr_dict and attr dictionaries, by updating attr_dict
@@ -297,15 +269,15 @@ class DirectedHypergraph(object):
 
         # Remove every hyperedge which is in the forward star of the node
         forward_star = self.get_forward_star(node)
-        for hyperedge_id in forward_star:
-            self.remove_hyperedge(hyperedge_id)
+        for hyperedge in forward_star:
+            self.remove_hyperedge(hyperedge)
 
         # Remove every hyperedge which is in the backward star of the node
         # but that is not also in the forward start of the node (to handle
         # overlapping hyperedges)
         backward_star = self.get_backward_star(node)
-        for hyperedge_id in backward_star - forward_star:
-            self.remove_hyperedge(hyperedge_id)
+        for hyperedge in backward_star - forward_star:
+            self.remove_hyperedge(hyperedge)
 
         # Remove node's forward and backward star
         del self._forward_star[node]
@@ -343,10 +315,10 @@ class DirectedHypergraph(object):
         for node in nodes:
             self.remove_node(node)
 
-    def get_node_set(self):
-        """Returns the set of nodes that are currently in the hypergraph.
+    def get_node_id_set(self):
+        """Returns a set of node IDs that are currently in the hypergraph.
 
-        :returns: set -- all nodes currently in the hypergraph
+        :returns: set -- all IDs of nodes currently in the hypergraph
 
         """
         return set(self._node_attributes.keys())
@@ -393,15 +365,6 @@ class DirectedHypergraph(object):
             attributes[attr_name] = copy.copy(attr_value)
         return attributes
 
-    def _assign_next_hyperedge_id(self):
-        """Returns the next [consecutive] ID to be assigned
-            to a hyperedge.
-        :returns: str -- hyperedge ID to be assigned.
-
-        """
-        self._current_hyperedge_id += 1
-        return "e" + str(self._current_hyperedge_id)
-
     def add_hyperedge(self, tail, head, attr_dict=None, **attr):
         """Adds a hyperedge to the hypergraph, along with any related
         attributes of the hyperedge.
@@ -419,8 +382,14 @@ class DirectedHypergraph(object):
         :param attr: keyword arguments of attributes of the hyperedge;
                     attr's values will override attr_dict's values
                     if both are provided.
-        :returns: str -- the ID of the hyperedge that was added.
+        :returns: object reference to the added hyperedge.
         :raises: ValueError -- tail and head arguments cannot both be empty.
+
+	:note: If you invoke this function with the tail and head of an
+		existing hyperedge, this function will simply update
+		the attributes of that hyperedge. Therefore, a directed
+		hypergraph cannot contain two hyperedges with the same
+		tail sets and head sets but different attributes.
 
         Examples:
         ::
@@ -456,36 +425,34 @@ class DirectedHypergraph(object):
             self.add_nodes(frozen_head)
             self.add_nodes(frozen_tail)
 
-            # Create new hyperedge name to use as reference for that hyperedge
-            hyperedge_id = self._assign_next_hyperedge_id()
+	    # If weight attribute is not defined, assign it a default value of 1.
+	    if not "weight" in attr_dict:
+		attr_dict["weight"] = 1	    
+
+            # Create new hyperedge object.
+            hyperedge = DirectedHyperedge(None, tail, head, attr_dict)
 
             # Add hyperedge to the forward-star and to the backward-star
             # for each node in the tail and head sets, respectively
             for node in frozen_tail:
-                self._forward_star[node].add(hyperedge_id)
+                self._forward_star[node].add(hyperedge)
             for node in frozen_head:
-                self._backward_star[node].add(hyperedge_id)
+                self._backward_star[node].add(hyperedge)
+
+            # Add the hyperedge to the set of hyperedges.
+            self._hyperedges.add(hyperedge)
 
             # Add the hyperedge as the successors and predecessors
             # of the tail set and head set, respectively
-            self._successors[frozen_tail][frozen_head] = hyperedge_id
-            self._predecessors[frozen_head][frozen_tail] = hyperedge_id
+            self._successors[frozen_tail][frozen_head] = hyperedge
+            self._predecessors[frozen_head][frozen_tail] = hyperedge
 
-            # Assign some special attributes to this hyperedge. We assign
-            # a default weight of 1 to the hyperedge. We also store the
-            # original tail and head sets in order to return them exactly
-            # as the user passed them into add_hyperedge.
-            self._hyperedge_attributes[hyperedge_id] = \
-                {"tail": tail, "__frozen_tail": frozen_tail,
-                 "head": head, "__frozen_head": frozen_head,
-                 "weight": 1}
         else:
-            # If its not a new hyperedge, just get its ID to update attributes
-            hyperedge_id = self._successors[frozen_tail][frozen_head]
+            # If its not a new hyperedge, just update attributes
+            hyperedge = self._successors[frozen_tail][frozen_head]
+            hyperedge._attributes.update(attr_dict)
 
-        # Set attributes and return hyperedge ID
-        self._hyperedge_attributes[hyperedge_id].update(attr_dict)
-        return hyperedge_id
+        return hyperedge
 
     def add_hyperedges(self, hyperedges, attr_dict=None, **attr):
         """Adds multiple hyperedges to the graph, along with any related
@@ -506,8 +473,7 @@ class DirectedHypergraph(object):
         :param attr: keyword arguments of attributes of the hyperedges;
                     attr's values will override attr_dict's values
                     if both are provided.
-        :returns: list -- the IDs of the hyperedges added in the order
-                    specified by the hyperedges container's iterator.
+        :returns: list -- object references to the added hyperedge objects.
 
         See also:
         add_hyperedge
@@ -524,7 +490,7 @@ class DirectedHypergraph(object):
         """
         attr_dict = self._combine_attribute_arguments(attr_dict, attr)
 
-        hyperedge_ids = []
+        added_hyperedges = []
 
         for hyperedge in hyperedges:
             if len(hyperedge) == 3:
@@ -535,20 +501,20 @@ class DirectedHypergraph(object):
                 # attr_dict, with the former (node_attr_dict) taking precedence
                 new_dict = attr_dict.copy()
                 new_dict.update(hyperedge_attr_dict)
-                hyperedge_id = self.add_hyperedge(tail, head, new_dict)
+                added_hyperedge = self.add_hyperedge(tail, head, new_dict)
             else:
                 # See (["A", "B"], ["C", "D"]) in the documentation example
                 tail, head = hyperedge
-                hyperedge_id = \
+                added_hyperedge = \
                     self.add_hyperedge(tail, head, attr_dict.copy())
-            hyperedge_ids.append(hyperedge_id)
+            added_hyperedges.append(added_hyperedge)
 
-        return hyperedge_ids
+        return added_hyperedges
 
-    def remove_hyperedge(self, hyperedge_id):
+    def remove_hyperedge(self, hyperedge):
         """Removes a hyperedge and its attributes from the hypergraph.
 
-        :param hyperedge_id: ID of the hyperedge to be removed.
+        :param hyperedge: hyperedge object to be removed.
         :raises: ValueError -- No such hyperedge exists.
 
         Examples:
@@ -562,20 +528,18 @@ class DirectedHypergraph(object):
             >>> H.remove_hyperedge(xyz[0])
 
         """
-        if not self.has_hyperedge_id(hyperedge_id):
+        if not self.has_hyperedge(hyperedge._tail, hyperedge._head):
             raise ValueError("No such hyperedge exists.")
 
-        frozen_tail = \
-            self._hyperedge_attributes[hyperedge_id]["__frozen_tail"]
-        frozen_head = \
-            self._hyperedge_attributes[hyperedge_id]["__frozen_head"]
+        frozen_tail = hyperedge.__frozen_tail
+        frozen_head = hyperedge.__frozen_head
 
         # Remove this hyperedge from the forward-star of every tail node
         for node in frozen_tail:
-            self._forward_star[node].remove(hyperedge_id)
+            self._forward_star[node].remove(hyperedge)
         # Remove this hyperedge from the backward-star of every head node
         for node in frozen_head:
-            self._backward_star[node].remove(hyperedge_id)
+            self._backward_star[node].remove(hyperedge)
 
         # Remove frozen_head as a successor of frozen_tail
         del self._successors[frozen_tail][frozen_head]
@@ -590,14 +554,14 @@ class DirectedHypergraph(object):
         if self._predecessors[frozen_head] == {}:
             del self._predecessors[frozen_head]
 
-        # Remove hyperedge's attributes dictionary
-        del self._hyperedge_attributes[hyperedge_id]
+        # Remove hyperedge from set of hyperedges
+        self._hyperedges.remove(hyperedge)
 
-    def remove_hyperedges(self, hyperedge_ids):
+    def remove_hyperedges(self, hyperedges):
         """Removes a set of hyperedges and their attributes from
         the hypergraph.
 
-        :param hyperedge_ids: iterable container of IDs of the hyperedges
+        :param hyperedges: iterable container of the hyperedges
                         to be removed.
         :raises: ValueError -- No such hyperedge exists.
 
@@ -615,8 +579,8 @@ class DirectedHypergraph(object):
             >>> H.remove_hyperedges(hyperedge_ids)
 
         """
-        for hyperedge_id in hyperedge_ids:
-            self.remove_hyperedge(hyperedge_id)
+        for hyperedge in hyperedges:
+            self.remove_hyperedge(hyperedge)
 
     def has_hyperedge(self, tail, head):
         """Given a tail and head set of nodes, returns whether there
@@ -635,42 +599,30 @@ class DirectedHypergraph(object):
         return frozen_tail in self._successors and \
             frozen_head in self._successors[frozen_tail]
 
-    def has_hyperedge_id(self, hyperedge_id):
-        """Determines if a hyperedge referenced by hyperedge_id
-        exists in the hypergraph.
-
-        :param hyperedge_id: ID of the hyperedge whose existence is
-                            being checked.
-        :returns: bool -- true iff a hyperedge exists that has id hyperedge_id.
-
-        """
-        return hyperedge_id in self._hyperedge_attributes
-
-    def get_hyperedge_id_set(self):
-        """Returns the set of IDs of hyperedges that are currently
+    def get_hyperedges(self):
+        """Returns the set of hyperedges that are currently
         in the hypergraph.
 
-        :returns: set -- all IDs of hyperedges currently in the hypergraph
+        :returns: set -- all hyperedges currently in the hypergraph
 
         """
-        return set(self._hyperedge_attributes.keys())
+        return self._hyperedges
 
-    def hyperedge_id_iterator(self):
-        """Provides an iterator over the list of hyperedge IDs.
+    def hyperedge_iterator(self):
+        """Provides an iterator over the list of hyperedges.
 
         """
-        return iter(self._hyperedge_attributes)
+        return iter(self._hyperedges)
 
-    def get_hyperedge_id(self, tail, head):
-        """From a tail and head set of nodes, returns the ID of the hyperedge
-        that these sets comprise.
+    def get_hyperedge(self, tail, head):
+        """From a tail and head set of nodes, returns a reference to
+		the corresponding hyperedge object.
 
         :param tail: iterable container of references to nodes in the
                     tail of the hyperedge to be added
         :param head: iterable container of references to nodes in the
                     head of the hyperedge to be added
-        :returns: str -- ID of the hyperedge that has that the specified
-                tail and head sets comprise.
+        :returns: str -- reference to corresponding hyperedge object.
         :raises: ValueError -- No such hyperedge exists.
 
         Examples:
@@ -680,8 +632,8 @@ class DirectedHypergraph(object):
             >>> hyperedge_list = (["A"], ["B", "C"]),
                                   (("A", "B"), ("C"), {weight: 2}),
                                   (set(["B"]), set(["A", "C"])))
-            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-            >>> x = H.get_hyperedge_id(["A"], ["B", "C"])
+            >>> hyperedges = H.add_hyperedges(hyperedge_list)
+            >>> x = H.get_hyperedge(["A"], ["B", "C"])
 
         """
         frozen_tail = frozenset(tail)
@@ -691,84 +643,6 @@ class DirectedHypergraph(object):
             raise ValueError("No such hyperedge exists.")
 
         return self._successors[frozen_tail][frozen_head]
-
-    def get_hyperedge_attribute(self, hyperedge_id, attribute_name):
-        """Given a hyperedge ID and the name of an attribute, get a copy
-        of that hyperedge's attribute.
-
-        :param hyperedge_id: ID of the hyperedge to retrieve the attribute of.
-        :param attribute_name: name of the attribute to retrieve.
-        :returns: attribute value of the attribute_name key for the
-                specified hyperedge.
-        :raises: ValueError -- No such hyperedge exists.
-        :raises: ValueError -- No such attribute exists.
-
-        Examples:
-        ::
-
-            >>> H = DirectedHypergraph()
-            >>> hyperedge_list = (["A"], ["B", "C"]),
-                                  (("A", "B"), ("C"), {weight: 2}),
-                                  (set(["B"]), set(["A", "C"])))
-            >>> hyperedge_ids = H.add_hyperedges(hyperedge_list)
-            >>> attribute = H.get_hyperedge_attribute(hyperedge_ids[0])
-
-        """
-        if not self.has_hyperedge_id(hyperedge_id):
-            raise ValueError("No such hyperedge exists.")
-        elif attribute_name not in self._hyperedge_attributes[hyperedge_id]:
-            raise ValueError("No such attribute exists.")
-        else:
-            return copy.\
-                copy(self._hyperedge_attributes[hyperedge_id][attribute_name])
-
-    def get_hyperedge_attributes(self, hyperedge_id):
-        """Given a hyperedge ID, get a dictionary of copies of that hyperedge's
-        attributes.
-
-        :param hyperedge_id: ID of the hyperedge to retrieve the attributes of.
-        :returns: dict -- copy of each attribute of the specified hyperedge_id
-                (except the private __frozen_tail and __frozen_head entries).
-        :raises: ValueError -- No such hyperedge exists.
-
-        """
-        if not self.has_hyperedge_id(hyperedge_id):
-            raise ValueError("No such hyperedge exists.")
-        dict_to_copy = self._hyperedge_attributes[hyperedge_id].items()
-        attributes = {}
-        for attr_name, attr_value in dict_to_copy:
-            if attr_name not in ("__frozen_tail", "__frozen_head"):
-                attributes[attr_name] = copy.copy(attr_value)
-        return attributes
-
-    def get_hyperedge_tail(self, hyperedge_id):
-        """Given a hyperedge ID, get a copy of that hyperedge's tail.
-
-        :param hyperedge_id: ID of the hyperedge to retrieve the tail from.
-        :returns: a copy of the container of nodes that the user provided
-                as the tail to the hyperedge referenced as hyperedge_id.
-
-        """
-        return self.get_hyperedge_attribute(hyperedge_id, "tail")
-
-    def get_hyperedge_head(self, hyperedge_id):
-        """Given a hyperedge ID, get a copy of that hyperedge's head.
-
-        :param hyperedge: ID of the hyperedge to retrieve the head from.
-        :returns: a copy of the container of nodes that the user provided
-            as the head to the hyperedge referenced as hyperedge_id.
-
-        """
-        return self.get_hyperedge_attribute(hyperedge_id, "head")
-
-    def get_hyperedge_weight(self, hyperedge_id):
-        """Given a hyperedge ID, get that hyperedge's weight.
-
-        :param hyperedge: ID of the hyperedge to retrieve the weight from.
-        :returns: a the weight of the hyperedge referenced as hyperedge_id.
-
-        """
-        return self.get_hyperedge_attribute(hyperedge_id, "weight")
 
     def get_forward_star(self, node):
         """Given a node, get a copy of that node's forward star.
@@ -841,8 +715,8 @@ class DirectedHypergraph(object):
         :returns: bool -- True iff the hypergraph is a B-hypergraph.
 
         """
-        for hyperedge_id in self._hyperedge_attributes:
-            head = self.get_hyperedge_head(hyperedge_id)
+        for hyperedge in self._hyperedges:
+	    head = hyperedge.get_head()
             if len(head) > 1:
                 return False
         return True
@@ -857,8 +731,8 @@ class DirectedHypergraph(object):
         :returns: bool -- True iff the hypergraph is an F-hypergraph.
 
         """
-        for hyperedge_id in self._hyperedge_attributes:
-            tail = self.get_hyperedge_tail(hyperedge_id)
+        for hyperedge in self._hyperedges:
+	    tail = hyperedge.get_tail()
             if len(tail) > 1:
                 return False
         return True
@@ -873,9 +747,9 @@ class DirectedHypergraph(object):
         :returns: bool -- True iff the hypergraph is an F-hypergraph.
 
         """
-        for hyperedge_id in self._hyperedge_attributes:
-            tail = self.get_hyperedge_tail(hyperedge_id)
-            head = self.get_hyperedge_head(hyperedge_id)
+        for hyperedge in self._hyperedges:
+	    tail = hyperedge.get_tail()
+	    head = hyperedge.get_head()
             if len(tail) > 1 and len(head) > 1:
                 return False
         return True
@@ -892,6 +766,7 @@ class DirectedHypergraph(object):
         """
         return self.__copy__()
 
+# TODO: Finish this
     def __copy__(self):
         """Creates a new DirectedHypergraph object with the same node and
         hyperedge structure.
@@ -916,7 +791,7 @@ class DirectedHypergraph(object):
                 new_H._node_attributes[node][attr_name] = \
                     copy.copy(attr_value)
 
-        # Loop over every hyperedge_id and its corresponding attribute dict
+        # Loop over every hyperedge and its corresponding attribute dict
         # in the original hypergraph's _hyperedge_attributes dict
         for hyperedge_id, attr_dict in self._hyperedge_attributes.items():
             # Create a new dict for that node to store that node's attributes
@@ -1477,3 +1352,17 @@ class DirectedHypergraph(object):
         self._check_predecessor_successor_consistency()
         self._check_hyperedge_id_consistency()
         self._check_node_consistency()
+
+# TEMP - for testing
+def main():
+    H = DirectedHypergraph()
+    H.add_node("A")
+    H.add_node("B")
+    H.add_node("C")
+    H.add_node("D")
+    H.add_node("E")
+    edge = H.add_hyperedge(set(["A", "B"]), set(["C", "D", "E"]), {'color': 'red'})
+    print(edge.get_attributes())
+    print(H.has_hyperedge(("A", "B"), ("C", "D", "E")))
+
+main()

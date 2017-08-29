@@ -350,6 +350,15 @@ class DirectedHypergraph(object):
         head or tail, that hyperedge is removed.
         
         Note: hyperedges modified this way will have different IDs than before
+        
+        Examples:
+        ::
+        
+            >>> H = DirectedHypergraph()
+            >>> node_list = ['A', 'B', 'C', 'D']
+            >>> H.add_nodes(node_list)
+            >>> H.add_hyperedge(['A','B'],['C','D'])
+            >>> H.trim_node('A')
         """
     
         fs = self.get_forward_star(node)
@@ -390,7 +399,7 @@ class DirectedHypergraph(object):
         self.remove_node(node)
     
     def trim_nodes(self, nodes):
-        
+        """Trims multiple nodes from the hypergraph (see trim_node() for details)"""
         for node in nodes:
             self.trim_node(node)
             

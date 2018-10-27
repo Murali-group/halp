@@ -67,13 +67,17 @@ def to_networkx_digraph(H):
     nx_graph = nx.DiGraph()
 
     for node in G.node_iterator():
-        nx_graph.add_node(node, G.get_node_attributes(node))
+        node_attributes = G.get_node_attributes(node)
+        for key in node_attributes:
+            nx_graph[node][key] = node_attributes[val]
 
     for hyperedge_id in G.hyperedge_id_iterator():
         tail_node = G.get_hyperedge_tail(hyperedge_id).pop()
         head_node = G.get_hyperedge_head(hyperedge_id).pop()
+        nx_graph.add_edge(tail_node, head_node)
         edge_attributes = G.get_hyperedge_attributes(hyperedge_id)
-        nx_graph.add_edge(tail_node, head_node, edge_attributes)
+        for key in edge_attributes:
+            nx_graph[tail_node][head_node][key] = edge_attributes[key]
 
     return nx_graph
 
@@ -97,10 +101,10 @@ def from_networkx_digraph(nx_digraph):
 
     G = DirectedHypergraph()
 
-    for node in nx_digraph.nodes_iter():
+    for node in nx_digraph.nodes():
         G.add_node(node, copy.copy(nx_digraph.node[node]))
 
-    for edge in nx_digraph.edges_iter():
+    for edge in nx_digraph.edges():
         tail_node = edge[0]
         head_node = edge[1]
         G.add_hyperedge(tail_node,

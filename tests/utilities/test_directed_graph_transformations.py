@@ -74,7 +74,7 @@ def test_from_networkx_digraph():
 
     assert G_nodes == set(nxG_nodes)
 
-    for edge in nxG.edges_iter():
+    for edge in nxG.edges():
         tail_node = edge[0]
         head_node = edge[1]
         assert G.has_hyperedge(tail_node, head_node)

@@ -2,15 +2,20 @@ language: python
 
 python:
   - 2.7
-  - 3.2
+  - 3.4
 
 virtualenv:
     system_site_packages: true
 
+env: # see https://docs.travis-ci.com/user/languages/python/#testing-against-multiple-versions-of-dependencies-eg-django-or-flask
+  - NETWORKX_VERSION=1.11
+  - NETWORKX_VERSION=2.2
+
 install:
   - pip install coveralls
   - pip install pep8
-  - pip install networkx
+  # test both networkx 1.11 and 2.2
+  - pip install -q networkx=$NETWORKX_VERSION
   # need the following installed from their respective github repos
   # to ensure that the latest version of numpy and scipy are installed;
   # causes errors in the TravisCI framework otherwise

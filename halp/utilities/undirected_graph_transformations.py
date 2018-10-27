@@ -68,12 +68,17 @@ def to_networkx_graph(H):
     nx_graph = nx.Graph()
 
     for node in G.node_iterator():
-        nx_graph.add_node(node, G.get_node_attributes(node))
+        nx_graph.add_node(node)
+        node_attributes = G.get_node_attributes(node)
+        for key in node_attributes:
+            nx_graph[node][key] = node_attributes[val]
 
     for hyperedge_id in G.hyperedge_id_iterator():
         edge_nodes = G.get_hyperedge_nodes(hyperedge_id)
+        nx_graph.add_edge(edge_nodes[0], edge_nodes[1])
         edge_attributes = G.get_hyperedge_attributes(hyperedge_id)
-        nx_graph.add_edge(edge_nodes[0], edge_nodes[1], edge_attributes)
+        for key in edge_attributes:
+            nx_graph[edge_nodes[0]][edge_nodes[1]][key] = edge_attributes[key]
 
     return nx_graph
 
@@ -97,10 +102,10 @@ def from_networkx_graph(nx_graph):
 
     G = UndirectedHypergraph()
 
-    for node in nx_graph.nodes_iter():
+    for node in nx_graph.nodes():
         G.add_node(node, copy.copy(nx_graph.node[node]))
 
-    for edge in nx_graph.edges_iter():
+    for edge in nx_graph.edges():
         G.add_hyperedge([edge[0], edge[1]],
                         copy.copy(nx_graph[edge[0]][edge[1]]))
 

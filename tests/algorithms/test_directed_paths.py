@@ -97,7 +97,34 @@ def test_b_visit():
     except BaseException as e:
         assert False, e
 
+def test_b_visit_restrictive():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
 
+    # Let {'s','u'} be the source set:
+    visited_nodes, visited_hyperedges, restrictive_hyperedges = directed_paths.b_visit_restrictive(H, set(['s','u']))
+    assert visited_nodes == set(['s', 'x', 'y', 'z', 't', 'u'])
+    assert visited_hyperedges == set(['e1','e2','e3','e4','e6','e8'])
+    assert restrictive_hyperedges == set(['e7'])
+
+    # let {'z','a'} be the source set:
+    visited_nodes, visited_hyperedges, restrictive_hyperedges = directed_paths.b_visit_restrictive(H, set(['z','a']))
+    assert visited_nodes == set(['a','u','t','z'])
+    assert visited_hyperedges == set(['e5'])
+    assert restrictive_hyperedges == set(['e4','e7'])
+
+    # let {'t} be the source set:
+    visited_nodes, visited_hyperedges, restrictive_hyperedges = directed_paths.b_visit_restrictive(H, set(['t']))
+    assert visited_nodes == set(['t'])
+    assert visited_hyperedges == set()
+    assert restrictive_hyperedges == set(['e7'])
+
+    # pass a node instead of a set:
+    try: 
+        directed_paths.b_visit_restrictive(H, 's')
+    except TypeError:
+        pass
+    
 def test_is_b_connected():
     H = DirectedHypergraph()
     H.read("tests/data/basic_directed_hypergraph.txt")
@@ -155,6 +182,23 @@ def test_f_visit():
     except BaseException as e:
         assert False, e
 
+def test_f_visit_restrictive():
+    H = DirectedHypergraph()
+    H.read("tests/data/basic_directed_hypergraph.txt")
+
+    # let {'z','a'} be the source set:
+    visited_nodes, visited_hyperedges, restrictive_hyperedges = directed_paths.f_visit_restrictive(H, set(['z','a']))
+    assert visited_nodes == set(['s','x','a','t','b','z'])
+    assert visited_hyperedges == set(['e1','e3','e6','e8','e7'])
+    assert restrictive_hyperedges == set(['e5','e2','e4'])
+
+    ## TODO add more tests for F-visit.
+
+    # pass a node instead of a set:
+    try: 
+        directed_paths.f_visit_restrictive(H, 's')
+    except TypeError:
+        pass
 
 def test_is_f_connected():
     H = DirectedHypergraph()
@@ -352,6 +396,58 @@ def test_get_hypertree_from_predecessors():
     except BaseException as e:
         assert False, e
 
+def test_b_relaxation():
+    H = DirectedHypergraph()
+    H.read("tests/data/restrictive_directed_hypergraph.txt")
+
+    # Let {'a','b'} be the source nodes. This is the running example 
+    # in the manuscript in prep.
+    dist = directed_paths.b_relaxation(H,set(['a','b']))
+    for n in sorted(dist.keys()):
+        print('final:',n,dist[n])
+
+    ## B-connected set
+    for n in ['a','b','c','d','e','f','i']:
+        assert dist[n] == 0
+    ## k=1
+    for n in ['l','m','o']:
+        assert dist[n] == 1
+    ## k = 2
+    for n in ['p','q']:
+        assert dist[n] == 2
+    ## k = 3
+    assert dist['r'] == 3
+    ## unreachable
+    for n in ['g','h','n','j','k']:
+        assert dist[n] == None
+
+    ## Let {'n'} be the source node.
+    dist = directed_paths.b_relaxation(H,set(['n']))
+
+    ## B-connected set
+    assert dist['n'] == 0
+    ## k= 1
+    assert dist['o'] == 1
+    assert dist['q'] == 1
+    ## k = 2
+    assert dist['r'] == 2
+    ## unreacthable
+    for n in ['a','b','c','d','e','f','g','h','i','j','k','l','m','p']:
+        assert dist[n] == None
+
+
+
+# def test_shortest_hyperpath():
+#     H = DirectedHypergraph()
+#     H.read("tests/data/basic_directed_hypergraph.txt")
+#     self.assertRaises(KeyError,directed_paths.shortest_b_hyperpath(H,'p','u'))
+#     self.assertRaises(KeyError,directed_paths.shortest_b_hyperpath(H,'s','p'))
+#     self.assertRaises(KeyError,directed_paths.shortest_b_hyperpath(H,'s','a'))
+    
+#     res = directed_paths.shortest_b_hyperpath(H,'s','u')
+
+#     return
+#test_shortest_hyperpath()
 
 class TestGetHyperpathFromPredecessors(unittest.TestCase):
     # valid input tests

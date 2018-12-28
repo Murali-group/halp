@@ -11,7 +11,6 @@ except ImportError:
 
 from halp.directed_hypergraph import DirectedHypergraph
 from halp.utilities.priority_queue import PriorityQueue
-import halp.utilities.directed_statistics as stats
 
 # TODO-A: consider including target_node (with default value as None) in visit
 # and b-visit to allow for early stoppage in an is_connected check and in an
@@ -187,90 +186,6 @@ def _x_visit(H, source_node, b_visit):
 
     return x_visited_nodes, Pv, Pe, v
 
-def _x_visit_restrictive(H, source_set, b_visit):
-    """Executes the 'Visit' algorithm described in the paper under review:
-    Nicholas Franzese, Adam Groce, TM Murali, and Anna Ritz. 
-    Hypergraph-Based Connectivity for Signaling Pathway Topologies
-
-    This visit algorithm is similar to the one implemented in the _x_visit() 
-    function (Gallo et al., 1993), but it has the following differences:
-    (a) the algorithm begins from a set of source nodes, rather than a single node.
-    (b) the algorithm returns the visited nodes (and not the predecessor information)
-    (c) the algorithm returns the set of traversed hyperedges
-    (c) the algorithm returns the set of restricted hyperedges (those that that are 
-        reachable but not traversable according to the manuscript definition).
-
-    :param H: the hypergraph to perform the 'Visit' algorithm on.
-    :param source_set: the set of initial nodes to begin traversal from.
-    :param b_visit: boolean flag representing whether a B-Visit should
-                    be performed (vs an F-Visit).
-    :returns: set -- nodes that were visited in this traversal.
-              set -- hyperedges that were traversed.
-              set -- hyperedges that were reached but not traversed.
-    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
-
-    """
-    if not isinstance(H, DirectedHypergraph):
-        raise TypeError("Algorithm only applicable to directed hypergraphs")
-
-   # If the b_visit flag is set, perform a traditional B-Visit
-    if b_visit:
-        forward_star = H.get_forward_star
-        hyperedge_tail = H.get_hyperedge_tail
-        hyperedge_head = H.get_hyperedge_head
-    # If the b_visit flag is not set, implicitly perform an F-Visit by
-    # implicitly taking the symmetric image (what the 'else' statement
-    # is for) and then performing a traditional B-Visit
-    else:
-        forward_star = H.get_backward_star
-        hyperedge_tail = H.get_hyperedge_head
-        hyperedge_head = H.get_hyperedge_tail
-
-    node_set = H.get_node_set()
-    hyperedge_id_set = H.get_hyperedge_id_set()
-
-    # c keeps track of the number of nodes in the tail of each hyperedge
-    # that have been reached in the traversal.
-    c = {hyperedge_id: 0 for hyperedge_id in hyperedge_id_set}
-
-    # Explicitly tracks the set of visited nodes
-    visited_nodes = set() ## B in Algorithm 1 of the manuscript
-    visited_hedges = set() ## X in Alg. 1 of the manuscript
-
-    Q = Queue()
-    for s in source_set:
-        Q.put(s)
-        visited_nodes.add(s)
-
-    while not Q.empty():
-        current_node = Q.get()
-
-        # At current_node, we can traverse each hyperedge in its forward star
-        for hyperedge_id in forward_star(current_node):
-            # Since we're arrived at a new node, we increment
-            # k[hyperedge_id] to indicate that we've reached 1 new
-            # node in this hyperedge's tail
-            c[hyperedge_id] += 1
-
-            # Traverse this hyperedge only when we have reached all the nodes
-            # in its tail (i.e., when k[hyperedge_id] == |T(hyperedge_id)|)
-            if c[hyperedge_id] == len(hyperedge_tail(hyperedge_id)):
-                 head_nodes = hyperedge_head(hyperedge_id)
-                 # Add unvisited but reachable nodes to Q.
-                 for n in head_nodes.difference(visited_nodes):
-                    Q.put(n) 
-                 # Update visited nodes and visited hedges sets.
-                 visited_nodes.update(head_nodes) 
-                 visited_hedges.add(hyperedge_id)
-
-    restrictive_hedges = set() #R in Alg. 1 of the manuscript
-    for hyperedge_id in hyperedge_id_set:
-        # If at least one node in the tail is reached, but not all nodes,
-        # then this hyperedge is restrictive.  Add to set of restrictive hedges.
-        if c[hyperedge_id] >= 1 and c[hyperedge_id] < len(hyperedge_tail(hyperedge_id)):
-            restrictive_hedges.add(hyperedge_id)
-
-    return visited_nodes, visited_hedges, restrictive_hedges
 
 def b_visit(H, source_node):
     """Executes the 'B-Visit' algorithm described in the paper:
@@ -295,24 +210,6 @@ def b_visit(H, source_node):
 
     """
     return _x_visit(H, source_node, True)
-
-def b_visit_restrictive(H, source_set):
-    """Executes the b_visit() algorithm as described in this paper under review:
-    Nicholas Franzese, Adam Groce, TM Murali, and Anna Ritz. 
-    Hypergraph-Based Connectivity for Signaling Pathway Topologies 
-
-    The B-Visit algorithm begins from a source node and traverses a hyperedge
-    after all nodes in the hyperedge's tail have been reached.  This keeps 
-    track of traversed and restrictive hyperedges as well.
-
-    :param H: the hypergraph to perform the 'B-Visit' algorithm on.
-    :param source_set: a set of initial nodes to begin traversal from.
-    :returns: set -- nodes that were visited in this traversal.
-              set -- hyperedges that were traversed.
-              set -- hyperedges that were reached but not traversed.
-
-    """
-    return _x_visit_restrictive(H, source_set, True)
 
 
 def is_b_connected(H, source_node, target_node):
@@ -361,24 +258,6 @@ def f_visit(H, source_node):
 
     """
     return _x_visit(H, source_node, False)
-
-def f_visit_restrictive(H, source_set):
-    """Executes the b_visit() algorithm as described in this paper under review:
-    Nicholas Franzese, Adam Groce, TM Murali, and Anna Ritz. 
-    Hypergraph-Based Connectivity for Signaling Pathway Topologies 
-
-    The F-visit algorithm performs the b_visit algorithm on the hypergraph's
-    symmetric image, beginning at the source set. Refer to b_visit_restrictive's
-    documentation for more details.
-
-    :param H: the hypergraph to perform the 'B-Visit' algorithm on.
-    :param source_set: a set of initial nodes to begin traversal from.
-    :returns: set -- nodes that were visited in this traversal.
-              set -- hyperedges that were traversed.
-              set -- hyperedges that were reached but not traversed.
-
-    """
-    return _x_visit_restrictive(H, source_set, False)
 
 
 def is_f_connected(H, source_node, target_node):
@@ -439,7 +318,7 @@ def gap_function(tail_nodes, W):
 
 def _shortest_x_tree(H, source_node, b_tree,
                      F=sum_function, valid_ordering=False):
-    """General form of the Shortest B-Tree algorithm, extended to also
+    """General form of the Shorest B-Tree algorithm, extended to also
     perform the implicit Shortest F-Tree procedure if the b_tree flag is
     not set (providing better time/memory performance than explcitily taking
     the hypergraph's symmetric image and then performing the SBT procedure
@@ -721,160 +600,3 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
             path.add_node(node)
 
     return path
-
-## TODO: make f- version of this. General _x_ version???
-def b_relaxation(H,source_set):
-    """
-    Executes the b_relaxation() algorithm as described in this paper under review:
-    Nicholas Franzese, Adam Groce, TM Murali, and Anna Ritz. 
-    Hypergraph-Based Connectivity for Signaling Pathway Topologies 
-
-    Th b_relaxation algorithm computes, for every node, the number of hyperedges that 
-    must relax the B-connectivity criterion in order for it to be connected to any node
-    in the source set.
-
-    :param H: the hypergraph to perform the 'B-Visit' algorithm on.
-    :param source_set: a set of initial nodes to begin traversal from.
-    :returns: dict -- mapping of each node to the number of hyperedges that must relax
-    the b-connectivity constraint to be connected to nodes in the source set. If the
-    value is 0, then the node is B-connected to the source set. If the value is None,
-    then the node is not connected to any source node in the graph represenation.
-    """
-
-    if not isinstance(H, DirectedHypergraph):
-        raise TypeError("Algorithm only applicable to directed hypergraphs")
-
-    ## Make sure source_node is in H
-    for source_node in source_set:
-        if not H.has_node(source_node):
-            raise KeyError("Source node %s is not in H" % source_node)
-
-    node_set = H.get_node_set()
-    hyperedge_id_set = H.get_hyperedge_id_set()
-
-    ## Initialize first B-visit.
-    ## visited_nodes_prev is the set of connected nodes
-    ## visited_hyperedges is the set of traversed hyperedges
-    ## restrictive_hyperedges_prev is the set of restrictive hyperedges
-    visited_nodes_prev, visited_hyperedges, \
-        restrictive_hyperedges_prev = b_visit_restrictive(H,source_set)
-
-    ## dist is a mapping of nodes to the number of hyperedges that must relax
-    ## the B-connectivity criterion for the node to be connected to the source.
-    dist = {v:None for v in node_set}
-    # nodes in visited_nodes_prev are B-connected to the source set. They have distance 0.
-    for v in visited_nodes_prev: 
-        dist[v] = 0 
-
-    ## seen is a mapping of hyperedges to True if they have been traversed.
-    seen = {e:False for e in hyperedge_id_set}
-    # hyperedges in visited_hyperedges have already been traversed from the initial B-visit.
-    for e in visited_hyperedges:
-        seen[e] = True
-
-    k = 1 # number of relaxations required.
-
-    ## While there is some hyperedge in restricted_hyperedges_prev that hasn't been traversed,
-    ## process the hyperedge.  Otherwise we are done.
-    while any([not seen[e] for e in restrictive_hyperedges_prev]):
-        ## Initialize this iteration of visited nodes and restrictive hyperedges.
-        visited_nodes = set()
-        visited_nodes.update(visited_nodes_prev)
-        restrictive_hyperedges = set()
-
-        # for every unseen restrictive hyperedge, run B-visit from its heads.
-        for hyperedge_id in restrictive_hyperedges_prev:
-            if not seen[hyperedge_id]:
-                seen[hyperedge_id] = True
-
-                ## Run B-visit starting from the heads of hyperedge e.
-                visited_nodes_temp, visited_hyperedges_temp, restrictive_hyperedges_temp = b_visit_restrictive(H,H.get_hyperedge_head(hyperedge_id))
-                ## Add these newly visited nodes to visited_nodes
-                visited_nodes.update(visited_nodes_temp)
-                ## Update the restrictive hyperedges
-                restrictive_hyperedges.update(restrictive_hyperedges_temp)
-                ## this B-visit may have traversed other hyperedges; update this.
-                for e in visited_hyperedges_temp:
-                    seen[e] = True
-
-        # Update the distance for the newly-visited nodes in this iteration.
-        for v in visited_nodes.difference(visited_nodes_prev):
-            dist[v] = k
-        # Update k and restrictive hyperedges.
-        k += 1
-        restrictive_hyperedges_prev = restrictive_hyperedges
-
-    return dist
-
-##TODO: implement shortest f hyperpath; shortest hyperpaths from source/target sets.
-
-### IN PROGRESS!! Alex Pan is doing this now. 
-def shortest_b_hyperpath(H,source_node,destination_node,epsilon=1e-4,constant=10e6,outprefix='out'):
-    """Executes the shortest B-hyperpath algorithm described in the paper:
-    Pathway Analysis with Signaling Hypergraphs.  Anna Ritz, Brendan Avent, and T. M. Murali. 
-    IEEE Transactions on Computational Biology and Bioinformatics (TCBB) 2017. 15(5):1042-1055.
-    (https://www.computer.org/csdl/trans/tb/preprint/07164280.pdf)
-
-    The shortest B-hyperpath between a source node and a target node is formulated 
-    as an integer linear program (ILP). In this implementation, the ILP is solved
-    using CPLEX, which is available for free for academic use.
-
-    :param H: the directed hypergraph used to compute the shortest B-hyperpath.
-    :param source_node: the initial node from which the hyperpath begins.
-    :param destination_node: the final node that the hyperpath reaches.
-    :param epsilon: optional small value (default 10^-4).
-    :param constant: optional large constant (default 10^6).
-    :returns: set -- nodes that are in the shortest B-hyperpath.
-              set -- hyperedges that are in the shortest B-hyperpath.
-              float -- objective function value.
-              dict -- mapping from each node visited to the ID of the hyperedge
-              that preceeded it in this traversal (can be used in 
-              get_hyperpath_from_predecessors function to extract the hyperpath).
-    :raises: TypeError -- Algorithm only applicable to directed hypergraphs
-    :raises: KeyError -- source_node is not in H.
-    :raises: KeyError -- destination_node is not in H.
-    :raises: KeyError -- destination_node is not in H after identifying the sub-hypergraph B-connected to source_node.
-    """
-
-    if not isinstance(H, DirectedHypergraph):
-        raise TypeError("Algorithm only applicable to directed hypergraphs")
-
-    ## make sure source_node is in H
-    if not H.has_node(source_node):
-        raise KeyError("Source node %s is not in H" % source_node)
-
-    ## make sure destination node is in H
-    if not H.has_node(destination_node):
-        raise KeyError("Destination node %s is not in H" % destination_node)
-
-    print('Original H has %d nodes and %d hyperedges.' % (stats.number_of_nodes(H),stats.number_of_hyperedges(H)))
-    print('Source node = %s\nDestination node = %s' % (source_node,destination_node))
-
-    ## get B-connected subset
-    b_visited_nodes, Pv, Pe, v = b_visit(H,source_node)
-    H_bconn = get_hypertree_from_predecessors(H, Pv, source_node)
-
-    ## make sure destination node is still in H
-    if not H_bconn.has_node(destination_node):
-        raise KeyError("Destination node %s is not in H" % destination_node)
-
-    print('There are %d nodes B-connected to %s, leaving %d hyperedges.' % (len(b_visited_nodes),source_node,stats.number_of_hyperedges(H_bconn)))
-
-    ## write LP file
-    lp_outfile = outprefix+'.lp'
-    f_out = open(lp_outfile,'w')
-    out = writeObjective(H_bconn,f_out)
-    c = 0
-    f_out,c = writeActivityVariableConstraints(H_bconn,s,f_out,c)
-    f_out,c = writeFixedValueConstraints(H_bconn,{destination_node:1},f_out,c)
-    f_out,c = writeOrderVariableConstraints(H_bconn,f_out,c)
-    f_out = writeActivityVariableTypes(H_bconn,f_out)
-    f_out.write('END\n')
-    f_out.close()
-    print('ILP with %d constraints written to file %s.' % (c,lp_outfile)) 
-
-    ## Solve to optimality
-
-    ## Parse solution
-
-    return

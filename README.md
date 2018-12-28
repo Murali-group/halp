@@ -5,3 +5,4 @@ _halp_ is a Python software package that provides both a directed and an undirec
 
 See [http://murali-group.github.io/halp/](http://murali-group.github.io/halp/) for documentation, code examples, and more information.
 
+*to run python tests*, dying on first error: `python3 -m pytest -x`

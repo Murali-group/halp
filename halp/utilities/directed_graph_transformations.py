@@ -31,11 +31,15 @@ def to_graph_decomposition(H):
 
     G = DirectedHypergraph()
 
+    ## AR edit -- is this correct? It seems like it's going through
+    ## G.nodes (whcih is empty) and also adding something called node_attributes
+    ## which is an unspecified variable.
     nodes = [(node, H.get_node_attributes(node_attributes))
              for node in G.node_iterator()]
     G.add_nodes(nodes)
 
-    edges = [([tail_node], [head_node])
+    ## AR edit - make this a set not a list.
+    edges = [(set([tail_node]), set([head_node]))
              for hyperedge_id in H.hyperedge_id_iterator()
              for tail_node in H.get_hyperedge_tail(hyperedge_id)
              for head_node in H.get_hyperedge_head(hyperedge_id)]

@@ -723,7 +723,7 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
     return path
 
 ## TODO: make f- version of this. General _x_ version???
-def b_relaxation(H,source_set):
+def b_relaxation(H,source_set,b_visit_dict = {}):
     """
     Executes the b_relaxation() algorithm as described in this paper under review:
     Nicholas Franzese, Adam Groce, TM Murali, and Anna Ritz. 
@@ -735,6 +735,9 @@ def b_relaxation(H,source_set):
 
     :param H: the hypergraph to perform the 'B-Visit' algorithm on.
     :param source_set: a set of initial nodes to begin traversal from.
+    :param b_visit_dict: a dictionary where the key is a hyperedge ID and the value is a 
+    3-tuple of (bconnected nodes, traversed hedges, restrictive hedges). Used to 
+    speedup b_relaxation with a constant call instead of a b_visit() call.
     :returns: dict -- mapping of each node to the number of hyperedges that must relax
     the b-connectivity constraint to be connected to nodes in the source set. If the
     value is 0, then the node is B-connected to the source set. If the value is None,
@@ -788,7 +791,12 @@ def b_relaxation(H,source_set):
                 seen[hyperedge_id] = True
 
                 ## Run B-visit starting from the heads of hyperedge e.
-                visited_nodes_temp, visited_hyperedges_temp, restrictive_hyperedges_temp = b_visit_restrictive(H,H.get_hyperedge_head(hyperedge_id))
+                if hyperedge_id in b_visit_dict:
+                    visited_nodes_temp = b_visit_dict[hyperedge_id][0]
+                    visited_hyperedges_temp = b_visit_dict[hyperedge_id][1]
+                    restrictive_hyperedges_temp = b_visit_dict[hyperedge_id][2]
+                else:
+                    visited_nodes_temp, visited_hyperedges_temp, restrictive_hyperedges_temp = b_visit_restrictive(H,H.get_hyperedge_head(hyperedge_id))
                 ## Add these newly visited nodes to visited_nodes
                 visited_nodes.update(visited_nodes_temp)
                 ## Update the restrictive hyperedges

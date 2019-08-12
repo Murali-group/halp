@@ -1078,7 +1078,6 @@ class DirectedHypergraph(object):
 
         which defines a hyperedge of weight 12 from a tail set containing
         nodes "x1" and "x2" to a head set containing nodes "x3", "x4", and "x5"
-
         """
         in_file = open(file_name, 'r')
 

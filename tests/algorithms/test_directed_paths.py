@@ -402,9 +402,13 @@ def test_b_relaxation():
 
     # Let {'a','b'} be the source nodes. This is the running example 
     # in the manuscript in prep.
-    dist = directed_paths.b_relaxation(H,set(['a','b']))
+    dist,restrict = directed_paths.b_relaxation(H,set(['a','b']))
     for n in sorted(dist.keys()):
-        print('final:',n,dist[n])
+        print('final: dist',n,dist[n])
+        
+    ## TODO test restrictive hyperedges.
+    for r in sorted(restrict.keys()):
+        print('final: restrict',r,restrict[r])
 
     ## B-connected set
     for n in ['a','b','c','d','e','f','i']:
@@ -422,7 +426,7 @@ def test_b_relaxation():
         assert dist[n] == None
 
     ## Let {'n'} be the source node.
-    dist = directed_paths.b_relaxation(H,set(['n']))
+    dist, restrict = directed_paths.b_relaxation(H,set(['n']))
 
     ## B-connected set
     assert dist['n'] == 0

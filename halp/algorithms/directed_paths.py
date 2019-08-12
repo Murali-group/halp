@@ -723,7 +723,7 @@ def get_hyperpath_from_predecessors(H, Pv, source_node, destination_node,
     return path
 
 ## TODO: make f- version of this. General _x_ version???
-def b_relaxation(H,source_set,b_visit_dict = {}):
+def b_relaxation(H,source_set,b_visit_dict = {},verbose=False):
     """
     Executes the b_relaxation() algorithm as described in this paper under review:
     Nicholas Franzese, Adam Groce, TM Murali, and Anna Ritz. 
@@ -742,6 +742,8 @@ def b_relaxation(H,source_set,b_visit_dict = {}):
     the b-connectivity constraint to be connected to nodes in the source set. If the
     value is 0, then the node is B-connected to the source set. If the value is None,
     then the node is not connected to any source node in the graph represenation.
+    :returns: dict -- mapping of each node to the iteration in which it is incident to a traversed hyperedge.
+    This includes nodes that are int he tail of relaxed traversals.
     """
 
     if not isinstance(H, DirectedHypergraph):
@@ -769,6 +771,16 @@ def b_relaxation(H,source_set,b_visit_dict = {}):
     for v in visited_nodes_prev: 
         dist[v] = 0 
 
+    # will be the iteration in which the hyperedge is traversed.
+    traversed = {0:set()}
+    for e in visited_hyperedges:
+        ## for hypergraph connectivity paper -- hyperedge IDs may change so we use a common identifier
+        ## if 'identifier' attribute doesn't exist, use the hyperedge_id.
+        if 'identifier' in H.get_hyperedge_attributes(e):  
+            traversed[0].add(H.get_hyperedge_attribute(e,'identifier'))
+        else:
+            traversed[0].add(e)
+
     ## seen is a mapping of hyperedges to True if they have been traversed.
     seen = {e:False for e in hyperedge_id_set}
     # hyperedges in visited_hyperedges have already been traversed from the initial B-visit.
@@ -780,15 +792,25 @@ def b_relaxation(H,source_set,b_visit_dict = {}):
     ## While there is some hyperedge in restricted_hyperedges_prev that hasn't been traversed,
     ## process the hyperedge.  Otherwise we are done.
     while any([not seen[e] for e in restrictive_hyperedges_prev]):
+        #print('---- %d --- %d restrictive hedges' % (k,len(restrictive_hyperedges_prev)))
         ## Initialize this iteration of visited nodes and restrictive hyperedges.
         visited_nodes = set()
-        visited_nodes.update(visited_nodes_prev)
+        #visited_nodes.update(visited_nodes_prev)
         restrictive_hyperedges = set()
+        traversed[k]=set()
 
         # for every unseen restrictive hyperedge, run B-visit from its heads.
         for hyperedge_id in restrictive_hyperedges_prev:
             if not seen[hyperedge_id]:
                 seen[hyperedge_id] = True
+
+                # update traversed list with nodes incident
+                ## for hypergraph connectivity paper -- hyperedge IDs may change so we use a common identifier
+                ## if 'identifier' attribute doesn't exist, use the hyperedge_id.
+                if 'identifier' in H.get_hyperedge_attributes(hyperedge_id):  
+                    traversed[k].add(H.get_hyperedge_attribute(hyperedge_id,'identifier'))
+                else:
+                    traversed[k].add(hyperedge_id)
 
                 ## Run B-visit starting from the heads of hyperedge e.
                 if hyperedge_id in b_visit_dict:
@@ -804,15 +826,28 @@ def b_relaxation(H,source_set,b_visit_dict = {}):
                 ## this B-visit may have traversed other hyperedges; update this.
                 for e in visited_hyperedges_temp:
                     seen[e] = True
+                    ## for hypergraph connectivity paper -- hyperedge IDs may change so we use a common identifier
+                    ## if 'identifier' attribute doesn't exist, use the hyperedge_id.
+                    if 'identifier' in H.get_hyperedge_attributes(e):  
+                        traversed[k].add(H.get_hyperedge_attribute(e,'identifier'))
+                    else:
+                        traversed[k].add(e)
+                    
 
         # Update the distance for the newly-visited nodes in this iteration.
-        for v in visited_nodes.difference(visited_nodes_prev):
-            dist[v] = k
+        for v in visited_nodes:
+            if dist[v] == None: # haven't seen this yet - update the node distances.
+                dist[v] = k
+            if verbose and v == 'http://pathwaycommons.org/pc2/Protein_12ae17d7e8c17e2c2b62dca8901af3cf':
+                print("**** STAT FOUND k=",k,'dist[v]=',dist[v])
+            
+
+
         # Update k and restrictive hyperedges.
         k += 1
         restrictive_hyperedges_prev = restrictive_hyperedges
 
-    return dist
+    return dist,traversed
 
 ##TODO: implement shortest f hyperpath; shortest hyperpaths from source/target sets.
 

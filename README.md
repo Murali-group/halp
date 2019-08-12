@@ -20,6 +20,6 @@ pytest -x
 
 ### Development Notes
 
-*2018-10-27* updated code to work with [https://networkx.github.io/documentation/stable/release/migration_guide_from_1.x_to_2.0.html](both NetworX 1.11 and 2.0.  To run multiple versions of python packages w/ Travis CI: see [https://docs.travis-ci.com/user/languages/python/#testing-against-multiple-versions-of-dependencies-eg-django-or-flask](this page).
+*2018-10-27* updated code to work with [both NetworkX 1.11 and 2.0](https://networkx.github.io/documentation/stable/release/migration_guide_from_1.x_to_2.0.html).  To run multiple versions of python packages w/ Travis CI: see [this page](https://docs.travis-ci.com/user/languages/python/#testing-against-multiple-versions-of-dependencies-eg-django-or-flask).
 
 To keep this branch up-to-date with master: `git merge master`

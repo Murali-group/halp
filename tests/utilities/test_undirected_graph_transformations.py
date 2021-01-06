@@ -33,13 +33,13 @@ def test_to_networkx_graph():
     G = undirected_graph_transformations.to_networkx_graph(H)
 
     H_nodes = H.get_node_set()
-    G_nodes = G.node.keys()
+    G_nodes = G.nodes.keys()
 
     assert H_nodes == set(G_nodes)
 
     H_nodes_attributes = [H.get_node_attributes(node) for node in H_nodes]
     for node in G_nodes:
-        assert G.node[node] in H_nodes_attributes
+        assert G.nodes[node] in H_nodes_attributes
 
     for hyperedge_id in H.hyperedge_id_iterator():
         hyperedge_nodes = H.get_hyperedge_nodes(hyperedge_id)
@@ -69,12 +69,12 @@ def test_from_networkx_graph():
 
     G = undirected_graph_transformations.from_networkx_graph(nxG)
 
-    nxG_nodes = nxG.node.keys()
+    nxG_nodes = nxG.nodes.keys()
     G_nodes = G.get_node_set()
 
     assert G_nodes == set(nxG_nodes)
 
-    for edge in nxG.edges_iter():
+    for edge in nxG.edges():
         assert G.has_hyperedge((edge[0], edge[1]))
 
     # Try transforming an invalid undirected hypergraph

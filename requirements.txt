@@ -1,0 +1,19 @@
+#  - pip install git+http://github.com/numpy/numpy/
+#  - pip install git+http://github.com/scipy/scipy/
+#  - pip install git+http://github.com/scipy/scipy.git@maintenance/0.14.x
+#  - coverage run --source=halp setup.py test
+
+numpy==1.19.5
+scipy==1.6.0
+networkx==2.5
+## The following requirements were added by pip freeze:
+attrs==20.3.0
+coverage==5.3.1
+decorator==4.4.2
+iniconfig==1.1.1
+packaging==20.8
+pluggy==0.13.1
+py==1.10.0
+pyparsing==2.4.7
+pytest==6.2.1
+toml==0.10.2

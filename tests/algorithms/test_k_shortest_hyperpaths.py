@@ -262,7 +262,7 @@ class TestKShortestHyperpaths(unittest.TestCase):
             self):
         threeShortest = ksh.k_shortest_hyperpaths(
             self.nielsenGraph, 's', 't', 3)
-        self.assertEquals(len(threeShortest), 3)
+        self.assertEqual(len(threeShortest), 3)
         # shortest path
         hyperpath = threeShortest[0]
         self.assertEqual(hyperpath.get_node_set(), {'s', '1', '2', 't'})

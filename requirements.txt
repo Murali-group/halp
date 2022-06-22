@@ -3,7 +3,7 @@
 #  - pip install git+http://github.com/scipy/scipy.git@maintenance/0.14.x
 #  - coverage run --source=halp setup.py test
 
-numpy==1.19.5
+numpy==1.22.0
 scipy==1.6.0
 networkx==2.5
 ## The following requirements were added by pip freeze:
